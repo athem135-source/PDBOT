@@ -1,0 +1,33 @@
+services:
+  python-app:
+    build:
+      context: ./app
+      dockerfile: ../Dockerfile
+    container_name: python-app
+    restart: unless-stopped
+    init: true
+    working_dir: /app
+    # env_file: ./.env  # Uncomment if .env file exists in ./app
+    # No ports exposed; adjust if app/answer.py runs a server
+    depends_on:
+      - python-src
+    networks:
+      - backend
+
+  python-src:
+    build:
+      context: ./src
+      dockerfile: ../srcDockerfile
+    container_name: python-src
+    restart: unless-stopped
+    init: true
+    working_dir: /app
+    # env_file: ./.env  # Uncomment if .env file exists in ./src
+    expose:
+      - "8000"  # Exposed in Dockerfile, not published to host
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge

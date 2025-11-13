@@ -1,0 +1,122 @@
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.coverage
+
+# Node.js artifacts (if any)
+node_modules/
+npm-debug.log
+yarn-debug.log
+
+# Go artifacts (if any)
+/vendor/
+*.test
+.go-cache/
+
+# Java artifacts (if any)
+target/
+*.class
+.gradle/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build outputs
+build/
+dist/
+out/
+
+# Test files and directories
+test/
+tests/
+*_test.go
+
+# Debug and log files
+debug/
+*.log
+logs/
+
+# Version control
+.git/
+.gitignore
+.svn/
+.hg/
+
+# Environment and secrets
+.env*
+*.env
+*.pem
+*.key
+*.crt
+config.local.*
+*.local.yml
+
+# Project-specific patterns
+# Documentation
+README*
+*.md
+docs/
+
+# Docker files
+Dockerfile*
+docker-compose*
+compose.yaml
+
+# Temporary and local files
+tmp/
+temp/
+*.tmp
+.local/
+local/
+
+# Cache and backup files
+*.bak
+
+# Streamlit config
+.streamlit/
+
+# NLTK data (if not needed in container)
+nltk_data/
+
+# HuggingFace cache (if not needed in container)
+.hf_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# Miscellaneous
+*.tab
+
+# Exclude uploads if not needed
+/data/uploads/
+
+# Exclude feedback if not needed
+/feedback/
+
+# Exclude config text files if not needed
+/config/*.txt
+
+# Exclude asset files if not needed
+/src/assets/
+
+# Exclude backup readmes
+README_backup.md
+README.md.bak
+
+# Exclude backup Dockerfile
+Dockerfile.bak
+
+# Exclude backup files in general
+*.bak
+
+# Allow only necessary source code and configuration for build
+!app/
+!src/
+!config/*.json
+!src/data/*.json

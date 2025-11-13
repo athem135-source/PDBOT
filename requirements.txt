@@ -1,0 +1,26 @@
+# ============================================
+# PDBot Requirements - v0.6.0
+# ============================================
+
+# ---- Frontend & UI ----
+streamlit>=1.36.0              # Interactive web UI framework for chatbot interface
+requests>=2.32.0               # HTTP library for API calls (Ollama, Qdrant health checks)
+
+# ---- Document Processing ----
+pypdf>=4.2.0                   # PDF text extraction for manual ingestion
+
+# ---- LLM Backend ----
+transformers>=4.44.2           # Hugging Face transformers for tokenization and embeddings
+torch>=2.3.0                   # PyTorch deep learning framework (CPU/GPU support)
+
+# ---- RAG Pipeline ----
+langchain>=0.2.0               # RAG orchestration framework (document loaders, chains)
+langchain-text-splitters>=0.2.0  # Sentence-level text chunking for granular retrieval
+langchain-community>=0.2.0     # Community integrations (Qdrant, Ollama connectors)
+
+# ---- NLP & Embeddings ----
+nltk>=3.8.1                    # Natural Language Toolkit (sentence tokenization - punkt)
+sentence-transformers>=3.0.0   # Semantic embeddings (all-MiniLM-L6-v2, 384 dimensions)
+
+# ---- Vector Database ----
+qdrant-client>=1.9.0           # Qdrant vector DB client for semantic search

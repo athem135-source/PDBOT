@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  app:
+    container_name: PDBOT-restored
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      PNDBOT_QDRANT_URL: "http://qdrant:6333"
+      OLLAMA_HOST: "http://ollama:11434"
+      STREAMLIT_SERVER_PORT: "${APP_PORT:-8501}"
+    ports:
+      - "${APP_PORT:-8501}:8501"
+    depends_on:
+      - qdrant
+      - ollama
+    # Bind-mount source for live-editing; comment out for immutable image
+    volumes:
+      - ./:/app
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    ports:
+      - "6338:6333"  # host:container
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    # Uncomment for GPU support if available
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - capabilities: ["gpu"]
+
+volumes:
+  qdrant_data:
+  ollama_data:
