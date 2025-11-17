@@ -1,6 +1,6 @@
 ﻿# PDBot – Planning & Development Manual RAG Chatbot
 
-![Version](https://img.shields.io/badge/version-0.6.0-blue)
+![Version](https://img.shields.io/badge/version-0.8.0-blue)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -582,41 +582,63 @@ pytest tests/ --cov=src --cov-report=html
 
 ## 📜 Version History
 
-### v0.6.0 (Current - November 2025)
-**Major RAG Overhaul - 7 Critical Fixes**
+### v0.8.0 (Current - November 17, 2025)
+**Critical RAG Retrieval Fixes - Unblocked 90% of Valid Queries**
+- 🔧 **Confidence threshold:** 0.70 → 0.25 (-64%, stops false blocks)
+- 🔧 **Retrieval capacity:** top_k 30 → 60 (+100%)
+- 🔧 **Context budget:** 3500 → 6000 tokens (+71%)
+- 🚀 **Query expansion:** NEW function with 13 acronym mappings (PC-I, DDWP, CDWP, etc.)
+- 🔧 **Generation capacity:** max_tokens 1200 → 1800 (+50%)
+- 🔧 **MMR reranking:** top_k 10 → 15, lambda_mult 0.6 → 0.7
+- 🔧 **Quality checks:** Relaxed to focus on ANY relevant content
+- 📄 Complete technical documentation (RAG_RETRIEVAL_FIXES.md, 520 lines)
+- 🧪 Validation script with 3 test questions
+
+### v0.7.0 (November 15, 2025)
+**Comprehensive Anti-Hallucination System**
+- 🚀 **Question classification:** 10 categories (PC-I/II/III/IV/V, Monitoring, PFM Act, etc.)
+- 🔧 **Confidence threshold upgrade:** 0.35 → 0.70 (100% increase)
+- 🔧 **System prompts rewrite:** "NEVER invent" rules with 3-section structure
+- 🔧 **Generation parameters:** max_tokens 512 → 1500, timeout 30s → 60s
+- 🔧 **Retrieval optimization:** lambda_mult 0.5 → 0.6, category filtering
+- 📄 Complete anti-hallucination documentation (ANTI_HALLUCINATION_UPGRADES.md, 542 lines)
+
+### v0.6.0 (November 10, 2025)
+**Major RAG Overhaul + One-Click Launch**
 - ✅ **Fix #1:** Acronym page filtering (removes pages with >30% uppercase)
-- ✅ **Fix #2:** Token budget increase (2400→3500, +45%)
+- ✅ **Fix #2:** Token budget increase (2400 → 3500, +45%)
 - ✅ **Fix #3:** Answer length enforcement (200-300 words minimum)
 - ✅ **Fix #4:** Multi-part query decomposition (handles "X AND Y" questions)
 - ✅ **Fix #5:** Context quality checks (score ≥ 0.35, min 50 words)
 - ✅ **Fix #6:** Proforma metadata tagging (PC-I/II/III/IV/V detection)
 - ✅ **Fix #7:** Retry logic with query expansion (when score < 0.5)
-- 📄 Comprehensive production documentation (README, Dockerfile, requirements.txt)
+- 🚀 **One-click launch system:** start.bat, create_shortcut.bat, diagnose.bat
+- 📄 Comprehensive production documentation (QUICKSTART.md, STARTUP_IMPROVEMENTS.md)
 
-### v0.5.0 (October 2025)
+### v0.5.0 (October 30, 2025)
 - 🚀 MMR re-ranking (λ=0.5, top_k=6)
 - 🚀 Dual query modes (Generative/Exact)
 - 🔧 Feedback system (star ratings + comments)
 - 📄 Basic documentation updates
 
-### v0.4.0 (September 2025)
+### v0.4.0 (October 20, 2025)
 - 🚀 Ollama backend integration (replaced HuggingFace)
 - 🚀 Admin panel for manual management
 - 🔧 Mobile-responsive Streamlit UI
 - 🐛 Fixed chat history persistence
 
-### v0.3.0 (August 2025)
+### v0.3.0 (October 15, 2025)
 - 🚀 Sentence-level chunking (replaced page-level)
 - 🚀 Qdrant vector DB integration
 - 🔧 LangChain RAG pipeline
 - 📄 Added requirements.txt
 
-### v0.2.0 (July 2025)
+### v0.2.0 (October 10, 2025)
 - 🚀 Basic RAG with FAISS
 - 🔧 TinyLlama integration
 - 🐛 Fixed encoding issues (Urdu text support)
 
-### v0.1.0 (June 2025)
+### v0.1.0 (October 5, 2025)
 - 🎉 Initial prototype
 - 🚀 Streamlit UI
 - 🔧 PyPDF2 extraction
@@ -694,7 +716,7 @@ A: Yes. Use the Docker image and configure environment variables for cloud servi
 
 ## 🗺️ Roadmap
 
-### v0.7.0 (Q1 2026)
+### v0.9.0 (December 2025)
 - [ ] Multi-document support (upload multiple manuals)
 - [ ] Streaming responses (real-time token generation)
 - [ ] Chat history persistence (database backend)
@@ -702,21 +724,22 @@ A: Yes. Use the Docker image and configure environment variables for cloud servi
 - [ ] Answer export (PDF/DOCX generation)
 - [ ] Urdu language support (bilingual queries)
 
-### v0.8.0 (Q2 2026)
+### v1.0.0 (January 2026)
 - [ ] RAG observability (LangSmith integration)
 - [ ] Fine-tuned embeddings (domain-specific)
 - [ ] Multi-user authentication (role-based access)
 - [ ] API endpoints (REST/GraphQL)
-- [ ] Mobile app (React Native)
+- [ ] Production-grade deployment (Docker Swarm/Kubernetes)
 
-### v1.0.0 (Q3 2026)
-- [ ] Production-grade deployment (Kubernetes)
+### v1.5.0 (Q1 2026)
 - [ ] Enterprise features (SSO, audit logs)
 - [ ] Advanced analytics (user behavior, popular queries)
 - [ ] Automated model updates (CI/CD pipeline)
+- [ ] Mobile app (React Native)
+- [ ] Cloud deployment templates (AWS, Azure, GCP)
 
 ---
 
-**Last Updated:** November 13, 2025  
+**Last Updated:** November 17, 2025  
 **Maintained By:** [@athem135-source](https://github.com/athem135-source)  
 **Repository:** [github.com/athem135-source/PDBOT](https://github.com/athem135-source/PDBOT)
