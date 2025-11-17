@@ -1,39 +1,115 @@
 @echo off
-setlocal
+setlocal EnableDelayedExpansion
 
-REM Setup venv, install deps, and run the Streamlit app.
+REM ============================================
+REM PDBot Setup Script - v0.6.0
+REM Creates venv, installs dependencies, validates services
+REM ============================================
 
-IF NOT EXIST ".venv\Scripts\activate.bat" (
-  echo [+] Creating Python virtual environment...
-  py -m venv .venv
-  IF %ERRORLEVEL% NEQ 0 (
-    echo [!] Failed to create virtual environment. Ensure Python is installed and in PATH.
-    goto :end
-  )
-)
+echo.
+echo ========================================
+echo    PDBot Setup - Complete Installation
+echo ========================================
+echo.
 
-call ".venv\Scripts\activate"
-python -m pip install --upgrade pip
-IF EXIST requirements.txt (
-  echo [+] Installing dependencies from requirements.txt...
-  pip install -r requirements.txt
-) ELSE (
-  echo [!] requirements.txt not found. Aborting.
+REM Check Python installation
+echo [1/6] Checking Python installation...
+py --version >NUL 2>&1
+IF %ERRORLEVEL% NEQ 0 (
+  echo [ERROR] Python not found. Install Python 3.10+ from https://www.python.org/
   goto :end
 )
-
+for /f "tokens=2" %%i in ('py --version 2^>^&1') do set PYVER=%%i
+echo [OK] Python !PYVER! detected
 echo.
-echo [i] Checking Ollama installation (optional)...
+
+REM Create virtual environment
+echo [2/6] Setting up virtual environment...
+IF NOT EXIST ".venv\Scripts\activate.bat" (
+  echo Creating .venv...
+  py -m venv .venv
+  IF %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] Failed to create virtual environment.
+    goto :end
+  )
+  echo [OK] Virtual environment created
+) ELSE (
+  echo [OK] Virtual environment already exists
+)
+echo.
+
+REM Activate and upgrade pip
+echo [3/6] Activating environment and upgrading pip...
+call ".venv\Scripts\activate"
+python -m pip install --upgrade pip --quiet
+echo [OK] Pip upgraded
+echo.
+
+REM Install dependencies
+echo [4/6] Installing Python dependencies...
+IF EXIST requirements.txt (
+  echo This may take 2-5 minutes on first run...
+  pip install -r requirements.txt --quiet
+  IF %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] Dependency installation failed. Check your internet connection.
+    goto :end
+  )
+  echo [OK] All dependencies installed
+) ELSE (
+  echo [ERROR] requirements.txt not found.
+  goto :end
+)
+echo.
+
+REM Fix Keras 3 compatibility issue
+echo [5/6] Fixing Keras compatibility for sentence-transformers...
+pip uninstall -y keras >NUL 2>&1
+echo [OK] Keras compatibility fixed
+echo.
+
+REM Validate services
+echo [6/6] Validating external services...
+echo.
+echo   Checking Ollama (LLM backend)...
 ollama --version >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
-  echo [!] Ollama not detected in PATH. Install from https://ollama.com/ and pull a model, e.g. ^"ollama pull tinyllama^".
+  echo   [WARN] Ollama not detected.
+  echo   Install: https://ollama.com/
+  echo   Then run: ollama pull tinyllama
 ) ELSE (
-  echo [+] Ollama detected. Ensure the model is pulled: ollama pull tinyllama
+  for /f "tokens=*" %%i in ('ollama --version 2^>^&1') do set OLLAMA_VER=%%i
+  echo   [OK] Ollama detected: !OLLAMA_VER!
+  echo   Checking TinyLlama model...
+  ollama list 2^>^&1 | findstr /i "tinyllama" >NUL
+  IF %ERRORLEVEL% NEQ 0 (
+    echo   [WARN] TinyLlama model not found. Installing...
+    ollama pull tinyllama
+  ) ELSE (
+    echo   [OK] TinyLlama model ready
+  )
 )
-
 echo.
-echo [+] Launching app...
-streamlit run src\app.py
+echo   Checking Qdrant (Vector DB)...
+curl --silent --max-time 2 http://localhost:6333/health >NUL 2>&1
+IF %ERRORLEVEL% NEQ 0 (
+  echo   [WARN] Qdrant not responding on port 6333
+  echo   Install: https://qdrant.tech/documentation/quick-start/
+  echo   Or run: docker run -p 6333:6333 qdrant/qdrant
+) ELSE (
+  echo   [OK] Qdrant service is running
+)
+echo.
+
+echo ========================================
+echo    Setup Complete!
+echo ========================================
+echo.
+echo To run the chatbot:
+echo   run.bat          (Windows CMD)
+echo   .\run.ps1        (PowerShell)
+echo.
+echo The app will open at http://localhost:8501
+echo.
 
 :end
 endlocal

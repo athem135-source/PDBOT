@@ -124,9 +124,27 @@ docker run -d -p 6333:6333 -p 6334:6334 \
 
 ## 🚀 Quick Start
 
+> **⚡ Easiest Way:** For Windows users, just run `start.bat` - it handles everything automatically!  
+> **📖 Need Help?** See [QUICKSTART.md](QUICKSTART.md) for step-by-step instructions.  
+> **🔧 Having Issues?** Run `diagnose.bat` to check your setup.
+
 ### Local Setup (Recommended for Development)
 
-#### Windows:
+#### Windows (One-Click Launch):
+
+```cmd
+# Option 1: One-click setup + launch
+start.bat
+
+# Option 2: Create desktop shortcut, then double-click it
+create_shortcut.bat
+
+# Option 3: Manual control
+setup.bat    (first time only)
+run.bat      (every time after)
+```
+
+#### Windows (Manual Steps):
 
 ```powershell
 # 1. Clone the repository

@@ -24,3 +24,7 @@ sentence-transformers>=3.0.0   # Semantic embeddings (all-MiniLM-L6-v2, 384 dime
 
 # ---- Vector Database ----
 qdrant-client>=1.9.0           # Qdrant vector DB client for semantic search
+
+# ---- Compatibility Fixes ----
+# Note: Keras 3 is not compatible with sentence-transformers
+# If keras is installed, uninstall it with: pip uninstall -y keras

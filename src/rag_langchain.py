@@ -11,7 +11,12 @@ from __future__ import annotations
 
 import os
 import re
+import warnings
 from typing import List, Dict, Any
+
+# Suppress Keras compatibility warnings from sentence-transformers
+warnings.filterwarnings("ignore", message=".*Keras.*")
+warnings.filterwarnings("ignore", message=".*keras.*")
 
 try:
     from sentence_transformers import SentenceTransformer
