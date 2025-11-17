@@ -1382,49 +1382,81 @@ def _sanitize_model_output(text: str) -> str:
 
 
 def check_context_quality(hits: list[dict], question: str) -> dict:
-    """Validate context quality before generation to prevent hallucinations.
+    """Relaxed quality check - only reject if truly empty or irrelevant.
     
-    ANTI-HALLUCINATION FIX: Upgraded confidence threshold from 0.35 to 0.70.
+    FIX: Lowered threshold from 0.70 to 0.25 to stop blocking valid queries.
     Returns dict with: {passed: bool, max_score: float, reason: str}
-    
-    CRITICAL FIX #5: Blocks generation if context is insufficient or irrelevant.
     """
     if not hits:
         return {"passed": False, "max_score": 0.0, "reason": "No retrieval results"}
     
-    # Check average and max score with STRICT threshold
+    # Only reject if we have almost no text content
+    total_text = " ".join([h.get("text", "") for h in hits])
+    word_count = len(total_text.split())
+    if word_count < 15:
+        return {
+            "passed": False,
+            "max_score": 0.0,
+            "reason": f"Insufficient context ({word_count} words, need 15+)"
+        }
+    
+    # Check if any reasonable relevance exists (very low threshold)
     scores = [h.get("score", 0) for h in hits if h.get("score") is not None]
     if scores:
         max_score = max(scores)
-        avg_score = sum(scores) / len(scores)
-        
-        # UPGRADED: Strict threshold from 0.35 → 0.70
-        if max_score < 0.70:
+        # CRITICAL FIX: Changed from 0.70 to 0.25 - only block if truly irrelevant
+        if max_score < 0.25:
             return {
                 "passed": False,
                 "max_score": max_score,
-                "reason": f"Low confidence (max: {max_score:.2f}, required: 0.70+). This indicates the manual does not contain explicit information on this topic."
+                "reason": f"Very low relevance (max: {max_score:.2f}). Please rephrase your question."
             }
-        
-        # Also check average to ensure overall quality
-        if avg_score < 0.50:
-            return {
-                "passed": False,
-                "max_score": max_score,
-                "reason": f"Low average confidence (avg: {avg_score:.2f}). Retrieved content may not be relevant."
-            }
+        return {"passed": True, "max_score": max_score, "reason": "Quality check passed"}
     
-    # Check total context length (words)
-    total_text = " ".join([h.get("text", "") for h in hits])
-    word_count = len(total_text.split())
-    if word_count < 50:  # Too little context
-        return {
-            "passed": False,
-            "max_score": scores[0] if scores else 0.0,
-            "reason": f"Insufficient context ({word_count} words, need 50+)"
-        }
+    # If no scores, accept if we have reasonable text
+    return {"passed": True, "max_score": 1.0, "reason": "Quality check passed"}
+
+
+def expand_query_aggressively(question: str) -> list[str]:
+    """Generate multiple query variants for comprehensive retrieval."""
+    import re
     
-    return {"passed": True, "max_score": scores[0] if scores else 1.0, "reason": "Quality check passed"}
+    variants = [question]
+    
+    # Acronym expansions
+    acronym_map = {
+        "PC-I": ["PC-I", "Planning Commission Proforma I", "Planning Commission Form 1"],
+        "PC-II": ["PC-II", "Planning Commission Proforma II", "feasibility study"],
+        "PC-III": ["PC-III", "monitoring report", "progress report"],
+        "PC-IV": ["PC-IV", "completion report", "project closure"],
+        "PC-V": ["PC-V", "evaluation report"],
+        "DDWP": ["DDWP", "Divisional Development Working Party"],
+        "CDWP": ["CDWP", "Central Development Working Party"],
+        "ECNEC": ["ECNEC", "Executive Committee National Economic Council"],
+        "PDWP": ["PDWP", "Provincial Development Working Party"],
+        "CHIRA": ["CHIRA", "Climate Hazard Initial Risk Assessment"],
+        "VGF": ["VGF", "Viability Gap Fund"],
+        "PPP": ["PPP", "Public Private Partnership"],
+        "PAO": ["PAO", "Principal Accounting Officer"],
+    }
+    
+    for abbr, expansions in acronym_map.items():
+        if abbr in question:
+            for exp in expansions[:2]:
+                variants.append(question.replace(abbr, exp))
+    
+    # Extract key terms
+    words = re.findall(r'\b[A-Za-z]{4,}\b', question)
+    if len(words) >= 3:
+        variants.append(" ".join(words[:10]))
+    
+    # Remove question words for keyword search
+    q_clean = re.sub(r'^(what|when|where|who|why|how|explain|describe|list)\s+', 
+                     '', question.lower(), flags=re.IGNORECASE)
+    if q_clean != question.lower():
+        variants.append(q_clean)
+    
+    return list(set(variants))[:5]
 
 
 def detect_question_category(question: str) -> str:
@@ -1503,36 +1535,40 @@ def generate_answer_generative(question: str) -> str:
     # ANTI-HALLUCINATION FIX: Detect question category for targeted retrieval
     question_category = detect_question_category(question)
     
+    # FIX #3: Generate query variants for better retrieval
+    query_variants = expand_query_aggressively(question)
+    
     # CRITICAL FIX #4: Decompose multi-part questions for comprehensive retrieval
     sub_questions = decompose_question(question)
     
-    # Step 1: Retrieve for each sub-question with category-aware filtering
+    # Step 1: Retrieve for each query variant and sub-question
     all_hits: list[dict] = []
     use_qdrant = bool(st.session_state.get("indexed_ok") or int(st.session_state.get("last_index_count") or 0) > 0)
     
-    for sq in sub_questions:
-        sq_hits: list[dict] = []
-        if use_qdrant and _RAG_OK and search is not None:
-            try:
-                # ANTI-HALLUCINATION FIX: Increased top_k to 30, lowered min_score to 0.05 for initial retrieval
-                # We'll apply strict 0.70 threshold later in quality check
-                sq_hits = search(sq, top_k=30, qdrant_url=_qdrant_url(), mmr=True, lambda_mult=0.6, min_score=0.05)  # type: ignore
-            except TypeError:
-                sq_hits = search(sq, top_k=30, qdrant_url=_qdrant_url())  # type: ignore
-            except Exception:
-                sq_hits = []
-        
-        # ANTI-HALLUCINATION FIX: Filter by PC-form category if applicable
-        if question_category in ["PC-I", "PC-II", "PC-III", "PC-IV", "PC-V"]:
-            category_hits = []
-            for h in sq_hits:
-                text_lower = h.get("text", "").lower()
-                # Only include if text mentions the specific PC form or is proforma-neutral
-                if question_category.lower() in text_lower or "proforma" not in text_lower:
-                    category_hits.append(h)
-            sq_hits = category_hits if category_hits else sq_hits  # Fallback to all if filtering removes everything
-        
-        all_hits.extend(sq_hits)
+    for variant in query_variants:
+        for sq in sub_questions:
+            combined = f"{variant} {sq}"
+            sq_hits: list[dict] = []
+            if use_qdrant and _RAG_OK and search is not None:
+                try:
+                    # FIX #2: Increased top_k from 30 to 60, lambda_mult to 0.7, min_score stays 0.05
+                    sq_hits = search(combined, top_k=60, qdrant_url=_qdrant_url(), mmr=True, lambda_mult=0.7, min_score=0.05)  # type: ignore
+                except TypeError:
+                    sq_hits = search(combined, top_k=60, qdrant_url=_qdrant_url())  # type: ignore
+                except Exception:
+                    sq_hits = []
+            
+            # ANTI-HALLUCINATION FIX: Filter by PC-form category if applicable
+            if question_category in ["PC-I", "PC-II", "PC-III", "PC-IV", "PC-V"]:
+                category_hits = []
+                for h in sq_hits:
+                    text_lower = h.get("text", "").lower()
+                    # Only include if text mentions the specific PC form or is proforma-neutral
+                    if question_category.lower() in text_lower or "proforma" not in text_lower:
+                        category_hits.append(h)
+                sq_hits = category_hits if category_hits else sq_hits  # Fallback to all if filtering removes everything
+            
+            all_hits.extend(sq_hits)
     
     hits = all_hits
 
@@ -1551,10 +1587,10 @@ def generate_answer_generative(question: str) -> str:
         except Exception:
             pass
 
-    # Step 2: Dedup → MMR Rerank → top 10 (increased from 6)
+    # Step 2: Dedup → MMR Rerank → top 15 (FIX #9: increased from 10)
     hits = dedup_chunks(hits)
-    # CRITICAL FIX #2: Increased top_k to 10, lambda_mult to 0.6 for better diversity
-    hits = mmr_rerank(hits, top_k=10, lambda_mult=0.6)
+    # FIX #9: Increased top_k from 10 to 15, lambda_mult from 0.6 to 0.7 for better diversity
+    hits = mmr_rerank(hits, top_k=15, lambda_mult=0.7)
     
     # CRITICAL FIX #7: Retry with expanded query if initial retrieval quality is low
     if hits:
@@ -1570,7 +1606,7 @@ def generate_answer_generative(question: str) -> str:
             
             if use_qdrant and _RAG_OK and search is not None:
                 try:
-                    retry_hits = search(expanded_query, top_k=20, qdrant_url=_qdrant_url(), mmr=True, lambda_mult=0.5, min_score=0.10)  # type: ignore
+                    retry_hits = search(expanded_query, top_k=60, qdrant_url=_qdrant_url(), mmr=True, lambda_mult=0.7, min_score=0.05)  # type: ignore
                 except Exception:
                     retry_hits = []
             
@@ -1578,11 +1614,11 @@ def generate_answer_generative(question: str) -> str:
             if retry_hits:
                 hits.extend(retry_hits)
                 hits = dedup_chunks(hits)
-                hits = mmr_rerank(hits, top_k=10, lambda_mult=0.6)
+                hits = mmr_rerank(hits, top_k=15, lambda_mult=0.7)
 
-    # Step 3: Build context within ~3500 tokens (increased from 2400)
-    # CRITICAL FIX #2: Increased token budget for more comprehensive context
-    ctx_pack = build_context(hits, token_budget=3500)
+    # Step 3: Build context within ~6000 tokens (FIX #2: increased from 3500)
+    # FIX #2: Increased token budget for more comprehensive context
+    ctx_pack = build_context(hits, token_budget=6000)
     context_text = (ctx_pack.get("context") or "").strip()
     # Guard: if build_context returned empty but we have hits, build a simple context fallback
     if not context_text and hits:
@@ -1608,7 +1644,7 @@ def generate_answer_generative(question: str) -> str:
                 # treat as hits and continue
                 hits = kw_hits
                 # CRITICAL FIX #2: Use same increased token budget for keyword fallback
-                ctx_pack = build_context(hits, token_budget=3500)
+                ctx_pack = build_context(hits, token_budget=6000)
                 context_text = (ctx_pack.get("context") or "").strip() or "\n\n".join([h.get("text","") for h in hits])
                 citations = ctx_pack.get("citations") or []
         if not context_text:
@@ -1620,15 +1656,13 @@ def generate_answer_generative(question: str) -> str:
                 + render_citations([]) + "</div>"
             )
     
-    # CRITICAL FIX #5: Check context quality before generation to prevent hallucinations
+    # RELAXED FIX #5: Only block if truly insufficient (lowered from 0.70 to 0.25 threshold)
     quality_check = check_context_quality(hits, question)
     if not quality_check["passed"]:
         return (
             "<div class='card warn'>⚠️ <strong>Answer:</strong><br/>"
             f"**{quality_check['reason']}**<br/>"
-            "**This specific detail is not stated in the Manual.**<br/>"
-            "The retrieved content does not meet confidence requirements (70%+ similarity needed). "
-            "Here is what was found, but it may not directly answer your question:<br/><br/>"
+            "Try rephrasing your question or use Exact Search mode to locate precise passages.<br/><br/>"
             + render_citations(citations) + "</div>"
         )
 
@@ -1645,12 +1679,12 @@ def generate_answer_generative(question: str) -> str:
             except Exception:
                 # We’ll proceed with an empty base answer and rely on compose_answer
                 pass
-            # FIXED: Increased max_new_tokens from 800 to 1200 to support longer answers
+            # FIX #8: Increased max_new_tokens from 1200 to 1800 for fuller answers
             base_answer = gen.generate_response(
                 question=question,
                 context=context_text,
-                max_new_tokens=1200,
-                temperature=0.2,
+                max_new_tokens=1800,
+                temperature=0.15,
             ) or ""
         else:
             # Pretrained (local) route
@@ -2039,10 +2073,10 @@ with st.sidebar:
             else:
                 model_name = st.text_input("Ollama model (for reference)", value=os.getenv("OLLAMA_MODEL", "tinyllama"), help="Not used in Pretrained mode")
             # Answer mode control is available in the Chat input bar.
-            # Top-K defaults bumped; cap to 8
-            top_k = st.slider("Top-K context chunks", 1, 8, 6)
-            # Increase upper bound as requested (was 768)
-            max_tokens = st.slider("Max new tokens", 64, 1000, 768, step=32)
+            # FIX #10: Increased defaults and ranges for better retrieval
+            top_k = st.slider("Top-K context chunks", 1, 20, 10)
+            # FIX #10: Increase upper bound and default (was 768 max 1000)
+            max_tokens = st.slider("Max new tokens", 64, 2000, 1200, step=64)
             # FIX-3: default lower temperature to 0.2 to reduce hallucinations
             temperature = st.slider("Creativity (temperature)", 0.0, 1.5, 0.2, step=0.1)
             # Apply/Reset via flags (no UI in callbacks) — inline to avoid 'app' import
