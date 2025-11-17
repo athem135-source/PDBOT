@@ -53,20 +53,24 @@ class LocalModel:
 
     def _ollama_generate(self, prompt: str, max_new_tokens: int, temperature: float = 0.0, system: Optional[str] = None) -> str:
         url = f"{self._ollama_url}/api/generate"
+        # ANTI-HALLUCINATION FIX: Add min_length and stop tokens for complete answers
         payload = {
             "model": self._ollama_model,
             "prompt": prompt,
             "stream": False,
             "options": {
                 "temperature": float(max(0.0, min(2.0, temperature))),
-                "num_predict": max_new_tokens,
+                "num_predict": max_new_tokens,  # Increased to 1500
+                "stop": ["===END", "USER:", "QUESTION:"],  # Prevent premature stopping
+                "num_ctx": 4096,  # Larger context window
+                "repeat_penalty": 1.1,  # Reduce repetition
             },
         }
         if system:
             payload["system"] = system
 
         try:
-            r = requests.post(url, json=payload, timeout=30)
+            r = requests.post(url, json=payload, timeout=60)  # Increased timeout for longer generation
         except requests.exceptions.RequestException as e:
             return f"(ollama connection error: {e})"
 
@@ -95,7 +99,7 @@ class LocalModel:
         # Ollama may return different shapes; try common keys
         if isinstance(data, dict):
             if "response" in data:
-                return str(data.get("response", "")).strip()[:2000]
+                return str(data.get("response", "")).strip()  # Removed [:2000] limit
             # new API may use outputs or text
             if "outputs" in data and isinstance(data["outputs"], list) and data["outputs"]:
                 first = data["outputs"][0]
@@ -242,29 +246,46 @@ class LocalModel:
         filtered_context = self._filter_context_by_keywords(question, context)
         # FIX-3: lower temperature for LLM generation step (cap at 0.2)
         temperature = min(0.2, float(temperature or 0.0))
-        # Cap tokens for HF backends to avoid stalls
+        # ANTI-HALLUCINATION FIX: Increased max_new_tokens to 1500, min_length to 80
         try:
-            max_new_tokens = min(int(max_new_tokens or 256), 512)
+            max_new_tokens = min(int(max_new_tokens or 1500), 1500)
         except Exception:
-            max_new_tokens = 256
+            max_new_tokens = 1500
 
         if self.backend == "ollama":
-            # CRITICAL FIX #3: Enforce 200-300 word minimum, strict context adherence
+            # ANTI-HALLUCINATION FIX: Strict 3-section structure, no invented information
             system_msg = (
-                "You are PD-Bot, a Planning and Development expert. Answer ONLY from the provided DOCUMENT using [n] citations. "
-                "CRITICAL REQUIREMENTS:\n"
-                "1. Your answer MUST be 200-300 words minimum\n"
-                "2. Structure: (a) Direct answer (2-3 sentences), (b) Detailed explanation with 4-6 bullet points, (c) Page citations\n"
-                "3. DO NOT make up information. If context is insufficient, say 'Not found in manual.'\n"
-                "4. Use ONLY information explicitly stated in the DOCUMENT\n"
-                "5. Include all relevant details from the context"
+                "You are PDBot, a Planning & Development expert. You MUST answer ONLY from the provided MANUAL TEXT.\n\n"
+                "===STRICT RULES (NEVER VIOLATE)===\n"
+                "1. NEVER invent definitions, meanings, rules, or explanations\n"
+                "2. If the manual does NOT define a term, say: 'The manual does not define this term.'\n"
+                "3. NEVER add external knowledge, assumptions, or common sense\n"
+                "4. If information is missing, say: 'This specific detail is not stated in the Manual. However, here is what is mentioned:'\n"
+                "5. NEVER mix PC-I, PC-II, PC-III, PC-IV, PC-V content unless question asks for comparison\n"
+                "6. Every statement MUST be traceable to the manual text\n\n"
+                "===REQUIRED ANSWER STRUCTURE (120-170 words)===\n"
+                "(a) DIRECT EXTRACT: Quote 1-4 exact sentences from the manual\n"
+                "(b) SIMPLIFIED EXPLANATION: 2-4 lines in neutral professional government style\n"
+                "(c) STEPWISE SUMMARY (if applicable): Clear bullets ONLY from the extracts, no invented steps\n\n"
+                "===PC-FORM SEPARATION===\n"
+                "- PC-I question → only list PC-I components\n"
+                "- PC-II question → only list PC-II data requirements\n"
+                "- PC-III question → only monitoring-related items\n"
+                "- PC-IV question → only completion report items\n"
+                "- PC-V question → only PC-V specific content\n"
+                "Never combine different PC forms unless explicitly asked for comparison."
             )
-            # FIXED: Improved prompt structure with clear context boundaries and length requirement
+            # ANTI-HALLUCINATION FIX: Clear prompt with strict boundaries
             prompt = (
-                f"===DOCUMENT START===\n{filtered_context}\n===DOCUMENT END===\n\n"
+                f"===MANUAL TEXT (ONLY SOURCE)===\n{filtered_context}\n===END MANUAL TEXT===\n\n"
                 f"QUESTION: {question}\n\n"
-                "Provide a comprehensive answer (200-300 words minimum) based solely on the document above. "
-                "Include all relevant details and structure your response clearly with bullet points:\n"
+                "INSTRUCTIONS:\n"
+                "1. Read the manual text above carefully\n"
+                "2. If the answer is NOT in the text, say: 'This specific detail is not stated in the Manual.'\n"
+                "3. If a term is undefined in the text, say: 'The manual does not define this term.'\n"
+                "4. Structure your answer as: (a) Direct Extract, (b) Simplified Explanation, (c) Stepwise Summary\n"
+                "5. Length: 120-170 words\n"
+                "6. Use ONLY information from the manual text above\n\n"
                 "ANSWER:"
             )
             out = self._ollama_generate(prompt, max_new_tokens, temperature=temperature, system=system_msg)

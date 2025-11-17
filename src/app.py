@@ -1381,30 +1381,83 @@ def _sanitize_model_output(text: str) -> str:
     return t
 
 
-def check_context_quality(hits: list[dict], question: str) -> bool:
-    """Check if we have enough quality context to answer safely (prevent hallucinations).
+def check_context_quality(hits: list[dict], question: str) -> dict:
+    """Validate context quality before generation to prevent hallucinations.
     
-    CRITICAL FIX #5: Prevents LLM from generating when context is insufficient.
-    Returns False if: no hits, very low relevance scores, or too little total context.
+    ANTI-HALLUCINATION FIX: Upgraded confidence threshold from 0.35 to 0.70.
+    Returns dict with: {passed: bool, max_score: float, reason: str}
+    
+    CRITICAL FIX #5: Blocks generation if context is insufficient or irrelevant.
     """
     if not hits:
-        return False
+        return {"passed": False, "max_score": 0.0, "reason": "No retrieval results"}
     
-    # Check average and max score
+    # Check average and max score with STRICT threshold
     scores = [h.get("score", 0) for h in hits if h.get("score") is not None]
     if scores:
         max_score = max(scores)
-        # If best match has score < 0.35, context is very weak
-        if max_score < 0.35:
-            return False
+        avg_score = sum(scores) / len(scores)
+        
+        # UPGRADED: Strict threshold from 0.35 → 0.70
+        if max_score < 0.70:
+            return {
+                "passed": False,
+                "max_score": max_score,
+                "reason": f"Low confidence (max: {max_score:.2f}, required: 0.70+). This indicates the manual does not contain explicit information on this topic."
+            }
+        
+        # Also check average to ensure overall quality
+        if avg_score < 0.50:
+            return {
+                "passed": False,
+                "max_score": max_score,
+                "reason": f"Low average confidence (avg: {avg_score:.2f}). Retrieved content may not be relevant."
+            }
     
     # Check total context length (words)
     total_text = " ".join([h.get("text", "") for h in hits])
     word_count = len(total_text.split())
     if word_count < 50:  # Too little context
-        return False
+        return {
+            "passed": False,
+            "max_score": scores[0] if scores else 0.0,
+            "reason": f"Insufficient context ({word_count} words, need 50+)"
+        }
     
-    return True
+    return {"passed": True, "max_score": scores[0] if scores else 1.0, "reason": "Quality check passed"}
+
+
+def detect_question_category(question: str) -> str:
+    """Classify question into PC-form or topic category for targeted retrieval.
+    
+    ANTI-HALLUCINATION FIX: Route retrieval only to relevant manual sections.
+    Prevents mixing PC-I, PC-II, PC-III, PC-IV, PC-V content inappropriately.
+    """
+    lower = question.lower()
+    
+    # PC-form detection (highest priority)
+    if any(term in lower for term in ["pc-i", "pc i", "pc 1", "proforma i", "proforma 1"]):
+        return "PC-I"
+    if any(term in lower for term in ["pc-ii", "pc ii", "pc 2", "proforma ii", "proforma 2"]):
+        return "PC-II"
+    if any(term in lower for term in ["pc-iii", "pc iii", "pc 3", "proforma iii", "proforma 3"]):
+        return "PC-III"
+    if any(term in lower for term in ["pc-iv", "pc iv", "pc 4", "proforma iv", "proforma 4"]):
+        return "PC-IV"
+    if any(term in lower for term in ["pc-v", "pc v", "pc 5", "proforma v", "proforma 5"]):
+        return "PC-V"
+    
+    # Topic detection
+    if any(term in lower for term in ["monitor", "progress report", "tracking", "implementation"]):
+        return "Monitoring"
+    if any(term in lower for term in ["pfm act", "public finance", "finance management", "fiscal"]):
+        return "PFM Act"
+    if any(term in lower for term in ["budget", "allocation", "funding", "appropriation"]):
+        return "Budget"
+    if any(term in lower for term in ["ecnec", "cdwp", "ddwp", "approval", "scrutiny"]):
+        return "Approval Process"
+    
+    return "General"
 
 
 def decompose_question(question: str) -> list[str]:
@@ -1447,10 +1500,13 @@ def generate_answer_generative(question: str) -> str:
     except Exception:
         pass
     
+    # ANTI-HALLUCINATION FIX: Detect question category for targeted retrieval
+    question_category = detect_question_category(question)
+    
     # CRITICAL FIX #4: Decompose multi-part questions for comprehensive retrieval
     sub_questions = decompose_question(question)
     
-    # Step 1: Retrieve for each sub-question (up to 30 per sub-question)
+    # Step 1: Retrieve for each sub-question with category-aware filtering
     all_hits: list[dict] = []
     use_qdrant = bool(st.session_state.get("indexed_ok") or int(st.session_state.get("last_index_count") or 0) > 0)
     
@@ -1458,13 +1514,23 @@ def generate_answer_generative(question: str) -> str:
         sq_hits: list[dict] = []
         if use_qdrant and _RAG_OK and search is not None:
             try:
-                # CRITICAL FIX #2: Increased top_k from 20 to 30 for more comprehensive retrieval
-                # CRITICAL FIX #4: Retrieve for each sub-question
-                sq_hits = search(sq, top_k=30, qdrant_url=_qdrant_url(), mmr=True, lambda_mult=0.5, min_score=0.10)  # type: ignore
+                # ANTI-HALLUCINATION FIX: Increased top_k to 30, lowered min_score to 0.05 for initial retrieval
+                # We'll apply strict 0.70 threshold later in quality check
+                sq_hits = search(sq, top_k=30, qdrant_url=_qdrant_url(), mmr=True, lambda_mult=0.6, min_score=0.05)  # type: ignore
             except TypeError:
                 sq_hits = search(sq, top_k=30, qdrant_url=_qdrant_url())  # type: ignore
             except Exception:
                 sq_hits = []
+        
+        # ANTI-HALLUCINATION FIX: Filter by PC-form category if applicable
+        if question_category in ["PC-I", "PC-II", "PC-III", "PC-IV", "PC-V"]:
+            category_hits = []
+            for h in sq_hits:
+                text_lower = h.get("text", "").lower()
+                # Only include if text mentions the specific PC form or is proforma-neutral
+                if question_category.lower() in text_lower or "proforma" not in text_lower:
+                    category_hits.append(h)
+            sq_hits = category_hits if category_hits else sq_hits  # Fallback to all if filtering removes everything
         
         all_hits.extend(sq_hits)
     
@@ -1555,12 +1621,14 @@ def generate_answer_generative(question: str) -> str:
             )
     
     # CRITICAL FIX #5: Check context quality before generation to prevent hallucinations
-    if not check_context_quality(hits, question):
+    quality_check = check_context_quality(hits, question)
+    if not quality_check["passed"]:
         return (
             "<div class='card warn'>⚠️ <strong>Answer:</strong><br/>"
-            "**Insufficient information found in the manual.**<br/>"
-            "The retrieved context has very low relevance scores (confidence < 35%). "
-            "Please rephrase your question or consult the manual directly for this topic.<br/><br/>"
+            f"**{quality_check['reason']}**<br/>"
+            "**This specific detail is not stated in the Manual.**<br/>"
+            "The retrieved content does not meet confidence requirements (70%+ similarity needed). "
+            "Here is what was found, but it may not directly answer your question:<br/><br/>"
             + render_citations(citations) + "</div>"
         )
 
