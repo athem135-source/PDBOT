@@ -2636,16 +2636,7 @@ with tab_chat:
                     role = "user" if str(r0).lower().startswith("you") else "assistant"
                 
                 # Use native st.chat_message (handles avatars and scrolling automatically)
-                avatar = None
-                if role == "assistant":
-                    try:
-                        if os.path.exists(_AVATAR_PATH) and os.path.getsize(_AVATAR_PATH) > 1000:
-                            avatar = _AVATAR_PATH
-                        else:
-                            avatar = "🤖"
-                    except Exception:
-                        avatar = "🤖"
-                with st.chat_message(role, avatar=avatar if role == "assistant" else None):
+                with st.chat_message(role):
                     st.markdown(msg, unsafe_allow_html=True)
 
             # Sticky ask bar below the transcript (native st.chat_input is sticky by default)
@@ -2699,15 +2690,7 @@ with tab_chat:
                             answer_html, citations = generate_answer(q)
                         
                         # ENTERPRISE UI: Stream the response for live typing effect
-                        avatar = None
-                        try:
-                            if os.path.exists(_AVATAR_PATH) and os.path.getsize(_AVATAR_PATH) > 1000:
-                                avatar = _AVATAR_PATH
-                            else:
-                                avatar = "🤖"
-                        except Exception:
-                            avatar = "🤖"
-                        with st.chat_message("assistant", avatar=avatar):
+                        with st.chat_message("assistant"):
                             # Check if answer is HTML (has tags), if so display without streaming
                             if "<div" in answer_html or "<br" in answer_html:
                                 st.markdown(answer_html, unsafe_allow_html=True)
@@ -2729,15 +2712,7 @@ with tab_chat:
                         write_crash(e)
                     except Exception:
                         pass
-                    avatar = None
-                    try:
-                        if os.path.exists(_AVATAR_PATH) and os.path.getsize(_AVATAR_PATH) > 1000:
-                            avatar = _AVATAR_PATH
-                        else:
-                            avatar = "🤖"
-                    except Exception:
-                        avatar = "🤖"
-                    with st.chat_message("assistant", avatar=avatar):
+                    with st.chat_message("assistant"):
                         st.error("Something went wrong while generating the answer. Please try again.")
 
         # Intercept ask handled directly by input handler above
