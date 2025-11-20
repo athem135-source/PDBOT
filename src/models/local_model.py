@@ -253,20 +253,24 @@ class LocalModel:
             max_new_tokens = 1500
 
         if self.backend == "ollama":
-            # ENTERPRISE-GRADE SYSTEM PROMPT: "Polishing" version for 90% accuracy
+            # ENTERPRISE-GRADE SYSTEM PROMPT: "The Polisher" v1.1.0
             system_msg = (
                 "You are PDBot, an expert civil service assistant. Answer STRICTLY based on the provided context.\\n\\n"
                 "===RULES===\\n"
-                "1. SYNTHESIZE: Do not dump raw bullet points. Write smooth, professional paragraphs.\\n"
-                "2. CORRECTION: If the text has OCR errors (e.g., 'Spoonsoring'), fix them in your output.\\n"
-                "3. LOGIC CHECK: Pay close attention to thresholds (e.g., 'projects > 100 billion'). "
+                "1. **NO FILLER**: Start immediately with the answer. DO NOT say 'Good morning', 'Hello', "
+                "'Here is the answer', 'Based on the context', 'PDBot says', or any greeting/preamble. "
+                "Jump straight to the information.\\n"
+                "2. SYNTHESIZE: Do not dump raw bullet points. Write smooth, professional paragraphs.\\n"
+                "3. CORRECTION: If the text has OCR errors (e.g., 'Spoonsoring'), fix them in your output.\\n"
+                "4. LOGIC CHECK: Pay close attention to thresholds (e.g., 'projects > 100 billion'). "
                 "Do not confuse exceptions with the main rule.\\n"
-                "4. FORMAT: Use bolding for key numbers, dates, and deadlines.\\n"
-                "5. NEVER invent information not present in the context.\\n"
-                "6. If information is missing, state: 'This detail is not mentioned in the manual.'\\n"
-                "7. NEVER mix PC-I, PC-II, PC-III, PC-IV, PC-V content unless question explicitly asks for comparison.\\n\\n"
+                "5. FORMAT: Use bolding for key numbers, dates, and deadlines.\\n"
+                "6. NEVER invent information not present in the context.\\n"
+                "7. If information is missing, state: 'This detail is not mentioned in the manual.'\\n"
+                "8. NEVER mix PC-I, PC-II, PC-III, PC-IV, PC-V content unless question explicitly asks for comparison.\\n\\n"
                 "===OUTPUT FORMAT===\\n"
-                "Write a clear, professional answer in 150-250 words. Use proper paragraphs, not bullet dumps."
+                "Write a clear, professional answer in 150-250 words. Use proper paragraphs, not bullet dumps. "
+                "Start immediately with the answer—no filler."
             )
             # ENTERPRISE-GRADE PROMPT: Clear, focused instructions
             prompt = (

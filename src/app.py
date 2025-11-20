@@ -997,48 +997,23 @@ def answer_rating_modal():
             except Exception:
                 pass
 
-# Top-right Settings popover (moves Download/Continue actions here)
-try:
-    from streamlit import popover as _popover  # type: ignore
-    has_pop = True
-except Exception:
-    has_pop = False
-
+# ENTERPRISE v1.1.0: Removed Settings popover - actions moved to floating bar
+# Simple header with download button only
 act_cols = st.columns([6,1])
 with act_cols[1]:
-    if has_pop:
-        with st.popover("⚙️ Settings"):
-            st.markdown("**Chat Controls**")
-            # Prepare chat text for download
-            lines = []
-            for role, msg in _iter_chat():
-                label = "You" if role == "user" else "PDBOT"
-                # strip HTML cards when saving
-                try:
-                    import re
-                    msg_txt = re.sub(r"<[^>]+>", "", str(msg))
-                except Exception:
-                    msg_txt = str(msg)
-                lines.append(f"{label}: {msg_txt}")
-            txt_data = "\n\n".join(lines) if lines else "(empty)"
-            if st.button("🆕 New chat", use_container_width=True, key="settings_new_chat"):
-                request_rating_then("new")
-            if st.button("🧹 Clear all", use_container_width=True, key="settings_clear_all"):
-                request_rating_then("clear")
-            st.download_button("⬇️ Download chat (.txt)", data=txt_data, file_name="chat_history.txt", mime="text/plain", key="download_chat_header")
-            if st.button("➡️ Continue chat", use_container_width=True):
-                try:
-                    from src.utils.persist import load_chat
-                    loaded = load_chat()
-                    # normalize if needed
-                    st.session_state.chat_history = [
-                        (m if isinstance(m, dict) else {"role": ("user" if str(m[0]).lower().startswith("you") else "assistant"), "content": m[1]})
-                        for m in (loaded or [])
-                    ]
-                except Exception:
-                    st.info("No saved chat found.")
-    else:
-        st.caption("Settings available in the sidebar (popover not supported)")
+    # Prepare chat text for download
+    lines = []
+    for role, msg in _iter_chat():
+        label = "You" if role == "user" else "PDBOT"
+        # strip HTML cards when saving
+        try:
+            import re
+            msg_txt = re.sub(r"<[^>]+>", "", str(msg))
+        except Exception:
+            msg_txt = str(msg)
+        lines.append(f"{label}: {msg_txt}")
+    txt_data = "\n\n".join(lines) if lines else "(empty)"
+    st.download_button("⬇️ Download", data=txt_data, file_name="chat_history.txt", mime="text/plain", key="download_chat_header", help="Download chat history")
 
 _CSS = """
 <style>
@@ -1148,6 +1123,44 @@ textarea, .stTextInput > div > div > input{ border-radius:10px !important; }
 /* Responsive tweaks */
 @media (max-width: 768px){
   .chat-msg{ max-width: 100%; }
+
+/* ENTERPRISE v1.1.0: Floating action bar at bottom (Gemini-style sticky footer) */
+.floating-action-bar {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    background: var(--background-color);
+    padding: 10px 20px;
+    border-radius: 50px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.20);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    border: 1px solid rgba(0,0,0,0.15);
+}
+[data-theme="dark"] .floating-action-bar {
+    background: #1a1f28;
+    border-color: rgba(255,255,255,0.1);
+}
+.floating-action-bar button {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(0,0,0,0.2);
+    background: rgba(255,255,255,0.05);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+.floating-action-bar button:hover {
+    background: rgba(255,255,255,0.1);
+    transform: translateY(-1px);
+}
+.chat-container-wrapper {
+    padding-bottom: 160px; /* Make room for floating bar */
+}
   .block-container { padding-left: 10px; padding-right: 10px; }
 }
 
@@ -1538,20 +1551,23 @@ def decompose_question(question: str) -> list[str]:
 
 
 def rewrite_query_with_history(question: str, chat_history: list) -> str:
-    """ENTERPRISE FEATURE: Contextualize question using chat history.
+    """ENTERPRISE v1.1.0: LLM-based contextual query rewriting.
+    
+    Uses Ollama LLM to intelligently rewrite follow-up questions into standalone queries
+    by analyzing chat history. Much more sophisticated than pattern matching.
     
     Example:
     - History: "Tell me about PC-I"
-    - User asks: "What is the fee?"
-    - Rewritten: "What is the fee for PC-I?"
+    - User asks: "Who signs it?"
+    - Rewritten: "Who signs the PC-I form?"
     
-    This enables contextual memory for follow-up questions.
+    This enables true contextual memory for follow-up questions.
     """
     if not chat_history or len(chat_history) < 2:
         # No history or too short, return original
         return question
     
-    # Extract last 4 messages (2 user + 2 bot turns)
+    # Extract last 4 messages (2 user + 2 bot turns) for context
     recent = chat_history[-4:] if len(chat_history) >= 4 else chat_history
     
     # Build history context
@@ -1563,42 +1579,55 @@ def rewrite_query_with_history(question: str, chat_history: list) -> str:
             if role == "user":
                 history_text += f"User: {content}\\n"
             else:
-                # Only include first 100 chars of bot response to avoid bloat
-                history_text += f"Bot: {content[:100]}...\\n"
+                # Only include first 150 chars of bot response to avoid bloat
+                history_text += f"Bot: {content[:150]}...\\n"
     
     # Check if question is short and ambiguous (likely a follow-up)
     is_followup = (
-        len(question.split()) <= 8 and
+        len(question.split()) <= 10 and
         not any(pc in question.upper() for pc in ["PC-I", "PC-II", "PC-III", "PC-IV", "PC-V"]) and
-        not question.lower().startswith(("what is", "define", "explain"))
+        not question.lower().startswith(("what is the", "define", "explain", "tell me about"))
     )
     
     if not is_followup:
         # Question is detailed enough, return original
         return question
     
-    # Use simple pattern matching to add context
-    # Extract key entities from history (PC forms, technical terms)
-    import re
-    entities = []
-    
-    # Look for PC forms in recent history
-    pc_matches = re.findall(r'\\b(PC-[IV]+)\\b', history_text, re.IGNORECASE)
-    if pc_matches:
-        entities.extend(list(set(pc_matches)))
-    
-    # Look for capitalized terms (likely important entities)
-    cap_terms = re.findall(r'\\b([A-Z][A-Za-z]{2,})\\b', history_text)
-    if cap_terms:
-        entities.extend(list(set(cap_terms))[:2])  # Max 2 terms
-    
-    if entities:
-        # Append most relevant entity to question
-        context_entity = entities[0]
-        rewritten = f"{question} for {context_entity}"
-        return rewritten
-    
-    return question
+    # Use LLM to rewrite the question contextually
+    try:
+        from src.models.local_model import LocalModel
+        rewriter = LocalModel(backend="ollama")
+        
+        rewrite_prompt = f"""Given this conversation history:
+{history_text}
+
+The user just asked: "{question}"
+
+This is a follow-up question. Rewrite it into a complete, standalone question that includes relevant context from the conversation history. Keep it concise (under 20 words).
+
+Standalone question:"""
+        
+        # Use low temperature for deterministic rewriting
+        rewritten = rewriter._ollama_generate(
+            rewrite_prompt, 
+            max_new_tokens=50, 
+            temperature=0.0,
+            system="You are a query rewriter. Rewrite follow-up questions into standalone questions using conversation context. Be concise and accurate."
+        )
+        
+        # Clean up the rewritten query
+        rewritten = rewritten.strip()
+        if rewritten and len(rewritten) > 5 and len(rewritten.split()) <= 25:
+            return rewritten
+        else:
+            # Fallback to original if rewrite failed
+            return question
+            
+    except Exception as e:
+        # Fallback to original on any error
+        import logging
+        logging.getLogger("pdbot").warning(f"Query rewriting failed: {e}, using original question")
+        return question
 
 
 def generate_answer_generative(question: str) -> str:
@@ -2560,29 +2589,26 @@ with tab_chat:
         # Chat window - ENTERPRISE UI: Native Streamlit chat messages
         st.markdown("### Conversation")
         
-        # Action buttons row ABOVE chat (Gemini-style)
-        col1, col2, col3, col4 = st.columns([1, 1, 1, 6])
-        with col1:
-            if st.button("🆕 New", key="new_chat_btn", help="Start new conversation"):
-                st.session_state.chat_history = []
-                st.session_state["last_question"] = ""
-                st.session_state["last_hits"] = []
-                try:
-                    clear_chat_history()
-                except Exception:
-                    pass
-                st.rerun()
-        with col2:
-            if st.button("↻ Regen", key="regen_chat_btn", help="Regenerate last answer", disabled=not st.session_state.get("last_question")):
+        # ENTERPRISE v1.1.0: Floating action bar at bottom (Gemini-style)
+        # Render buttons using columns for Streamlit interactivity
+        floating_cols = st.columns([1, 1, 1, 1, 5])
+        with floating_cols[0]:
+            if st.button("🆕 New Chat", key="new_chat_btn_float", help="Start new conversation", use_container_width=True):
+                request_rating_then("new")
+        with floating_cols[1]:
+            if st.button("🧹 Clear", key="clear_chat_btn_float", help="Clear all chat history", use_container_width=True):
+                request_rating_then("clear")
+        with floating_cols[2]:
+            if st.button("↻ Regen", key="regen_chat_btn_float", help="Regenerate last answer", disabled=not st.session_state.get("last_question"), use_container_width=True):
                 st.session_state._regen_inline = True
                 st.rerun()
-        with col3:
+        with floating_cols[3]:
             mode = st.session_state.get("answer_mode", "Generative")
             new_mode = "Exact" if mode == "Generative" else "Gen"
-            if st.button(f"🔄 {new_mode}", key="toggle_mode_btn", help="Toggle answer mode"):
+            if st.button(f"🔄 {new_mode}", key="toggle_mode_btn_float", help="Toggle answer mode", use_container_width=True):
                 st.session_state["answer_mode"] = "Exact Search" if mode == "Generative" else "Generative"
                 st.rerun()
-        with col4:
+        with floating_cols[4]:
             st.caption(f"Mode: **{st.session_state.get('answer_mode', 'Generative')}**")
         
         # Chat history display - Native st.chat_message (Gemini-style, auto-scrolling)
