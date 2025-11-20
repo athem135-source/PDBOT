@@ -9,6 +9,7 @@ requests>=2.32.0               # HTTP library for API calls (Ollama, Qdrant heal
 
 # ---- Document Processing ----
 pypdf>=4.2.0                   # PDF text extraction for manual ingestion
+pymupdf>=1.23.0                # PyMuPDF (fitz) for PDF page rendering in View Source feature
 
 # ---- LLM Backend ----
 transformers>=4.44.2           # Hugging Face transformers for tokenization and embeddings

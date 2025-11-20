@@ -1,6 +1,6 @@
 ﻿# PDBot – Planning & Development Manual RAG Chatbot
 
-![Version](https://img.shields.io/badge/version-0.8.0-blue)
+![Version](https://img.shields.io/badge/version-0.9.0-blue)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -48,21 +48,53 @@
 1. **Generative Mode** (Default): Advanced RAG pipeline with LLM-generated comprehensive answers (200-300 words)
 2. **Exact Search Mode**: Fast keyword-based retrieval with highlighted matches
 
+### 🆕 View Source Feature (v0.9.0)
+- **PDF Page Rendering**: Click "📄 View Source Pages" to see exact PDF pages cited in answers
+- **High-Quality Images**: 2x zoom rendering at 150 DPI for crystal-clear text
+- **Smart Citations**: Automatically displays up to 5 most relevant pages per answer
+- **Powered by PyMuPDF**: Fast, accurate PDF-to-image conversion with fitz library
+- **Contextual Display**: Only shows when citations exist and PDF is available
+
 ### Anti-Hallucination Safeguards
 - **Context quality checks**: Blocks generation if relevance score < 0.35 or context < 50 words
 - **Acronym page filtering**: Removes pages with >30% uppercase acronyms
 - **Retry logic**: Expands query when initial retrieval fails (score < 0.5)
 - **Proforma-specific metadata**: Tags PC-I/II/III/IV/V content for targeted retrieval
 
-### Advanced RAG Pipeline
-- **Sentence-level chunking**: Granular semantic units for precise retrieval
-- **MMR re-ranking**: Balances relevance and diversity (λ=0.6, top 10 from 30 candidates)
-- **Query decomposition**: Handles compound "X AND Y" questions separately
-- **Token budget**: 3500 tokens of context (45% increase from v0.5)
+### Advanced RAG Pipeline (v0.9.0)
+- **7-way chunk classification**: Main manual, annexure, checklist, table, appendix, misc, unknown
+- **Cross-encoder reranking**: ms-marco-MiniLM-L-6-v2 (20 candidates → top 3 final chunks)
+- **Intelligent filtering**: Excludes annexure/checklist for conceptual queries
+- **Post-generation guardrails**: Detects and prevents annexure contamination
+- **Enhanced metadata**: 9 fields per chunk (page, paragraph, line, chunk_type, proforma, etc.)
+- **Improved chunking**: 600 chars with 100 char overlap for better context windows
 
 ---
 
 ## 🏗️ Architecture
+
+### Modular Structure (v0.9.0)
+
+```
+src/
+├── utils/
+│   ├── pdf_renderer.py       # PDF page rendering with PyMuPDF
+│   ├── text_utils.py         # Text processing utilities
+│   └── persist.py            # Chat history persistence
+├── logic/
+│   └── state_manager.py      # Centralized session state (40+ variables)
+├── ui/
+│   ├── layout.py             # Page config, CSS themes, header/footer
+│   ├── sidebar.py            # Sidebar controls (manual, settings, admin)
+│   └── chat_interface.py     # Chat display + View Source feature
+├── models/
+│   ├── local_model.py        # Ollama LLM integration
+│   └── pretrained_model.py   # Local pretrained model support
+├── rag_langchain.py          # RAG pipeline with cross-encoder reranking
+└── app.py                    # Application entry point (<100 lines)
+```
+
+### System Architecture
 
 ```
 ┌──────────────┐         ┌──────────────┐         ┌──────────────┐
@@ -78,9 +110,10 @@
 ```
 
 ### Data Flow
-1. **Ingestion**: PDF → PyPDF2 → Sentence Split → Embedding (all-MiniLM-L6-v2) → Qdrant
-2. **Retrieval**: Query → MMR (top 10/30) → Filter Acronyms → Token Budget (3500) → Context
-3. **Generation**: Context → Ollama (TinyLlama, temp=0.2, max_tokens=1200) → Streamed Response
+1. **Ingestion**: PDF → PyPDF → Sentence Split → Classification → Embedding (all-MiniLM-L6-v2) → Qdrant
+2. **Retrieval**: Query → MMR (top 20) → Cross-encoder Reranking → Filter (top 3) → Context
+3. **Generation**: Context → Ollama (TinyLlama, temp=0.15, max_tokens=1200) → Streamed Response
+4. **Citation**: Answer → Extract Pages → PyMuPDF Rendering → Display in Expander
 
 ---
 
@@ -190,6 +223,9 @@ pip install -r requirements.txt
 
 # 4. Configure manual path
 echo "/path/to/your/Manual-for-Development-Project-2024.pdf" > config/manual_path.txt
+
+# 5. Run the application
+streamlit run src/app.py
 
 # 5. Start Qdrant (if not already running)
 docker run -d -p 6333:6333 qdrant/qdrant
@@ -355,8 +391,12 @@ enableCORS = false
 - Faster response (1-3 seconds)
 - No LLM generation (no hallucination risk)
 
-### Step 3: Review Evidence
+### Step 3: Review Evidence & View Source
 
+- Click **"📄 View Source Pages"** expander to see actual PDF pages cited in the answer
+  - Displays high-quality page images rendered at 2x zoom (150 DPI)
+  - Shows up to 5 most relevant pages with page numbers
+  - Powered by PyMuPDF for fast, accurate rendering
 - Click **"Supporting Passages"** dropdown to see retrieved context
 - Click **"Citations"** dropdown to see page numbers and sources
 - Use **"Regenerate"** button to get alternative wording with same context
@@ -380,13 +420,20 @@ enableCORS = false
 ```
 PDBOT/
 ├── src/                          # Main application source
-│   ├── app.py                    # Streamlit UI (2962 lines)
-│   ├── rag_langchain.py          # RAG pipeline (273 lines)
+│   ├── app.py                    # Streamlit entry point (<100 lines)
+│   ├── rag_langchain.py          # RAG pipeline with cross-encoder (846 lines)
 │   ├── models/                   # LLM wrappers
 │   │   ├── local_model.py        # Ollama integration
 │   │   ├── pretrained_model.py   # HuggingFace models
 │   │   └── qwen_pretrained.py    # Qwen model wrapper
-│   ├── utils/                    # Helper functions
+│   ├── logic/                    # Business logic
+│   │   └── state_manager.py      # Session state management (186 lines)
+│   ├── ui/                       # UI components
+│   │   ├── layout.py             # Page config, CSS, header (186 lines)
+│   │   ├── sidebar.py            # Sidebar controls (227 lines)
+│   │   └── chat_interface.py     # Chat + View Source (273 lines)
+│   ├── utils/                    # Helper utilities
+│   │   ├── pdf_renderer.py       # PDF page rendering with PyMuPDF (111 lines)
 │   │   ├── persist.py            # Chat history persistence
 │   │   └── text_utils.py         # Text processing utilities
 │   └── assets/                   # Static files (logos, CSS)
@@ -410,7 +457,7 @@ PDBOT/
 ├── .streamlit/                   # Streamlit configuration
 │   └── config.toml
 │
-├── requirements.txt              # Python dependencies (commented)
+├── requirements.txt              # Python dependencies (v0.9.0)
 ├── Dockerfile                    # Production container
 ├── docker-compose.yml            # Multi-service orchestration
 ├── setup.bat                     # Windows setup script
@@ -582,7 +629,29 @@ pytest tests/ --cov=src --cov-report=html
 
 ## 📜 Version History
 
-### v0.8.0 (Current - November 17, 2025)
+### v0.9.0 (Current - November 20, 2025)
+**Modular Architecture + View Source Feature**
+- 🏗️ **Modular refactoring:** app.py 3088 → <100 lines (entry point only)
+  - `src/utils/pdf_renderer.py` - PDF page rendering (106 lines)
+  - `src/logic/state_manager.py` - Session state management (186 lines)
+  - `src/ui/layout.py` - Page config, CSS, header/footer (186 lines)
+  - `src/ui/sidebar.py` - Sidebar controls (227 lines)
+  - `src/ui/chat_interface.py` - Chat display + View Source (273 lines)
+- 🆕 **View Source feature:** Click "📄 View Source Pages" to see exact PDF pages cited
+  - PyMuPDF integration for high-quality rendering (2x zoom, 150 DPI)
+  - Automatic extraction of cited pages from bot responses
+  - Expandable interface showing up to 5 most relevant pages
+- 🔧 **Enterprise RAG enhancements:**
+  - Cross-encoder reranking (ms-marco-MiniLM-L-6-v2)
+  - 7-way chunk classification (main_manual, annexure, checklist, table, appendix, misc)
+  - Intelligent filtering (excludes annexure/checklist for conceptual queries)
+  - Post-generation guardrails (prevents annexure contamination)
+  - Enhanced metadata (9 fields: page, paragraph, line, chunk_type, proforma, etc.)
+  - Improved chunking (600 chars with 100 overlap)
+- 📦 **New dependency:** pymupdf>=1.23.0
+- 📄 Clean separation of concerns for maintainability
+
+### v0.8.0 (November 17, 2025)
 **Critical RAG Retrieval Fixes - Unblocked 90% of Valid Queries**
 - 🔧 **Confidence threshold:** 0.70 → 0.25 (-64%, stops false blocks)
 - 🔧 **Retrieval capacity:** top_k 30 → 60 (+100%)
@@ -716,15 +785,7 @@ A: Yes. Use the Docker image and configure environment variables for cloud servi
 
 ## 🗺️ Roadmap
 
-### v0.9.0 (December 2025)
-- [ ] Multi-document support (upload multiple manuals)
-- [ ] Streaming responses (real-time token generation)
-- [ ] Chat history persistence (database backend)
-- [ ] Advanced metrics dashboard (accuracy, latency tracking)
-- [ ] Answer export (PDF/DOCX generation)
-- [ ] Urdu language support (bilingual queries)
-
-### v1.0.0 (January 2026)
+### v1.0.0 (Q1 2026)
 - [ ] RAG observability (LangSmith integration)
 - [ ] Fine-tuned embeddings (domain-specific)
 - [ ] Multi-user authentication (role-based access)

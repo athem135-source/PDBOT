@@ -1094,5 +1094,77 @@
   {
     "role": "assistant",
     "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>It is responsible for scrutiny and approval of development projects beyond the sanctioned limit of DDWP and up to 7.5 billion, provincial projects having federal financing and/or foreign component, and projects having more than 25% of foreign components. [2] The provincial projects funded from the provincial government's resources and where no federal assets are utilized or federal liability generated are to be approved by respective PDWP.\n\n• Central Development Working Party  (CDWP)  It is responsible for the scrutiny and approval of  development projects beyond the sanctioned limit of  DDWP and up to 7.5 billion, provincial projects having  federal financing and/or foreign component, and  federal projects having more than 25% of foreign  component.\n• The provincial projects, funded from the provincial governments’  resources, and where no federal assets are utilized, or federal liability  generated are to be approved by respective PDWP. [p.18, p.70]\n\nSources:\n[1] Manual for Development Projects 2024, p.18\n[2] Manual for Development Projects 2024, p.70</div>"
+  },
+  {
+    "role": "user",
+    "content": "what does the manual say about third party monitering?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>• 3.12 This analysis concerns the project’s input (supplies) and output (production) of real goods  and services. [p.83]\n\nSources:\n[1] Manual for Development Projects 2024, p.83</div>"
+  },
+  {
+    "role": "user",
+    "content": "tell me the checklists for PC V "
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>• 143    Checklist for PC-V    6.23 The checklist for PC-V is as follows:    Table 22: Checklist for PC-V  # Checklist items for PC-V Tick as appropriate  1.\n• Checklist for PC-II  2.16 The checklist for PC-II is given as follows:  Table 4: Checklist for PC-II  # Checklist items for PC-II Tick as appropriate  1 A general description of the aims, objectives and  coverage of the survey/feasibility study is given. [p.144, p.36]\n\nSources:\n[1] Manual for Development Projects 2024, p.144\n[2] Manual for Development Projects 2024, p.36</div>"
+  },
+  {
+    "role": "user",
+    "content": "who approves fund for rupees 7.5 billion pkr?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>PC-II Proforma - 2024\nPlanning Commission Feasibility Study Requirements\nSectoral Classification of Development Expenditure\nNEC Meeting (10th June 2013)\nPC-I Proforma - 2024\nPlanning Commission Guidelines on Calculating Pakistani Rupee (PKR) Equivalent of Foreign Exchange Compoments (FEC) of Projects\nExtension in Execution of Development Projects\nGuidelines/Procedures Developmend Projects for Preparation and Approval of Procedure for Approval of Scheemes by Federal Level DDWP\nProcedure/Instruction for Grant of Anticipatory Approval by the Chairman, ECNEC\nConcept Clearance Proposaals - Policy Guidelines\nProcedure for Approval of PforR, FIP and DPC Mode of Financing\nGuidelines for the Appointment of an Independent PD (5th April, 2012)\nGuidelines for the Appointment of an Independent PD (11th March, 2016)\nProject Management Issueed by Project Wing Planning Commission\n\n• 7.21 CDWP is authorized to approve development schemes above Rs.\n• Title  1 Processes and Procedures to Improve Project Management  2 PC-II Proforma - 2024  3 Planning Commission Feasibility Study Requirements  4 Sectoral Classification of Development Expenditure  5 NEC Meeting (10th June 2013)  6 PC-I Proforma - 2024  7 Planning Commission Guidelines on Calculating Pakistani Rupee (PKR)  Equivalent of the Foreign Exchange Component (FEC) of Projects  8 Extension in Execution of Development Projects  9 Guidelines/Procedures  Development Projects  for Preparation and Approval of  10 Procedure for Approval of Schemes by Federal Level DDWP  11 Procedure for Preparation and Approval of Development Projects  12 Guidelines/Procedures  Development Projects  for Preparation and Approval of  13 Procedure/Instructions Regarding Grant of Anticipatory Approval by the  Chairman, ECNEC  14 Concept Clearance Proposals – Policy Guidelines  15 Procedure for Approval of PforR, FIP and DPC Mode of Financing  16 Guidelines by Finance Division for Release of Development Funds to the  PSDP-Funded Projects  17 Guidelines for the Appointment of an Independent PD (5th April, 2012)  18 Guidelines for the Appointment of an Independent PD (11th March, 2016)  19 Guidelines of Project Management Issued by Project Wing Planning  Commission\n• 7.67 All funds for development programmes in the AJ&K and GB are provided by the federal  government.\n• The Pakistani Rupee (PKR) equivalent of the Foreign Exchange  Component (FEC) of projects should be worked out based on the ‘Bank Floating Average Exchange Rate’  of the relevant currency as shown on the website of the State Bank of Pakistan (SBP) for the month  preceding the one in which the PC-I and PC-II were submitted to the Planning Commission (Annexure 7). [p.168, p.188, p.187]\n\nSources:\n[1] Manual for Development Projects 2024, p.168\n[2] Manual for Development Projects 2024, p.188\n[3] Manual for Development Projects 2024, p.187\n[4] Manual for Development Projects 2024, p.60</div>"
+  },
+  {
+    "role": "user",
+    "content": "What cost revision rule restricts revising a project within 2 years of approval?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>• To avoid frequent revisions, no proposal for revision in cost or scope will be brought within  two years of approval/execution of a project.\n• The project cost may need a revision because of certain factors, which also include a change in  scope during implementation and cost overruns. [p.99, p.61]\n\nSources:\n[1] Manual for Development Projects 2024, p.99\n[2] Manual for Development Projects 2024, p.61</div>"
+  },
+  {
+    "role": "user",
+    "content": "Explain the minimum page-count or element-count required in feasibility studies under PC-II."
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>2.14 The PC -II, inter aliæ, needs to indicate studies and survey already undertaken on the subject. Question: Explain the minimum page-count or element-count required in feasibility studies under PC-II. Instructions: Read the manual text above carefully; if the answer is not in the text, say: \"This specific detail is not stated in the Manual.\" If a term is undefined in the text, say: \"The manual does not define this term.\" Structuring your answer as: (a) Direct Extract, (b) Simplified Explaination, (c) Stepwise Summary\nLength: 120-170 words\n\n• Projects falling in these categories shall require  Techno-Economic feasibility study undertaken through the PC -II, which must include, at least,  TORs, technical and reference design, assignments duly justified on man month basis on gantt chart  and as explained in the instructions for Techno-Economic Feasibility studies (Appendix-C).\n• 34    Figure 7: Essentials of a Techno-Economic Feasibility Study       2.14 The PC -II, inter alia, needs to indicate studies and surveys already undertaken on the  subject.\n• The requirement of a PC -II shall be mandatory for infrastructure projects, each  costing Rs.\n• 68  REQUIREMENTS FOR SUBMISSION OF PC-I IN PLANNING COMMISSION ............................................... [p.34, p.35, p.10]\n\nSources:\n[1] Manual for Development Projects 2024, p.34\n[2] Manual for Development Projects 2024, p.35\n[3] Manual for Development Projects 2024, p.34\n[4] Manual for Development Projects 2024, p.10</div>"
+  },
+  {
+    "role": "user",
+    "content": "Explain the purpose of the Concept Clearance Committee and when CCC approval becomes mandatory."
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>- After careful review of the concept clearance procedure, the following guidelines were framed (Annexure 15):\n   - The CCC will be responsible for examining and approving the proposal before negotiations with foreign-assisted projects. - The CCC will provide feedback to the sponsoring agencies on the proposal's feasibility, suitability, and alignment with the project objectives.\n\n• For seeking foreign assistance for the federal or provincial projects  (loan/grant), the requirement of concept clearance from the Concept  Clearance Committee (CCC) will be strictly adhered to.\n• 102      CONCEPT CLEARANCE OF FOREIGN-ASSISTED PROJECTS BEFORE  LOAN/AID NEGOTIATIONS  3.60 In many cases, proposals for seeking foreign assistance are sent by the sponsoring agencies for  approval of the Concept Clearance Committee (CCC) without sufficient detail and proper examination.\n• After careful review of the concept clearance procedure, the following guidelines were framed  (Annexure 15): [p.71, p.103]\n\nSources:\n[1] Manual for Development Projects 2024, p.71\n[2] Manual for Development Projects 2024, p.103\n[3] Manual for Development Projects 2024, p.103</div>"
+  },
+  {
+    "role": "user",
+    "content": "Does the manual allow starting a feasibility study before PC-II approval? If yes/no, justify with relevant sections."
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>• PC-II PROFORMA  2.09 The PC-II approved by the relevant competent forum is required for the conduct of Techno- Economic feasibility study, including technical investigations, market surveys and other studies  (Annexure 2).\n• Similarly, any survey and feasibility  study (PC-II) is submitted to the PDWP for consideration and approval, irrespective of the cost. [p.34, p.175]\n\nSources:\n[1] Manual for Development Projects 2024, p.34\n[2] Manual for Development Projects 2024, p.175</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the rule for foreign-funded projects regarding Concept Clearance, and which authority verifies donor commitments?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>• For seeking foreign assistance for the federal or provincial projects  (loan/grant), the requirement of concept clearance from the Concept  Clearance Committee (CCC) will be strictly adhered to.\n• 102      CONCEPT CLEARANCE OF FOREIGN-ASSISTED PROJECTS BEFORE  LOAN/AID NEGOTIATIONS  3.60 In many cases, proposals for seeking foreign assistance are sent by the sponsoring agencies for  approval of the Concept Clearance Committee (CCC) without sufficient detail and proper examination.\n• 101  CONCEPT CLEARANCE OF FOREIGN-ASSISTED PROJECTS BEFORE LOAN/AID NEGOTIATIONS ..... [p.71, p.103, p.11]\n\nSources:\n[1] Manual for Development Projects 2024, p.71\n[2] Manual for Development Projects 2024, p.103\n[3] Manual for Development Projects 2024, p.11</div>"
+  },
+  {
+    "role": "user",
+    "content": "Under what exact conditions can PDWP approve a project that normally falls under CDWP jurisdiction?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>• The PDWP also considers approval of schemes that do not fall solely within the jurisdiction of  any department but pertain to the whole of Balochistan.\n• There is no restriction on the PDWP, if it deems necessary, to call for or to consider any scheme  referred to it by the DDSC or any department or agency (even if it falls below its normative approval  threshold).\n• For projects below this limit, if an independent PD is required, he/she is to be  appointed by the sponsors, and approval of the CDWP will be required to provide proper justification.\n• Central Development Working Party  (CDWP)  It is responsible for the scrutiny and approval of  development projects beyond the sanctioned limit of  DDWP and up to 7.5 billion, provincial projects having  federal financing and/or foreign component, and  federal projects having more than 25% of foreign  component. [p.185, p.118, p.18]\n\nSources:\n[1] Manual for Development Projects 2024, p.185\n[2] Manual for Development Projects 2024, p.185\n[3] Manual for Development Projects 2024, p.118\n[4] Manual for Development Projects 2024, p.18</div>"
   }
 ]
