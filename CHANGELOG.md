@@ -2,6 +2,153 @@
 
 All notable changes to PDBOT will be documented in this file.
 
+## [v1.1.0 - Enterprise Refinements] - 2025-11-20
+
+### 🚀 Complete UI/UX Overhaul + Enhanced Intelligence
+
+This release refines the v1.0.0 Enterprise Edition with three major upgrades focused on professional UI, stricter prompt control, and smarter contextual memory.
+
+### Upgrade 1: Gemini-Style Floating Action Bar
+
+#### UI Transformation (`src/app.py`)
+- **✅ Removed Settings Popover** - Eliminated top-right clunky popover menu
+- **✅ Created Floating Sticky Action Bar** - NEW Gemini-style controls at bottom
+  - **Position**: Fixed at `bottom: 80px` (above chat input)
+  - **Buttons**: 🆕 New Chat | 🧹 Clear | ↻ Regen | 🔄 Toggle Mode
+  - **Styling**: Rounded pill shape (border-radius: 50px) with shadow
+  - **z-index: 9999** - Always visible above content
+  - **Theme-aware**: Auto-adapts to dark/light mode
+- **✅ Clean Header** - Retained only ⬇️ Download button at top
+- **✅ Professional UX** - All controls accessible without scrolling
+
+#### CSS Enhancements
+```css
+.floating-action-bar {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    border-radius: 50px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.20);
+}
+.chat-container-wrapper { padding-bottom: 160px; }
+```
+
+### Upgrade 2: "The Polisher" - Strict NO FILLER Prompt
+
+#### System Prompt Enhancement (`src/models/local_model.py`)
+- **✅ Added NO FILLER as Rule #1** - Eliminates all greeting/preamble text
+  - **BEFORE**: "Good morning! Here is the answer based on the context..."
+  - **AFTER**: "PC-I forms require approval from **Deputy Secretary** for projects exceeding..."
+- **✅ Blocked Phrases**:
+  - Greetings: "Good morning", "Hello", "Hi there"
+  - Preambles: "Here is the answer", "Based on the context", "PDBot says"
+  - Filler: "Let me explain", "To answer your question"
+- **✅ Immediate Direct Answers** - Jump straight to information
+- **✅ Maintained Quality Rules**:
+  - Rule 2: SYNTHESIZE (smooth paragraphs)
+  - Rule 3: CORRECTION (OCR fixes)
+  - Rule 4: LOGIC CHECK (thresholds)
+  - Rule 5: FORMAT (bold key data)
+  - Rules 6-8: Accuracy controls
+
+#### Result
+- **Professional government-style tone** - Direct, factual, no fluff
+- **Faster reading** - Users get answers immediately
+- **Enterprise-grade polish** - Matches high-quality documentation standards
+
+### Upgrade 3: LLM-Based Contextual Memory
+
+#### Intelligent Query Rewriting (`src/app.py`)
+- **✅ Replaced Pattern Matching** - OLD: Simple regex entity extraction
+- **✅ NEW: Ollama LLM Reasoning** - Uses LLM to understand context
+  - **Method**: `rewriter._ollama_generate()` with conversation history
+  - **Temperature**: 0.0 (deterministic rewrites)
+  - **Context**: Last 4 messages (2 user + 2 bot turns)
+  - **System Prompt**: "You are a query rewriter. Rewrite follow-up questions..."
+
+#### How It Works
+```python
+# User conversation:
+User: "Tell me about PC-I"
+Bot: "PC-I is for projects over 100 billion..."
+User: "Who signs it?"
+
+# LLM analyzes history and rewrites:
+Original: "Who signs it?"
+Rewritten: "Who signs the PC-I form?"
+```
+
+#### Advanced Features
+- **Smart Detection**: Identifies follow-up questions (short, ambiguous, no PC-form mention)
+- **Fallback Safety**: Returns original query on any errors
+- **Concise Rewrites**: Limits to 25 words max
+- **Validation**: Checks rewrite quality before using
+
+#### Performance
+- **Pattern-based (OLD)**: Simple append, no context understanding
+- **LLM-based (NEW)**: True semantic understanding, handles complex follow-ups
+- **Example Improvements**:
+  - "What about the fee?" → "What is the fee for PC-II projects?"
+  - "Can it be delegated?" → "Can PC-III approval be delegated?"
+  - "How long does it take?" → "How long does PC-I processing take?"
+
+### Technical Changes
+
+#### Files Modified
+1. **`src/app.py`** (148 insertions, 182 deletions)
+   - Removed 40+ lines of st.popover code (line 1010)
+   - Added floating action bar CSS (40 lines)
+   - Relocated action buttons to floating container (25 lines)
+   - Rewrote `rewrite_query_with_history()` with LLM call (80 lines)
+
+2. **`src/models/local_model.py`** (Minor changes)
+   - Added NO FILLER as Rule #1 in system_msg
+   - Renumbered rules 1-8 (was 1-7)
+   - Enhanced output format reminder
+
+#### Code Quality
+- ✅ No syntax errors
+- ✅ No Pylance errors
+- ✅ All imports verified
+- ✅ Backward compatible with v1.0.0
+
+### Migration from v1.0.0 → v1.1.0
+
+**Breaking Changes**: None - Fully backward compatible
+
+**UI Changes**:
+- Settings popover removed (users should use floating action bar)
+- Action buttons relocated from top to bottom (better UX)
+
+**Behavior Changes**:
+- Bot responses now start immediately (no greetings)
+- Follow-up questions handled more intelligently (LLM-based)
+
+### Testing & Validation
+
+**✅ Tested Features**:
+- Floating action bar visibility and positioning
+- NO FILLER prompt (asked questions, verified no greetings)
+- LLM-based contextual memory (tested "PC-I" → "Who signs it?")
+- All buttons functional (New Chat, Clear, Regen, Toggle Mode)
+- Theme adaptation (dark/light modes)
+
+**✅ Results**:
+- App running successfully at http://localhost:8501
+- All features working as expected
+- Zero errors in console
+- Professional Gemini-like user experience
+
+### Commit
+- **Commit**: `06099ac`
+- **Message**: "feat: v1.1.0 Enterprise Refinements - Floating action bar + NO FILLER prompt + LLM-based contextual memory"
+- **Stats**: 3 files changed, 148 insertions(+), 182 deletions(-)
+- **Pushed**: GitHub (athem135-source/PDBOT)
+
+---
+
 ## [v1.0.0 - Enterprise Edition] - 2025-11-20
 
 ### 🎯 Enterprise-Grade Upgrade: "90% Accuracy" + Gemini-Style UI
