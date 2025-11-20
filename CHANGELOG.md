@@ -2,7 +2,7 @@
 
 All notable changes to PDBOT will be documented in this file.
 
-## [v1.1.0 - Enterprise Refinements] - 2025-11-20
+## [v1.1.0 - Enterprise Refinements] - 2025-11-21
 
 ### 🚀 Complete UI/UX Overhaul + Enhanced Intelligence
 
@@ -12,27 +12,44 @@ This release refines the v1.0.0 Enterprise Edition with three major upgrades foc
 
 #### UI Transformation (`src/app.py`)
 - **✅ Removed Settings Popover** - Eliminated top-right clunky popover menu
-- **✅ Created Floating Sticky Action Bar** - NEW Gemini-style controls at bottom
+- **✅ True Floating Action Bar** - CSS `:has()` selector teleports pills to bottom
+  - **Technology**: Uses modern CSS `:has(> .floating-bar-marker)` to target container
   - **Position**: Fixed at `bottom: 80px` (above chat input)
-  - **Buttons**: 🆕 New Chat | 🧹 Clear | ↻ Regen | 🔄 Toggle Mode
-  - **Styling**: Rounded pill shape (border-radius: 50px) with shadow
-  - **z-index: 9999** - Always visible above content
-  - **Theme-aware**: Auto-adapts to dark/light mode
+  - **Buttons**: 🆕 New | 🧹 Clear | ↻ Regen | 🔄 Toggle Mode
+  - **Design**: Rounded 20px pills with glass effect (backdrop-filter: blur)
+  - **z-index: 9999** - Always visible above all content
+  - **Theme-aware**: Automatic light/dark mode pill styling
+  - **Animations**: Smooth hover effects with elevation
 - **✅ Clean Header** - Retained only ⬇️ Download button at top
 - **✅ Professional UX** - All controls accessible without scrolling
 
-#### CSS Enhancements
+#### CSS Implementation (Modern Approach)
 ```css
-.floating-action-bar {
-    position: fixed;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 9999;
-    border-radius: 50px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.20);
+/* Target container with marker */
+div:has(> .floating-bar-marker) {
+    position: fixed !important;
+    bottom: 80px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 9999 !important;
 }
-.chat-container-wrapper { padding-bottom: 160px; }
+
+/* Gemini-style pill buttons */
+div:has(> .floating-bar-marker) .stButton > button {
+    border-radius: 20px !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    div:has(> .floating-bar-marker) .stButton > button {
+        background: rgba(30, 30, 30, 0.8) !important;
+    }
+}
+
+.block-container { padding-bottom: 160px !important; }
 ```
 
 ### Upgrade 2: "The Polisher" - Strict NO FILLER Prompt

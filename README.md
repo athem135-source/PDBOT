@@ -13,10 +13,12 @@
 
 ### 🎨 Gemini-Style Floating Action Bar
 - **Removed clunky settings popover** - No more hidden menus at top
-- **Floating sticky controls** - Always visible action bar at bottom (Gemini-style)
-- **Quick access buttons**: 🆕 New Chat | 🧹 Clear | ↻ Regen | 🔄 Toggle Mode
-- **Professional design** - Rounded pill shape with shadow, adapts to dark/light theme
-- **Fixed positioning** - z-index 9999, bottom: 80px (above chat input)
+- **True floating sticky controls** - Pills float at bottom using CSS `:has()` selector
+- **Quick access buttons**: 🆕 New | 🧹 Clear | ↻ Regen | 🔄 Toggle Mode
+- **Professional pill design** - Rounded (20px radius), glass effect with backdrop blur
+- **Fixed positioning** - Always visible at `bottom: 80px`, z-index 9999
+- **Theme-adaptive** - Automatically adjusts for dark/light mode
+- **Hover effects** - Smooth transitions and elevation on hover
 
 ### 🎯 "The Polisher" - NO FILLER Prompt
 - **Immediate direct answers** - No greetings, no preambles, no filler text
@@ -79,11 +81,14 @@
 ### 💬 Gemini-Style Floating UI (v1.1.0)
 - **Native chat messages** - Streamlit's built-in chat with auto-scroll and avatars
 - **Streaming responses** - Live word-by-word typing effect (50 words/sec)
-- **Floating action bar** - Sticky controls at bottom (above input), always visible
-- **Quick action buttons** - 🆕 New Chat, 🧹 Clear, ↻ Regen, 🔄 Toggle mode
-- **Professional design** - Rounded pill with shadow, theme-adaptive
+- **True floating action bar** - CSS `:has()` selector teleports pills to bottom
+  - Pills use glass effect (backdrop-filter: blur) with 80% opacity
+  - Hover animations with smooth transitions
+  - Positioned at fixed `bottom: 80px` above chat input
+- **Quick action buttons** - 🆕 New | 🧹 Clear | ↻ Regen | 🔄 Toggle mode
+- **Professional design** - Rounded 20px pills with subtle shadows
 - **Sticky input bar** - Always visible, auto-growing textarea
-- **Mode indicator** - Current selection (Generative/Exact) visible in action bar
+- **Theme-adaptive** - Automatically switches between light/dark pill styles
 
 ### Dual Query Modes
 1. **Generative Mode** (Default): Advanced RAG pipeline with LLM-generated comprehensive answers (150-250 words)

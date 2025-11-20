@@ -1123,31 +1123,62 @@ textarea, .stTextInput > div > div > input{ border-radius:10px !important; }
 /* Responsive tweaks */
 @media (max-width: 768px){
   .chat-msg{ max-width: 100%; }
+}
 
-/* ENTERPRISE v1.1.0: Floating action bar at bottom (Gemini-style sticky footer) */
-.floating-action-bar {
-    position: fixed;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 9999;
-    background: var(--background-color);
-    padding: 10px 20px;
-    border-radius: 50px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.20);
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    border: 1px solid rgba(0,0,0,0.15);
+/* ENTERPRISE v1.1.0: Floating Action Bar - Gemini-Style Pills at Bottom */
+/* Target the container holding our marker */
+div:has(> .floating-bar-marker) {
+    position: fixed !important;
+    bottom: 80px !important; /* Sits right above the chat input */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 9999 !important;
+    background-color: transparent !important;
+    width: auto !important;
+    padding: 0 !important;
 }
-[data-theme="dark"] .floating-action-bar {
-    background: #1a1f28;
-    border-color: rgba(255,255,255,0.1);
+
+/* Style the buttons inside to look like "Gemini Pills" */
+div:has(> .floating-bar-marker) .stButton > button {
+    border-radius: 20px !important;
+    border: 1px solid rgba(128, 128, 128, 0.2) !important;
+    background: rgba(255, 255, 255, 0.8) !important; /* Glass effect light */
+    color: #333 !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    padding: 6px 16px !important;
+    min-height: 0px !important;
+    height: 36px !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
+    backdrop-filter: blur(10px);
+    transition: all 0.2s ease !important;
 }
-.floating-action-bar button {
-    padding: 8px 16px;
-    border-radius: 20px;
-    border: 1px solid rgba(0,0,0,0.2);
+
+div:has(> .floating-bar-marker) .stButton > button:hover {
+    background: rgba(255, 255, 255, 0.95) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    transform: translateY(-1px);
+}
+
+/* Dark mode adjustments for the pills */
+@media (prefers-color-scheme: dark) {
+    div:has(> .floating-bar-marker) .stButton > button {
+        background: rgba(30, 30, 30, 0.8) !important;
+        color: #eee !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    div:has(> .floating-bar-marker) .stButton > button:hover {
+        background: rgba(40, 40, 40, 0.9) !important;
+    }
+}
+
+/* Hide the mode indicator caption in floating bar */
+div:has(> .floating-bar-marker) .stCaption {
+    display: none !important;
+}
+
+/* Add padding to main content so text doesn't hide behind the footer */
+.block-container { padding-bottom: 160px !important; }
     background: rgba(255,255,255,0.05);
     cursor: pointer;
     font-size: 14px;
@@ -2589,28 +2620,6 @@ with tab_chat:
         # Chat window - ENTERPRISE UI: Native Streamlit chat messages
         st.markdown("### Conversation")
         
-        # ENTERPRISE v1.1.0: Floating action bar at bottom (Gemini-style)
-        # Render buttons using columns for Streamlit interactivity
-        floating_cols = st.columns([1, 1, 1, 1, 5])
-        with floating_cols[0]:
-            if st.button("🆕 New Chat", key="new_chat_btn_float", help="Start new conversation", use_container_width=True):
-                request_rating_then("new")
-        with floating_cols[1]:
-            if st.button("🧹 Clear", key="clear_chat_btn_float", help="Clear all chat history", use_container_width=True):
-                request_rating_then("clear")
-        with floating_cols[2]:
-            if st.button("↻ Regen", key="regen_chat_btn_float", help="Regenerate last answer", disabled=not st.session_state.get("last_question"), use_container_width=True):
-                st.session_state._regen_inline = True
-                st.rerun()
-        with floating_cols[3]:
-            mode = st.session_state.get("answer_mode", "Generative")
-            new_mode = "Exact" if mode == "Generative" else "Gen"
-            if st.button(f"🔄 {new_mode}", key="toggle_mode_btn_float", help="Toggle answer mode", use_container_width=True):
-                st.session_state["answer_mode"] = "Exact Search" if mode == "Generative" else "Generative"
-                st.rerun()
-        with floating_cols[4]:
-            st.caption(f"Mode: **{st.session_state.get('answer_mode', 'Generative')}**")
-        
         # Chat history display - Native st.chat_message (Gemini-style, auto-scrolling)
         chat_container = st.container()
         with chat_container:
@@ -2630,6 +2639,28 @@ with tab_chat:
             # If no manual is loaded yet, guide the user to enable admin and load it
             if not (st.session_state.get("raw_pages") or []):
                 st.info("Manual not loaded yet. Type 'nufc' and press Enter to enable admin mode, then use Settings → Manual to load or reload the manual.")
+            
+            # ENTERPRISE v1.1.0: Floating Action Bar (Gemini-style pills at bottom)
+            # This container will be "teleported" to the bottom via CSS :has() selector
+            with st.container():
+                st.markdown('<div class="floating-bar-marker"></div>', unsafe_allow_html=True)
+                floating_cols = st.columns([1, 1, 1, 1])
+                with floating_cols[0]:
+                    if st.button("🆕 New", key="new_chat_btn_float", help="Start new conversation"):
+                        request_rating_then("new")
+                with floating_cols[1]:
+                    if st.button("🧹 Clear", key="clear_chat_btn_float", help="Clear all chat history"):
+                        request_rating_then("clear")
+                with floating_cols[2]:
+                    if st.button("↻ Regen", key="regen_chat_btn_float", help="Regenerate last answer", disabled=not st.session_state.get("last_question")):
+                        st.session_state._regen_inline = True
+                        st.rerun()
+                with floating_cols[3]:
+                    mode = st.session_state.get("answer_mode", "Generative")
+                    new_mode = "Exact" if mode == "Generative" else "Gen"
+                    if st.button(f"🔄 {new_mode}", key="toggle_mode_btn_float", help="Toggle answer mode"):
+                        st.session_state["answer_mode"] = "Exact Search" if mode == "Generative" else "Generative"
+                        st.rerun()
             
             # ENTERPRISE UI: Native st.chat_input (sticky, auto-growing)
             q = st.chat_input("Ask the Planning Manual…", key="chat_question_input")
