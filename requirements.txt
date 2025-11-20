@@ -1,6 +1,6 @@
 # ============================================
-# PDBot Requirements - v0.9.0
-# Enterprise RAG Pipeline with Semantic Reranking
+# PDBot Requirements - v1.1.0
+# Enterprise RAG with LLM-Based Contextual Memory
 # ============================================
 
 # ---- Frontend & UI ----
@@ -9,7 +9,6 @@ requests>=2.32.0               # HTTP library for API calls (Ollama, Qdrant heal
 
 # ---- Document Processing ----
 pypdf>=4.2.0                   # PDF text extraction for manual ingestion
-pymupdf>=1.23.0                # PyMuPDF (fitz) for PDF page rendering in View Source feature
 
 # ---- LLM Backend ----
 transformers>=4.44.2           # Hugging Face transformers for tokenization and embeddings

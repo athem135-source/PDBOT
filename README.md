@@ -1,38 +1,35 @@
 ﻿# PDBot – Planning & Development Manual RAG Chatbot
 
-![Version](https://img.shields.io/badge/version-1.0.0--enterprise-blue)
+![Version](https://img.shields.io/badge/version-1.1.0--enterprise-blue)
 ![Python](https://img.shields.io/badge/python-3.12%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Accuracy](https://img.shields.io/badge/accuracy-90%25-brightgreen)
 
-**🏆 Enterprise-grade document-grounded chatbot for querying the Planning & Development Commission Manual using advanced RAG with contextual memory and Gemini-style UI.**
+**🏆 Enterprise-grade document-grounded chatbot for querying the Planning & Development Commission Manual using advanced RAG with LLM-based contextual memory and Gemini-style floating UI.**
 
 ---
 
-## 🚀 What's New in v1.0.0 (Enterprise Edition)
+## 🚀 What's New in v1.1.0 (Enterprise Refinements)
 
-### 🎯 90% Accuracy Target Achieved
-- **Raised min_score from 0.05 → 0.20** - Filters noise, boosts precision
-- **Reranking enabled by default** - Consistent quality across all queries
-- **PC-Form Keyword Boost** - 30% score boost for exact form matches (PC-I, PC-II, etc.)
-- **Enhanced System Prompt** - OCR correction, logic checking, professional formatting
+### 🎨 Gemini-Style Floating Action Bar
+- **Removed clunky settings popover** - No more hidden menus at top
+- **Floating sticky controls** - Always visible action bar at bottom (Gemini-style)
+- **Quick access buttons**: 🆕 New Chat | 🧹 Clear | ↻ Regen | 🔄 Toggle Mode
+- **Professional design** - Rounded pill shape with shadow, adapts to dark/light theme
+- **Fixed positioning** - z-index 9999, bottom: 80px (above chat input)
 
-### 🧠 Contextual Memory (Chat History Intelligence)
-- **Automatic query rewriting** - Analyzes last 4 messages to contextualize follow-ups
-- **Example**: After asking "Tell me about PC-I", the question "What is the fee?" automatically becomes "What is the fee for PC-I?"
-- **Smart entity detection** - Extracts PC forms and technical terms from conversation
+### 🎯 "The Polisher" - NO FILLER Prompt
+- **Immediate direct answers** - No greetings, no preambles, no filler text
+- **Blocks all fluff**: "Good morning", "Here is the answer", "Based on the context"
+- **Professional tone** - Government-style factual responses
+- **Maintained quality** - Still fixes OCR errors, checks logic, formats data
 
-### 💎 Gemini-Style Professional UI
-- **Native chat interface** - Streamlit's `st.chat_message()` with auto-scrolling
-- **Streaming responses** - Word-by-word typing effect at 50 words/second
-- **Action button row** - 🆕 New Chat, ↻ Regen, 🔄 Toggle mode (above sticky input)
-- **Removed 127 lines** of legacy custom HTML/CSS
-
-### 🔄 What We Removed
-- ❌ Custom div-based chat UI (replaced with native Streamlit)
-- ❌ Old rigid 3-section system prompt (replaced with "Polishing" prompt)
-- ❌ Manual JavaScript for input handling (native sticky input)
-- ❌ Complex CSS for chat styling (native themes)
+### 🧠 LLM-Based Contextual Memory
+- **Replaced pattern matching** with Ollama LLM reasoning for query rewriting
+- **Smarter follow-ups** - Understands context from last 4 messages
+- **Example**: After "Tell me about PC-I", asking "Who signs it?" → rewrites to "Who signs the PC-I form?"
+- **Deterministic** - Temperature=0.0 for consistent rewrites
+- **Safe fallback** - Returns original query on any errors
 
 ---
 
@@ -79,12 +76,14 @@
 - **Logic checking** - Careful handling of thresholds, exceptions vs rules
 - **Professional formatting** - Bolded numbers, dates, deadlines
 
-### 💬 Gemini-Style UI (v1.0.0)
+### 💬 Gemini-Style Floating UI (v1.1.0)
 - **Native chat messages** - Streamlit's built-in chat with auto-scroll and avatars
 - **Streaming responses** - Live word-by-word typing effect (50 words/sec)
+- **Floating action bar** - Sticky controls at bottom (above input), always visible
+- **Quick action buttons** - 🆕 New Chat, 🧹 Clear, ↻ Regen, 🔄 Toggle mode
+- **Professional design** - Rounded pill with shadow, theme-adaptive
 - **Sticky input bar** - Always visible, auto-growing textarea
-- **Action buttons** - New Chat, Regenerate, Toggle mode in clean row
-- **Mode indicator** - Current selection (Generative/Exact) always visible
+- **Mode indicator** - Current selection (Generative/Exact) visible in action bar
 
 ### Dual Query Modes
 1. **Generative Mode** (Default): Advanced RAG pipeline with LLM-generated comprehensive answers (150-250 words)
@@ -110,34 +109,39 @@
 
 ## 🏗️ Architecture
 
-### Monolithic Structure (v1.0.0 - Reverted from v0.9.0 Modular)
+### Monolithic Structure (v1.1.0 - Stable & Enterprise-Ready)
 
-**Why we reverted**: The modular architecture (v0.9.0) caused UI inconsistencies and removed critical features. The original monolithic structure proved more reliable for Streamlit's reactive model.
+**Why monolithic?** The modular architecture (v0.9.0) caused UI inconsistencies. The proven monolithic structure is more reliable for Streamlit's reactive model and enterprise features.
 
 ```
 src/
-├── app.py                    # Main application (3,100+ lines, enterprise-grade)
-│   ├── Contextual memory (query rewriting)
-│   ├── Gemini-style native chat UI
-│   ├── Streaming responses
-│   └── Action button controls
-├── rag_langchain.py          # RAG pipeline with PC-form boost
-│   ├── Enhanced min_score (0.20)
-│   ├── PC-Form Keyword Boost (30%)
-│   └── Cross-encoder reranking (always on)
+├── app.py                    # Main application (3,156 lines, enterprise-grade)
+│   ├── LLM-based contextual memory (query rewriting via Ollama)
+│   ├── Gemini-style floating action bar
+│   ├── Native chat UI with streaming
+│   ├── NO FILLER response handling
+│   └── Admin panel & settings
+├── rag_langchain.py          # RAG pipeline with PC-form boost (885 lines)
+│   ├── Enhanced min_score (0.20) - filters noise
+│   ├── PC-Form Keyword Boost (30%) - prioritizes exact matches
+│   └── Cross-encoder reranking (always enabled)
 ├── models/
-│   ├── local_model.py        # Ollama with "Polishing" prompt
-│   └── pretrained_model.py   # Local pretrained model support
+│   ├── local_model.py        # Ollama with "The Polisher" prompt (332 lines)
+│   │                         # NO FILLER + OCR correction + logic checking
+│   ├── pretrained_model.py   # HuggingFace model support
+│   └── qwen_pretrained.py    # Qwen model wrapper
 └── utils/
     ├── text_utils.py         # Text processing utilities
     └── persist.py            # Chat history persistence
 ```
 
-**Removed in v1.0.0**:
-- ❌ `src/ui/` directory (layout.py, sidebar.py, chat_interface.py)
-- ❌ `src/logic/` directory (answer_generator.py, state_manager.py)
-- ❌ `src/utils/pdf_renderer.py` (View Source feature removed for stability)
-- Total: **-2,766 lines** of modular code, **+360 lines** of enterprise features
+**What Was Removed**:
+- ❌ Settings popover (v1.1.0) - Replaced with floating action bar
+- ❌ `src/ui/` directory (v0.9.0 rollback) - Caused UI instability
+- ❌ `src/logic/` directory (v0.9.0 rollback) - State management issues
+- ❌ `src/utils/pdf_renderer.py` (v0.9.0 rollback) - PDF viewer feature removed
+- ❌ Custom HTML/CSS chat UI (v1.0.0) - Replaced with native Streamlit
+- ❌ Pattern-based query rewriting (v1.1.0) - Replaced with LLM reasoning
 
 ### System Architecture
 
@@ -436,15 +440,18 @@ enableCORS = false
 - Faster response (1-3 seconds)
 - No LLM generation (no hallucination risk)
 
-### Step 3: Review Evidence & View Source
+### Step 3: Review Evidence & Citations
 
-- Click **"📄 View Source Pages"** expander to see actual PDF pages cited in the answer
-  - Displays high-quality page images rendered at 2x zoom (150 DPI)
-  - Shows up to 5 most relevant pages with page numbers
-  - Powered by PyMuPDF for fast, accurate rendering
-- Click **"Supporting Passages"** dropdown to see retrieved context
-- Click **"Citations"** dropdown to see page numbers and sources
-- Use **"Regenerate"** button to get alternative wording with same context
+- Click **"Supporting Passages"** expander to see retrieved context chunks
+  - Shows the actual sentences/paragraphs used to generate the answer
+  - Includes relevance scores and chunk classifications
+- Click **"Citations"** expander to see page numbers and sources
+  - Lists all pages referenced in the answer
+  - Provides page-level source attribution
+- Use **↻ Regen** button (floating action bar) to get alternative wording with same context
+- Use **🧹 Clear** button (floating action bar) to reset conversation
+
+> **Note**: PDF page rendering feature was removed in v0.9.0 rollback for stability. Citations now show page numbers only.
 
 ### Step 4: Provide Feedback
 
@@ -465,39 +472,54 @@ enableCORS = false
 ```
 PDBOT/
 ├── src/                          # Main application source
-│   ├── app.py                    # Streamlit entry point (<100 lines)
-│   ├── rag_langchain.py          # RAG pipeline with cross-encoder (846 lines)
-│   ├── models/                   # LLM wrappers
-│   │   ├── local_model.py        # Ollama integration
+│   ├── app.py                    # Streamlit app (3,156 lines) - Main entry point
+│   ├── rag_langchain.py          # RAG pipeline (885 lines) - Retrieval & reranking
+│   ├── models/                   # LLM backends
+│   │   ├── __init__.py
+│   │   ├── local_model.py        # Ollama integration (332 lines)
 │   │   ├── pretrained_model.py   # HuggingFace models
-│   │   └── qwen_pretrained.py    # Qwen model wrapper
-│   ├── logic/                    # Business logic
-│   │   └── state_manager.py      # Session state management (186 lines)
-│   ├── ui/                       # UI components
-│   │   ├── layout.py             # Page config, CSS, header (186 lines)
-│   │   ├── sidebar.py            # Sidebar controls (227 lines)
-│   │   └── chat_interface.py     # Chat + View Source (273 lines)
-│   ├── utils/                    # Helper utilities
-│   │   ├── pdf_renderer.py       # PDF page rendering with PyMuPDF (111 lines)
-│   │   ├── persist.py            # Chat history persistence
-│   │   └── text_utils.py         # Text processing utilities
-│   └── assets/                   # Static files (logos, CSS)
+│   │   └── qwen_pretrained.py    # Qwen wrapper
+│   ├── utils/                    # Utilities
+│   │   ├── __init__.py
+│   │   ├── persist.py            # Chat history save/load
+│   │   └── text_utils.py         # Text processing
+│   ├── assets/                   # Static files (logos, CSS)
+│   └── data/                     # Runtime data
+│       └── chat_single.json      # Chat history storage
 │
-├── config/                       # Configuration files
+├── config/                       # Configuration
 │   └── manual_path.txt           # PDF manual location
 │
-├── data/                         # Runtime data
-│   ├── uploads/                  # User-uploaded PDFs
-│   └── chat_single.json          # Chat history
+├── data/                         # User data
+│   └── uploads/                  # User-uploaded PDFs
 │
 ├── feedback/                     # User feedback by rating
 │   ├── 1_star/
 │   ├── 2_star/
-│   ├── 3_star/
-│   ├── 4_star/
-│   └── 5_star/
+│   └── 3_star/
 │
 ├── logs/                         # Application logs
+│
+├── nltk_data/                    # NLTK data (punkt tokenizer)
+│   └── tokenizers/punkt_tab/
+│
+├── .streamlit/                   # Streamlit config
+│   └── config.toml
+│
+├── requirements.txt              # Python dependencies (v1.1.0)
+├── setup.bat                     # Windows setup script
+├── run.ps1                       # Windows run script
+├── run.bat                       # Batch launcher
+├── CHANGELOG.md                  # Version history
+├── .gitignore                    # Git ignore rules
+└── README.md                     # This file
+```
+
+**Key Files**:
+- `src/app.py` - All UI, chat logic, admin panel, contextual memory
+- `src/rag_langchain.py` - RAG pipeline with PC-form boost and reranking
+- `src/models/local_model.py` - "The Polisher" prompt with NO FILLER rule
+- `config/manual_path.txt` - Path to PDF manual (user-configurable)
 │
 ├── .streamlit/                   # Streamlit configuration
 │   └── config.toml
@@ -673,6 +695,37 @@ pytest tests/ --cov=src --cov-report=html
 ---
 
 ## 📜 Version History
+
+### v1.1.0 - Enterprise Refinements (November 20, 2025)
+**🚀 Complete UI/UX Overhaul + Enhanced Intelligence**
+
+**Upgrade 1: Gemini-Style Floating Action Bar**
+- ✅ Removed settings popover (clunky top-right menu)
+- ✅ Created floating sticky action bar at bottom (Gemini-style)
+  - Position: Fixed at bottom: 80px (above chat input)
+  - Buttons: 🆕 New Chat | 🧹 Clear | ↻ Regen | 🔄 Toggle Mode
+  - Design: Rounded pill with shadow, theme-adaptive (z-index: 9999)
+- ✅ Professional UX - All controls accessible without scrolling
+
+**Upgrade 2: "The Polisher" - NO FILLER Prompt**
+- ✅ Added NO FILLER as Rule #1 in system prompt
+  - Blocks: "Good morning", "Hello", "Here is the answer", "Based on the context"
+  - Forces immediate direct answers with no greetings/preambles
+- ✅ Maintained quality rules: OCR correction, logic checking, formatting
+- ✅ Result: Professional government-style factual responses
+
+**Upgrade 3: LLM-Based Contextual Memory**
+- ✅ Replaced pattern-based query rewriting with Ollama LLM call
+- ✅ Uses conversation history (last 4 messages) for intelligent rewrites
+- ✅ Example: "Who signs it?" after "PC-I" → "Who signs the PC-I form?"
+- ✅ Temperature=0.0 for deterministic rewrites, fallback to original on errors
+
+**Technical:**
+- Modified: `app.py` (148 insertions, 182 deletions), `local_model.py` (minor)
+- Commits: 06099ac + 9d1823d
+- Net change: -34 lines (cleaner, more efficient)
+
+---
 
 ### v1.0.0 - Enterprise Edition (November 20, 2025)
 **🏆 Enterprise-Grade Upgrade: "90% Accuracy" + Gemini-Style UI**
@@ -863,28 +916,36 @@ A: Yes. Upload any PDF via Admin Panel → Manage Manual.
 A: Install CUDA-enabled PyTorch: `pip install torch --index-url https://download.pytorch.org/whl/cu118`
 
 **Q: Can I deploy to cloud (AWS, Azure, GCP)?**  
-A: Yes. Use the Docker image and configure environment variables for cloud services.
+A: Yes. Use Docker deployment and configure environment variables for cloud services.
+
+**Q: Why was the PDF viewer feature removed?**  
+A: The PDF page rendering feature (v0.9.0) caused UI instability and was rolled back in v0.8.5. Citations now show page numbers for manual reference. This decision prioritizes stability and performance.
+
+**Q: How does the floating action bar work?**  
+A: The floating action bar (v1.1.0) uses CSS fixed positioning at `bottom: 80px` with `z-index: 9999`. It's always visible above the chat input and adapts to dark/light themes automatically.
 
 ---
 
 ## 🗺️ Roadmap
 
-### v1.0.0 (Q1 2026)
+### v1.2.0 (Q1 2026)
+- [ ] Enhanced admin panel (multi-document management)
+- [ ] Export options (PDF, Word, JSON)
+- [ ] Advanced filtering (date ranges, categories)
+- [ ] User preferences (theme, language, defaults)
+
+### v2.0.0 (Q2 2026)
 - [ ] RAG observability (LangSmith integration)
 - [ ] Fine-tuned embeddings (domain-specific)
 - [ ] Multi-user authentication (role-based access)
 - [ ] API endpoints (REST/GraphQL)
 - [ ] Production-grade deployment (Docker Swarm/Kubernetes)
-
-### v1.5.0 (Q1 2026)
-- [ ] Enterprise features (SSO, audit logs)
-- [ ] Advanced analytics (user behavior, popular queries)
-- [ ] Automated model updates (CI/CD pipeline)
 - [ ] Mobile app (React Native)
 - [ ] Cloud deployment templates (AWS, Azure, GCP)
 
 ---
 
-**Last Updated:** November 17, 2025  
+**Last Updated:** November 21, 2025  
+**Current Version:** v1.1.0 Enterprise Refinements  
 **Maintained By:** [@athem135-source](https://github.com/athem135-source)  
 **Repository:** [github.com/athem135-source/PDBOT](https://github.com/athem135-source/PDBOT)

@@ -86,5 +86,45 @@
   {
     "role": "assistant",
     "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>2.09 The PC-II approved by the relevant competent forum is required for the conduct of Techno-Economic feasibility study, including technical investigation, market survey, and other studies (Annexure 2). [2] Projects falling in these categories shall require a Techno-Economic feasibility study undertaken through the PC -II, which must include TORs, technical and reference design, assignment justified on man-month basis on gantt chart, and as explained in the instructions for Techno-Economic Feasibilty studies (Appendix-C). [3] 2.11 The requirement of the PC-II shall not apply to projects declared as R&D oriented or innovative in nature, irreversibly, by the forum having financial powers to approve the projects. [4] Any study older than three years is not accepted by the Planning Commission (Annexure 3). [5] For more complex projects or those with complex long-term climate impacts, technical assistance may be requested for a Techno-Economic feasibility study from one of the development partners/donors. [6] For more detailed information on the PC-II, please refer to Annexure 2.\n\n• PC-II PROFORMA \n2.09 The PC-II approved by the relevant competent forum is required for the conduct of Techno-\nEconomic feasibility study, including technical investigations, market surveys and other studies \n(Annexure 2).\n• Projects falling in these categories shall require \nTechno-Economic feasibility study undertaken through the PC -II, which must include, at least, \nTORs, technical and reference design, assignments duly justified on man month basis on gantt chart \nand as explained in the instructions for Techno-Economic Feasibility studies (Appendix-C).\n• 2.11 The requirement of the PC-II shall also not apply to projects declared as R&D oriented or \ninnovative in nature, irrespective of their cost, by the forum having financial powers to approve \nthe projects.\n• 2.12   The Techno-Economic feasibility should be proper and based on the current data , \nincluding climate and environmental data.\n• Any study older than three years is not accepted by \nthe Planning Commission (Annexure  3).\n• For more complex projects or the projects that have \ncomplex long -term cl imate impacts, technical assistance may be requested for a Techno-\nEconomic feasibility study from one of the development partners/donors.\n• 2.13 Planning Commission has notified instructions for Techno -Economic feasibility studies.\n• (Annexure 49), however following are the essentials of a Techno-Economic feasibility study: [p.34, p.36, p.152]\n\nSources:\n[1] Manual for Development Projects 2024, p.34\n[2] Manual for Development Projects 2024, p.34\n[3] Manual for Development Projects 2024, p.34\n[4] Manual for Development Projects 2024, p.34\n[5] Manual for Development Projects 2024, p.34\n[6] Manual for Development Projects 2024, p.34\n[7] Manual for Development Projects 2024, p.34\n[8] Manual for Development Projects 2024, p.34\n[9] Manual for Development Projects 2024, p.36\n[10] Manual for Development Projects 2024, p.152</div>"
+  },
+  {
+    "role": "user",
+    "content": "The quorum of the DWP will be incomplete without the presence of\neither represe"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Pg 170, Para 1, Line 1: \"The quorum of the DWP will be incomplete without the presence of \neither representative of the Finance Division or the Planning \nCommission.\"<br/><br/>📘 <strong>Source:</strong><br/>Page 170 – Paragraph 1 – Line 1</div>"
+  },
+  {
+    "role": "user",
+    "content": " Matters relating to attached departments, autonomous bodies, and special\ninstitutions ofthe P&D Department.\nxix. Electronic data manag"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card warn'>⚠️ <strong>Answer:</strong><br/>No grounded passages found. Please rephrase or narrow the scope.<br/><br/>📘 <strong>Source:</strong><br/>Page 173<br/>Page 173<br/>Page 181</div>"
+  },
+  {
+    "role": "user",
+    "content": " Matters relating to attached departments, autonomous bodies, and special\ninstitutions of the P&D Department.\nxix. Electronic data manag"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card warn'>⚠️ <strong>Answer:</strong><br/>No grounded passages found. Please rephrase or narrow the scope.<br/><br/>📘 <strong>Source:</strong><br/>Page 173<br/>Page 173<br/>Page 181</div>"
+  },
+  {
+    "role": "user",
+    "content": " Matters relating to attached departments, autonomous bodies, and special institutions of the P&D Department."
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Pg 173, Para 1, Line 1: \"Matters relating to attached departments, autonomous bodies, and \nspecial institutions of the P&D Department.\"\n\nPg 181, Para 1, Line 1: \"Matters relating to attached departments, autonomous bodies, and special \ninstitutions of the P&D Department.\"<br/><br/>📘 <strong>Source:</strong><br/>Page 173 – Paragraph 1 – Line 1<br/>Page 181 – Paragraph 1 – Line 1</div>"
+  },
+  {
+    "role": "user",
+    "content": "This Department in Balochistan was established with the dissolution of One-Unit on the 1"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Pg 182, Para 1, Line 11: \"BALOCHISTAN \nPLANNING AND DEVELOPMENT DEPARTMENT \n \n7.53 This Department in Balochistan was established with the dissolution of One-Unit on the 1st \nJuly 1970.\"<br/><br/>📘 <strong>Source:</strong><br/>Page 182 – Paragraph 1 – Line 11</div>"
   }
 ]

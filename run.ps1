@@ -1,5 +1,5 @@
 # ============================================
-# PDBot Run Script - v0.6.0 (PowerShell)
+# PDBot Run Script - v1.1.0 (PowerShell)
 # Quick launch with automatic setup if needed
 # ============================================
 
