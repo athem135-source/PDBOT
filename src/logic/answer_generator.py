@@ -332,10 +332,18 @@ def generate_answer_generative(question: str) -> str:
         return "Not available in the provided document."
 
     # Generate answer using LLM
-    from src.models.pretrained_model import ask_pretrained
-    
     try:
-        answer = ask_pretrained(question, context_text)
+        from src.models.pretrained_model import PretrainedModel
+        gen = PretrainedModel(
+            entrypoint=st.session_state.get("pretrained_entry") or "",
+            model_path=st.session_state.get("pretrained_path") or ""
+        )
+        answer = gen.predict(
+            question=question,
+            context=context_text,
+            chunks=[h.get("text", "") for h in hits],
+            raw_pages=st.session_state.get("raw_pages") or []
+        ) or "Not available in the provided document."
     except Exception as e:
         logging.exception("LLM generation failed")
         answer = f"Error generating answer: {e}"

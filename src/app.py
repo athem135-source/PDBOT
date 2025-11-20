@@ -7,17 +7,17 @@ import sys
 import warnings
 
 # Suppress TensorFlow/Keras warnings early
-warnings.filterwarnings("ignore", message=".*Keras.*")
-warnings.filterwarnings("ignore", message=".*keras.*")
-os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "3")
-os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
-os.environ.setdefault("HF_HUB_DISABLE_TELEMETRY", "1")
+warnings.filterwarnings("ignore", category=Warning)
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
 
 import streamlit as st
 
 # Import modular components
 from src.logic.state_manager import init_session_state, check_pending_rerun
-from src.ui.layout import setup_page_config, inject_theme, render_brand_header, auto_scroll_chat
+from src.ui.layout import setup_page_config, inject_theme, auto_scroll_chat
 from src.ui.sidebar import render_sidebar
 from src.ui.chat_interface import (
     render_chat_history, 
@@ -57,10 +57,7 @@ def main():
     # 5. Inject theme CSS
     inject_theme()
     
-    # 6. Render brand header
-    render_brand_header()
-    
-    # 7. Create main tabs
+    # 6. Create main tabs
     tab_chat, tab_help = st.tabs(["❓ Ask Questions", "📘 Instructions"])
     
     with tab_chat:

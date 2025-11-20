@@ -63,6 +63,8 @@ def setup_page_config():
         layout="wide",
         initial_sidebar_state="collapsed"
     )
+    # Render brand header immediately after page config
+    render_brand_header()
 
 
 def inject_theme():

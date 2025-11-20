@@ -25,9 +25,9 @@ from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass
 
 # Suppress compatibility warnings
-warnings.filterwarnings("ignore", message=".*Keras.*")
-warnings.filterwarnings("ignore", message=".*keras.*")
-os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "3")
+warnings.filterwarnings("ignore", category=Warning)
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
 # Import dependencies with graceful fallback
 SENTENCE_TRANSFORMERS_AVAILABLE = False
