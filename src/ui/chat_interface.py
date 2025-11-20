@@ -189,7 +189,7 @@ def _handle_user_question(question: str):
         
         # Generate answer
         with st.spinner("Generating answer…"):
-            from src.app import generate_answer  # Import from main app for now
+            from src.logic.answer_generator import generate_answer
             answer_html, citations = generate_answer(question)
         
         # Display answer

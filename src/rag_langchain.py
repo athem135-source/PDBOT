@@ -27,20 +27,46 @@ from dataclasses import dataclass
 # Suppress compatibility warnings
 warnings.filterwarnings("ignore", message=".*Keras.*")
 warnings.filterwarnings("ignore", message=".*keras.*")
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "3")
 
-try:
-    from sentence_transformers import SentenceTransformer, CrossEncoder
-except Exception as e:
-    raise RuntimeError(f"sentence-transformers missing: {e}")
+# Import dependencies with graceful fallback
+SENTENCE_TRANSFORMERS_AVAILABLE = False
+QDRANT_AVAILABLE = False
+PYPDF_AVAILABLE = False
+
+# Suppress torch warnings that interfere with imports
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    try:
+        from sentence_transformers import SentenceTransformer, CrossEncoder
+        SENTENCE_TRANSFORMERS_AVAILABLE = True
+    except ImportError:
+        SentenceTransformer = None  # type: ignore
+        CrossEncoder = None  # type: ignore
+    except Exception:
+        SentenceTransformer = None  # type: ignore
+        CrossEncoder = None  # type: ignore
 
 try:
     from qdrant_client import QdrantClient
     from qdrant_client.http.models import Distance, VectorParams, PointStruct
-except Exception as e:
-    raise RuntimeError(f"qdrant-client missing: {e}")
+    QDRANT_AVAILABLE = True
+except ImportError:
+    QdrantClient = None  # type: ignore
+    Distance = None  # type: ignore
+    VectorParams = None  # type: ignore
+    PointStruct = None  # type: ignore
+except Exception:
+    QdrantClient = None  # type: ignore
+    Distance = None  # type: ignore
+    VectorParams = None  # type: ignore
+    PointStruct = None  # type: ignore
 
 try:
     from pypdf import PdfReader
+    PYPDF_AVAILABLE = True
+except ImportError:
+    PdfReader = None
 except Exception:
     PdfReader = None
 
@@ -272,7 +298,7 @@ def _split_into_chunks(text: str, chunk_size: int = 600, chunk_overlap: int = 10
     return chunks
 
 
-def _connect_qdrant(url: str) -> QdrantClient:
+def _connect_qdrant(url: str):
     """Connect to Qdrant instance."""
     return QdrantClient(url=url)
 
@@ -297,6 +323,14 @@ def ingest_pdf_sentence_level(
     pages = _read_pdf_pages(pdf_path)
     if not pages:
         return 0
+
+    # Check dependencies are actually loaded
+    if SentenceTransformer is None:
+        raise RuntimeError("SentenceTransformer not loaded - sentence-transformers import failed")
+    if QdrantClient is None:
+        raise RuntimeError("QdrantClient not loaded - qdrant-client import failed")
+    if VectorParams is None or Distance is None or PointStruct is None:
+        raise RuntimeError("Qdrant models not loaded - qdrant-client.http.models import failed")
 
     # Initialize models
     model = SentenceTransformer(EMBED_MODEL)
@@ -560,6 +594,10 @@ def search_sentences(
         enable_reranking: Use cross-encoder (recommended: True)
         enable_filtering: Apply exclusion rules (recommended: True)
     """
+    # Check dependencies are actually loaded
+    if SentenceTransformer is None or QdrantClient is None:
+        raise RuntimeError("RAG dependencies not properly loaded. Please restart the application.")
+    
     # Step 1: Initial retrieval (get 20 candidates)
     initial_k = 20  # Cast wider net initially
     

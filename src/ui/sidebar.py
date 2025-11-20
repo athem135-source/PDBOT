@@ -26,7 +26,15 @@ def load_builtin_manual(force: bool = False):
     Args:
         force: Force reload even if already loaded
     """
-    from src.rag_langchain import ingest_pdf_sentence_level
+    # Try to import RAG function (may fail if dependencies missing)
+    try:
+        from src.rag_langchain import ingest_pdf_sentence_level
+        rag_available = True
+    except Exception as e:
+        ingest_pdf_sentence_level = None
+        rag_available = False
+        import logging
+        logging.warning(f"RAG indexing not available: {e}")
     
     # Import PyPDF loader
     try:
@@ -79,14 +87,19 @@ def load_builtin_manual(force: bool = False):
     
     # Index into Qdrant
     n_indexed = 0
-    try:
-        with st.spinner("Indexing built-in manual…"):
-            n_indexed = ingest_pdf_sentence_level(manual_path, qdrant_url=_qdrant_url())
-        st.session_state["indexed_ok"] = n_indexed > 0
-        st.session_state["last_index_count"] = n_indexed
-        st.session_state["builtin_indexed"] = n_indexed > 0
-    except Exception as e:
-        st.error(f"Failed to index into Qdrant: {e}")
+    if rag_available and ingest_pdf_sentence_level is not None:
+        try:
+            with st.spinner("Indexing built-in manual…"):
+                n_indexed = ingest_pdf_sentence_level(manual_path, qdrant_url=_qdrant_url())
+            st.session_state["indexed_ok"] = n_indexed > 0
+            st.session_state["last_index_count"] = n_indexed
+            st.session_state["builtin_indexed"] = n_indexed > 0
+        except Exception as e:
+            st.error(f"Failed to index into Qdrant: {e}")
+            st.session_state["indexed_ok"] = False
+            st.session_state["last_index_count"] = 0
+            st.session_state["builtin_indexed"] = False
+    else:
         st.session_state["indexed_ok"] = False
         st.session_state["last_index_count"] = 0
         st.session_state["builtin_indexed"] = False
