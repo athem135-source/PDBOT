@@ -460,7 +460,7 @@ enableCORS = false
 
 ### Step 4: Provide Feedback
 
-- Rate answers using ⭐ star ratings (1-5)
+- Rate answers using ⭐ star ratings (1-3)
 - Add optional comments
 - Feedback is saved to `feedback/` folder for analysis
 
