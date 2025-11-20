@@ -2632,7 +2632,9 @@ with tab_chat:
                     role = "user" if str(r0).lower().startswith("you") else "assistant"
                 
                 # Use native st.chat_message (handles avatars and scrolling automatically)
-                with st.chat_message(role):
+                # Custom avatar: Pakistan emblem for assistant
+                avatar = "src/assets/pakistan_emblem.png" if role == "assistant" else None
+                with st.chat_message(role, avatar=avatar):
                     st.markdown(msg, unsafe_allow_html=True)
 
             # Sticky ask bar below the transcript (native st.chat_input is sticky by default)
@@ -2686,7 +2688,7 @@ with tab_chat:
                             answer_html, citations = generate_answer(q)
                         
                         # ENTERPRISE UI: Stream the response for live typing effect
-                        with st.chat_message("assistant"):
+                        with st.chat_message("assistant", avatar="src/assets/pakistan_emblem.png"):
                             # Check if answer is HTML (has tags), if so display without streaming
                             if "<div" in answer_html or "<br" in answer_html:
                                 st.markdown(answer_html, unsafe_allow_html=True)
@@ -2708,7 +2710,7 @@ with tab_chat:
                         write_crash(e)
                     except Exception:
                         pass
-                    with st.chat_message("assistant"):
+                    with st.chat_message("assistant", avatar="src/assets/pakistan_emblem.png"):
                         st.error("Something went wrong while generating the answer. Please try again.")
 
         # Intercept ask handled directly by input handler above
