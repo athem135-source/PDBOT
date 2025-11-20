@@ -13,7 +13,7 @@ pymupdf>=1.23.0                # PyMuPDF (fitz) for PDF page rendering in View S
 
 # ---- LLM Backend ----
 transformers>=4.44.2           # Hugging Face transformers for tokenization and embeddings
-torch>=2.3.0                   # PyTorch deep learning framework (CPU/GPU support)
+torch==2.5.1                   # PyTorch deep learning framework (pinned - v2.9+ has meta tensor bug)
 
 # ---- RAG Pipeline ----
 langchain>=0.2.0               # RAG orchestration framework (document loaders, chains)

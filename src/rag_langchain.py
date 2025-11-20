@@ -300,7 +300,7 @@ def _split_into_chunks(text: str, chunk_size: int = 600, chunk_overlap: int = 10
 
 def _connect_qdrant(url: str):
     """Connect to Qdrant instance."""
-    return QdrantClient(url=url)
+    return QdrantClient(url=url)  # type: ignore[misc]
 
 
 def ingest_pdf_sentence_level(
@@ -346,7 +346,7 @@ def ingest_pdf_sentence_level(
             vectors_config=VectorParams(size=dim, distance=Distance.COSINE)
         )
 
-    points: List[PointStruct] = []
+    points: List[PointStruct] = []  # type: ignore[valid-type]
     pid = 1
     
     for page_idx, page_text in enumerate(pages, start=1):
@@ -502,12 +502,12 @@ def filter_chunks_by_rules(
 
 _reranker_cache = None
 
-def get_reranker() -> Optional[CrossEncoder]:
+def get_reranker() -> Optional[CrossEncoder]:  # type: ignore[valid-type]
     """Get or initialize the cross-encoder reranker model."""
     global _reranker_cache
     if _reranker_cache is None:
         try:
-            _reranker_cache = CrossEncoder(RERANKER_MODEL)
+            _reranker_cache = CrossEncoder(RERANKER_MODEL)  # type: ignore[misc]
             if DEBUG_MODE:
                 print(f"[DEBUG] Loaded reranker: {RERANKER_MODEL}")
         except Exception as e:
@@ -739,7 +739,7 @@ def mmr_rerank(
         return []
     
     texts = [c.get("text", "") for c in items]
-    model = SentenceTransformer(EMBED_MODEL)
+    model = SentenceTransformer(EMBED_MODEL)  # type: ignore[misc]
     vecs = model.encode(texts, normalize_embeddings=True)
     
     def cos(a, b):
