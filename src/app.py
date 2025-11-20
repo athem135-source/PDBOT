@@ -7,6 +7,14 @@ import logging
 from logging.handlers import RotatingFileHandler
 import traceback
 import warnings
+
+# Suppress TensorFlow and other warnings early
+warnings.filterwarnings("ignore", category=Warning)
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
+
 import streamlit as st
 import re
 from typing import Any, TYPE_CHECKING, cast
