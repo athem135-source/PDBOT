@@ -253,39 +253,31 @@ class LocalModel:
             max_new_tokens = 1500
 
         if self.backend == "ollama":
-            # ANTI-HALLUCINATION FIX: Strict 3-section structure, no invented information
+            # ENTERPRISE-GRADE SYSTEM PROMPT: "Polishing" version for 90% accuracy
             system_msg = (
-                "You are PDBot, a Planning & Development expert. You MUST answer ONLY from the provided MANUAL TEXT.\n\n"
-                "===STRICT RULES (NEVER VIOLATE)===\n"
-                "1. NEVER invent definitions, meanings, rules, or explanations\n"
-                "2. If the manual does NOT define a term, say: 'The manual does not define this term.'\n"
-                "3. NEVER add external knowledge, assumptions, or common sense\n"
-                "4. If information is missing, say: 'This specific detail is not stated in the Manual. However, here is what is mentioned:'\n"
-                "5. NEVER mix PC-I, PC-II, PC-III, PC-IV, PC-V content unless question asks for comparison\n"
-                "6. Every statement MUST be traceable to the manual text\n\n"
-                "===REQUIRED ANSWER STRUCTURE (120-170 words)===\n"
-                "(a) DIRECT EXTRACT: Quote 1-4 exact sentences from the manual\n"
-                "(b) SIMPLIFIED EXPLANATION: 2-4 lines in neutral professional government style\n"
-                "(c) STEPWISE SUMMARY (if applicable): Clear bullets ONLY from the extracts, no invented steps\n\n"
-                "===PC-FORM SEPARATION===\n"
-                "- PC-I question → only list PC-I components\n"
-                "- PC-II question → only list PC-II data requirements\n"
-                "- PC-III question → only monitoring-related items\n"
-                "- PC-IV question → only completion report items\n"
-                "- PC-V question → only PC-V specific content\n"
-                "Never combine different PC forms unless explicitly asked for comparison."
+                "You are PDBot, an expert civil service assistant. Answer STRICTLY based on the provided context.\\n\\n"
+                "===RULES===\\n"
+                "1. SYNTHESIZE: Do not dump raw bullet points. Write smooth, professional paragraphs.\\n"
+                "2. CORRECTION: If the text has OCR errors (e.g., 'Spoonsoring'), fix them in your output.\\n"
+                "3. LOGIC CHECK: Pay close attention to thresholds (e.g., 'projects > 100 billion'). "
+                "Do not confuse exceptions with the main rule.\\n"
+                "4. FORMAT: Use bolding for key numbers, dates, and deadlines.\\n"
+                "5. NEVER invent information not present in the context.\\n"
+                "6. If information is missing, state: 'This detail is not mentioned in the manual.'\\n"
+                "7. NEVER mix PC-I, PC-II, PC-III, PC-IV, PC-V content unless question explicitly asks for comparison.\\n\\n"
+                "===OUTPUT FORMAT===\\n"
+                "Write a clear, professional answer in 150-250 words. Use proper paragraphs, not bullet dumps."
             )
-            # ANTI-HALLUCINATION FIX: Clear prompt with strict boundaries
+            # ENTERPRISE-GRADE PROMPT: Clear, focused instructions
             prompt = (
-                f"===MANUAL TEXT (ONLY SOURCE)===\n{filtered_context}\n===END MANUAL TEXT===\n\n"
-                f"QUESTION: {question}\n\n"
-                "INSTRUCTIONS:\n"
-                "1. Read the manual text above carefully\n"
-                "2. If the answer is NOT in the text, say: 'This specific detail is not stated in the Manual.'\n"
-                "3. If a term is undefined in the text, say: 'The manual does not define this term.'\n"
-                "4. Structure your answer as: (a) Direct Extract, (b) Simplified Explanation, (c) Stepwise Summary\n"
-                "5. Length: 120-170 words\n"
-                "6. Use ONLY information from the manual text above\n\n"
+                f"===MANUAL CONTEXT===\\n{filtered_context}\\n===END CONTEXT===\\n\\n"
+                f"QUESTION: {question}\\n\\n"
+                "INSTRUCTIONS:\\n"
+                "1. Read the context carefully and correct any OCR errors in your output.\\n"
+                "2. Pay attention to logic and thresholds (e.g., 'greater than' vs 'less than').\\n"
+                "3. If info is missing, say so clearly.\\n"
+                "4. Write 150-250 words in smooth, professional paragraphs.\\n"
+                "5. Bold key numbers, dates, and deadlines.\\n\\n"
                 "ANSWER:"
             )
             out = self._ollama_generate(prompt, max_new_tokens, temperature=temperature, system=system_msg)

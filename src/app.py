@@ -1537,8 +1537,79 @@ def decompose_question(question: str) -> list[str]:
     return [question]
 
 
+def rewrite_query_with_history(question: str, chat_history: list) -> str:
+    """ENTERPRISE FEATURE: Contextualize question using chat history.
+    
+    Example:
+    - History: "Tell me about PC-I"
+    - User asks: "What is the fee?"
+    - Rewritten: "What is the fee for PC-I?"
+    
+    This enables contextual memory for follow-up questions.
+    """
+    if not chat_history or len(chat_history) < 2:
+        # No history or too short, return original
+        return question
+    
+    # Extract last 4 messages (2 user + 2 bot turns)
+    recent = chat_history[-4:] if len(chat_history) >= 4 else chat_history
+    
+    # Build history context
+    history_text = ""
+    for msg in recent:
+        if isinstance(msg, dict):
+            role = msg.get("role", "assistant")
+            content = msg.get("content", "")
+            if role == "user":
+                history_text += f"User: {content}\\n"
+            else:
+                # Only include first 100 chars of bot response to avoid bloat
+                history_text += f"Bot: {content[:100]}...\\n"
+    
+    # Check if question is short and ambiguous (likely a follow-up)
+    is_followup = (
+        len(question.split()) <= 8 and
+        not any(pc in question.upper() for pc in ["PC-I", "PC-II", "PC-III", "PC-IV", "PC-V"]) and
+        not question.lower().startswith(("what is", "define", "explain"))
+    )
+    
+    if not is_followup:
+        # Question is detailed enough, return original
+        return question
+    
+    # Use simple pattern matching to add context
+    # Extract key entities from history (PC forms, technical terms)
+    import re
+    entities = []
+    
+    # Look for PC forms in recent history
+    pc_matches = re.findall(r'\\b(PC-[IV]+)\\b', history_text, re.IGNORECASE)
+    if pc_matches:
+        entities.extend(list(set(pc_matches)))
+    
+    # Look for capitalized terms (likely important entities)
+    cap_terms = re.findall(r'\\b([A-Z][A-Za-z]{2,})\\b', history_text)
+    if cap_terms:
+        entities.extend(list(set(cap_terms))[:2])  # Max 2 terms
+    
+    if entities:
+        # Append most relevant entity to question
+        context_entity = entities[0]
+        rewritten = f"{question} for {context_entity}"
+        return rewritten
+    
+    return question
+
+
 def generate_answer_generative(question: str) -> str:
     """Run the full Generative Mode pipeline and return markdown text with citations."""
+    # ENTERPRISE FEATURE: Rewrite query using chat history for contextual memory
+    chat_history = st.session_state.get("chat_history", [])
+    contextualized_question = rewrite_query_with_history(question, chat_history)
+    
+    # Use contextualized question for retrieval, but keep original for display
+    search_query = contextualized_question
+    
     # Ensure manual is loaded at call-time if nothing is available yet
     try:
         if not (st.session_state.get("raw_pages") or []) and int(st.session_state.get("last_index_count") or 0) == 0:
@@ -1547,13 +1618,13 @@ def generate_answer_generative(question: str) -> str:
         pass
     
     # ANTI-HALLUCINATION FIX: Detect question category for targeted retrieval
-    question_category = detect_question_category(question)
+    question_category = detect_question_category(search_query)
     
     # FIX #3: Generate query variants for better retrieval
-    query_variants = expand_query_aggressively(question)
+    query_variants = expand_query_aggressively(search_query)
     
     # CRITICAL FIX #4: Decompose multi-part questions for comprehensive retrieval
-    sub_questions = decompose_question(question)
+    sub_questions = decompose_question(search_query)
     
     # Step 1: Retrieve for each query variant and sub-question
     all_hits: list[dict] = []
@@ -1610,12 +1681,12 @@ def generate_answer_generative(question: str) -> str:
     if hits:
         scores = [h.get("score", 0) for h in hits if h.get("score") is not None]
         if scores and max(scores) < 0.5:
-            # Extract key terms from question for query expansion
+            # Extract key terms from search_query for query expansion
             import re
-            words = re.findall(r'\b[A-Z]{2,}\b|\b[a-z]{4,}\b', question)
+            words = re.findall(r'\\b[A-Z]{2,}\\b|\\b[a-z]{4,}\\b', search_query)
             key_terms = " ".join(set(words[:5]))  # Top 5 unique terms
             
-            expanded_query = f"{question} {key_terms}"
+            expanded_query = f"{search_query} {key_terms}"
             retry_hits: list[dict] = []
             
             if use_qdrant and _RAG_OK and search is not None:
@@ -1766,6 +1837,19 @@ def append_and_save_chat(q: str, answer_html: str) -> None:
         save_chat_history(items)
     except Exception:
         pass
+
+def stream_response(text: str):
+    """ENTERPRISE FEATURE: Stream text word-by-word for Gemini-style live typing effect.
+    
+    Yields: Individual words with slight delay for natural typing feel.
+    """
+    import time
+    words = text.split()
+    for i, word in enumerate(words):
+        # Add space except for last word
+        yield word + (" " if i < len(words) - 1 else "")
+        # Slight delay for natural typing (adjust speed here)
+        time.sleep(0.02)  # 20ms per word = ~50 words/second
 
 def generate_answer(question: str) -> tuple[str, list[str]]:
     # Retrieve
@@ -2473,13 +2557,37 @@ with tab_chat:
 
         # Toolbar removed (moved to Settings menu)
 
-        # Chat window
-        st.markdown("### Chat window")
-        # Scrollable chat history panel (centered content)
+        # Chat window - ENTERPRISE UI: Native Streamlit chat messages
+        st.markdown("### Conversation")
+        
+        # Action buttons row ABOVE chat (Gemini-style)
+        col1, col2, col3, col4 = st.columns([1, 1, 1, 6])
+        with col1:
+            if st.button("🆕 New", key="new_chat_btn", help="Start new conversation"):
+                st.session_state.chat_history = []
+                st.session_state["last_question"] = ""
+                st.session_state["last_hits"] = []
+                try:
+                    clear_chat_history()
+                except Exception:
+                    pass
+                st.rerun()
+        with col2:
+            if st.button("↻ Regen", key="regen_chat_btn", help="Regenerate last answer", disabled=not st.session_state.get("last_question")):
+                st.session_state._regen_inline = True
+                st.rerun()
+        with col3:
+            mode = st.session_state.get("answer_mode", "Generative")
+            new_mode = "Exact" if mode == "Generative" else "Gen"
+            if st.button(f"🔄 {new_mode}", key="toggle_mode_btn", help="Toggle answer mode"):
+                st.session_state["answer_mode"] = "Exact Search" if mode == "Generative" else "Generative"
+                st.rerun()
+        with col4:
+            st.caption(f"Mode: **{st.session_state.get('answer_mode', 'Generative')}**")
+        
+        # Chat history display - Native st.chat_message (Gemini-style, auto-scrolling)
         chat_container = st.container()
         with chat_container:
-            st.markdown("<div id='chat-scroll' class='chat-scroll'>", unsafe_allow_html=True)
-            last_bot_index = None
             for idx, item in enumerate(st.session_state.chat_history[-200:]):
                 if isinstance(item, dict):
                     role = item.get("role", "assistant")
@@ -2487,46 +2595,17 @@ with tab_chat:
                 else:
                     r0, msg = cast(Any, item)
                     role = "user" if str(r0).lower().startswith("you") else "assistant"
-                is_user = (role == "user")
-                icon = "🧑" if is_user else "🤖"
-                label = "You" if is_user else "PDBOT"
-                klass = "chat-user" if is_user else "chat-bot"
-                st.markdown(
-                    f"<div class='{klass}'>"
-                    f"  <div class='chat-header'><span class='chat-icon'>{icon}</span><strong>{label}</strong></div>"
-                    f"  <div class='chat-body'>{msg}</div>"
-                    f"</div>",
-                    unsafe_allow_html=True,
-                )
-                if not is_user:
-                    last_bot_index = idx
-            # Per-answer regenerate button for the last Bot message
-            if last_bot_index is not None and st.session_state.get("last_question"):
-                if st.button("↻ Regenerate", key=f"regen_inline", help="Recreate the last answer using current settings"):
-                    st.session_state._regen_inline = True
-            st.markdown("<div id='chat-end'></div>", unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+                
+                # Use native st.chat_message (handles avatars and scrolling automatically)
+                with st.chat_message(role):
+                    st.markdown(msg, unsafe_allow_html=True)
 
-            # Sticky ask bar below the transcript
-            st.markdown(
-                """
-                <style>
-                .chat-scroll {max-height: 60vh; overflow-y: auto; padding: 0 4px;}
-                .ask-bar {position: sticky; bottom: 0; background: transparent; padding: 12px 0; z-index: 5;}
-                .ask-input textarea {min-height: 44px; resize: none;}
-                </style>
-                """,
-                unsafe_allow_html=True,
-            )
-            # FIXED: Replaced st.form with st.chat_input to prevent button freeze and enable immediate responses
-            st.subheader("Ask a question")
-            # Restore answer mode selector (persists in session)
-            st.radio("Answer mode", ["Generative", "Exact Search"], key="answer_mode", horizontal=True)
+            # Sticky ask bar below the transcript (native st.chat_input is sticky by default)
             # If no manual is loaded yet, guide the user to enable admin and load it
             if not (st.session_state.get("raw_pages") or []):
                 st.info("Manual not loaded yet. Type 'nufc' and press Enter to enable admin mode, then use Settings → Manual to load or reload the manual.")
             
-            # Use chat_input for immediate, non-blocking interaction
+            # ENTERPRISE UI: Native st.chat_input (sticky, auto-growing)
             q = st.chat_input("Ask the Planning Manual…", key="chat_question_input")
             if q and q.strip():
                 try:
@@ -2542,13 +2621,31 @@ with tab_chat:
                         st.session_state["ui_notice"] = ("info", "Welcome, Admin. Admin mode enabled.")
                         st.rerun()
                     else:
+                        # Add user message to history first
+                        st.session_state.chat_history.append({"role": "user", "content": q})
+                        
                         with st.spinner("Generating answer…"):
-                            # FIXED: Run generation in main thread; display answer immediately
+                            # Generate answer
                             answer_html, citations = generate_answer(q)
-                        # Display answer in chat message format
+                        
+                        # ENTERPRISE UI: Stream the response for live typing effect
                         with st.chat_message("assistant"):
-                            st.markdown(answer_html, unsafe_allow_html=True)
-                        append_and_save_chat(q, answer_html)
+                            # Check if answer is HTML (has tags), if so display without streaming
+                            if "<div" in answer_html or "<br" in answer_html:
+                                st.markdown(answer_html, unsafe_allow_html=True)
+                            else:
+                                # Stream plain text answers
+                                st.write_stream(stream_response(answer_html))
+                        
+                        # Save to history
+                        st.session_state.chat_history.append({"role": "assistant", "content": answer_html})
+                        try:
+                            items = load_chat_history() or []
+                            items.append({"role": "user", "content": q})
+                            items.append({"role": "assistant", "content": answer_html})
+                            save_chat_history(items)
+                        except Exception:
+                            pass
                 except Exception as e:
                     try:
                         write_crash(e)
@@ -2557,50 +2654,7 @@ with tab_chat:
                     with st.chat_message("assistant"):
                         st.error("Something went wrong while generating the answer. Please try again.")
 
-
-                        # Auto-expand textarea height and Enter-to-send (Shift+Enter for newline)
-            st.markdown(
-                """
-                <script>
-                                (function(){
-                                    const doc = window.parent.document;
-                                    // Scope to the ask bar to avoid clicking other primary buttons
-                                    const askBar = doc.querySelector('div.ask-bar');
-                                    const ta = askBar ? askBar.querySelector('textarea') : null;
-                                    if (ta){
-                                        ta.addEventListener('input', e => { ta.style.height='44px'; ta.style.height=(ta.scrollHeight)+'px'; });
-                                        ta.addEventListener('keydown', (e) => {
-                                            if (e.key === 'Enter' && !e.shiftKey) {
-                                                // Prefer the Ask Question button within ask bar
-                                                let btn = askBar.querySelector('button[kind="primary"]');
-                                                if (!btn){
-                                                    // Fallback: find a button with text containing 'Ask Question'
-                                                    const buttons = Array.from(doc.querySelectorAll('button'));
-                                                    btn = buttons.find(b => (b.innerText||'').toLowerCase().includes('ask question')) || null;
-                                                }
-                                                if (!btn){
-                                                    // Last resort: first primary button on page
-                                                    btn = doc.querySelector('button[kind="primary"]');
-                                                }
-                                                if (btn && !btn.disabled){
-                                                    // Debounce to avoid double submits on rapid key presses
-                                                    if (!btn.dataset.locked){
-                                                        btn.dataset.locked = '1';
-                                                        btn.click();
-                                                        setTimeout(()=>{ try{ delete btn.dataset.locked; }catch(_){} }, 900);
-                                                    }
-                                                    e.preventDefault();
-                                                }
-                                            }
-                                        });
-                                    }
-                                })();
-                </script>
-                """,
-                unsafe_allow_html=True,
-            )
-
-        # Intercept ask handled directly by on_submit_question; confirmation UI removed
+        # Intercept ask handled directly by input handler above
 
         # If a finalize signal exists, proceed to ask the chosen question
         # Initialize progress placeholders to satisfy type checkers even if exceptions occur early

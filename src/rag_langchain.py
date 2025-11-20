@@ -576,8 +576,8 @@ def search_sentences(
     qdrant_url: str = "http://localhost:6333",
     mmr: bool = False,
     lambda_mult: float = 0.7,
-    min_score: float = 0.05,
-    enable_reranking: bool = True,
+    min_score: float = 0.20,  # ENTERPRISE FIX: Raised from 0.05 to 0.20 to filter noise
+    enable_reranking: bool = True,  # ENTERPRISE FIX: Always use reranking for 90% accuracy
     enable_filtering: bool = True,
 ) -> List[Dict[str, Any]]:
     """Enterprise-grade search with filtering and reranking.
@@ -650,6 +650,39 @@ def search_sentences(
     # Step 2: Filter annexure/checklist if needed
     if enable_filtering:
         chunks, excluded = filter_chunks_by_rules(chunks, query)
+    
+    # ENTERPRISE FIX: PC-Form Keyword Boost (90% accuracy target)
+    # If query contains specific PC-form (PC-I, PC-II, etc.), prioritize chunks with exact match
+    pc_forms = ["PC-I", "PC-II", "PC-III", "PC-IV", "PC-V"]
+    matched_pc = None
+    query_upper = query.upper()
+    
+    for pc in pc_forms:
+        if pc in query_upper:
+            matched_pc = pc
+            break
+    
+    if matched_pc and chunks:
+        # Boost score for chunks containing the exact PC form
+        boosted_chunks = []
+        non_boosted_chunks = []
+        
+        for chunk in chunks:
+            text_upper = chunk.get("text", "").upper()
+            if matched_pc in text_upper:
+                # Boost score by 30%
+                original_score = chunk.get("score", 0)
+                chunk["score"] = min(1.0, original_score * 1.3)
+                chunk["pc_boosted"] = True
+                boosted_chunks.append(chunk)
+            else:
+                non_boosted_chunks.append(chunk)
+        
+        # Prioritize boosted chunks, then non-boosted
+        chunks = boosted_chunks + non_boosted_chunks
+        
+        if DEBUG_MODE:
+            print(f"[DEBUG] PC-form boost: {matched_pc} found, boosted {len(boosted_chunks)} chunks")
     
     # Step 3: Rerank with cross-encoder
     if enable_reranking and chunks:
