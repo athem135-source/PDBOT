@@ -1,5 +1,6 @@
 # ============================================
-# PDBot Requirements - v0.6.0
+# PDBot Requirements - v0.9.0
+# Enterprise RAG Pipeline with Semantic Reranking
 # ============================================
 
 # ---- Frontend & UI ----
@@ -20,7 +21,9 @@ langchain-community>=0.2.0     # Community integrations (Qdrant, Ollama connecto
 
 # ---- NLP & Embeddings ----
 nltk>=3.8.1                    # Natural Language Toolkit (sentence tokenization - punkt)
-sentence-transformers>=3.0.0   # Semantic embeddings (all-MiniLM-L6-v2, 384 dimensions)
+sentence-transformers>=3.0.0   # Semantic embeddings + cross-encoder reranking
+                               # Models: all-MiniLM-L6-v2 (embeddings, 384d)
+                               #         cross-encoder/ms-marco-MiniLM-L-6-v2 (reranker)
 
 # ---- Vector Database ----
 qdrant-client>=1.9.0           # Qdrant vector DB client for semantic search
