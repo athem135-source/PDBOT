@@ -538,7 +538,7 @@ def _load_builtin_manual(force: bool = False):
     else:
         st.error("Manual could not be read. Install 'langchain-community' or 'pypdf' to enable PDF reading.")
 
-_HEADER = "<h1 style='margin-bottom:0; font-weight:800;'>PDBOT</h1><p style='opacity:.8;margin-top:4px'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</p>"
+_HEADER = "<h1 style='margin-bottom:0; font-weight:800;'>PDBOT</h1><p style='opacity:.5;margin-top:0px;font-size:0.9em;'>v1.1.0</p><p style='opacity:.8;margin-top:4px'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</p>"
 # Single, hardcoded default logo path: place your logo at this location and it will be used automatically
 # Prefer explicit light-theme logo filename for white theme
 HARDCODED_LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "branding_logo-black.png")
@@ -1393,7 +1393,7 @@ If the information is not present in the Manual for Development Projects 2024, r
    If the user is abusive, insulting, or hostile, reply EXACTLY:
 
    🚫 **NOTICE:** This is an official government tool. Please maintain professional decorum. 
-   Continued abuse may result in access restrictions. How can I assist you with the Manual?
+   Continued abuse may result in access restrictions and being reported to authorities. How can I assist you with the Manual?
 
 3. OFF-TOPIC QUESTIONS (sports, personal life, medical advice, recipes, gaming, etc.)
    Reply exactly:
