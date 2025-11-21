@@ -1,11 +1,32 @@
 ﻿# PDBot – Planning & Development Manual RAG Chatbot
 
-![Version](https://img.shields.io/badge/version-1.1.0--enterprise-blue)
+![Version](https://img.shields.io/badge/version-1.2.0--enterprise-blue)
 ![Python](https://img.shields.io/badge/python-3.12%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Accuracy](https://img.shields.io/badge/accuracy-90%25-brightgreen)
 
 **🏆 Enterprise-grade document-grounded chatbot for querying the Planning & Development Commission Manual using advanced RAG with LLM-based contextual memory and Gemini-style floating UI.**
+
+---
+
+## 🚀 What's New in v1.2.0 (Government-Grade Guardrails)
+
+### 🛡️ Red Line Protocol System
+- **Anti-fraud safeguards** - Detects and blocks requests involving bribery, document falsification, or procedural bypass
+- **Professional conduct enforcement** - Handles abusive language with templated warnings
+- **Topic boundary protection** - Rejects off-topic queries (sports, recipes, medical advice, etc.)
+- **Logged warnings** - All violations are flagged for review
+
+### 📝 Enhanced OCR Error Correction
+- **Aggressive typo fixing** - Automatically corrects scanning errors like "Spoonsoring" → "Sponsoring"
+- **Clean output formatting** - Converts messy bullet fragments into coherent paragraphs
+- **Natural synthesis** - No more raw copy-paste from source text
+- **Section references** - Clean citations like "According to Section 7.22" instead of "• 7.22 • iii."
+
+### 🧠 Hardcoded Technical Rules
+- Built-in knowledge of critical thresholds (15% cost escalation, DDWP Rs. 1000M limit)
+- PC-II requirements, ex-post-facto prohibition, procurement rules
+- Ensures consistent answers even with incomplete retrieval
 
 ---
 
@@ -700,6 +721,29 @@ pytest tests/ --cov=src --cov-report=html
 ---
 
 ## 📜 Version History
+
+### v1.2.0 - Government-Grade Guardrails (November 21, 2025)
+**🛡️ Security & Quality Enhancements**
+
+**Red Line Protocol System**
+- ✅ Anti-fraud detection: Blocks requests for bribery, document falsification, procedural bypass
+- ✅ Abuse handling: Templated warnings for hostile language
+- ✅ Off-topic rejection: Boundaries for non-Manual questions (sports, medical, etc.)
+- ✅ Logged warnings: All violations flagged for review
+
+**Enhanced OCR & Output Quality**
+- ✅ Aggressive typo correction: "Spoonsoring" → "Sponsoring", "otterwise" → "otherwise"
+- ✅ Clean formatting: Paragraphs instead of raw bullets (no more "• i." fragments)
+- ✅ Natural synthesis: Coherent explanations instead of copy-paste
+- ✅ Section references: "According to Section 7.22" vs "• 7.22 • iii."
+
+**Hardcoded Technical Rules**
+- ✅ Built-in thresholds: 15% cost escalation, DDWP Rs. 1000M limit, PC-II triggers
+- ✅ Procurement rules: Equipment scope validation, ex-post-facto prohibition
+- ✅ Consistent answers: Guarantees accuracy even with incomplete retrieval
+
+**UI Enhancements**
+- ✅ Version display: Added "v1.1.0" indicator under PDBOT title
 
 ### v1.1.0 - Enterprise Refinements (November 20, 2025)
 **🚀 Complete UI/UX Overhaul + Enhanced Intelligence**
