@@ -29,6 +29,9 @@ warnings.filterwarnings("ignore", category=Warning)
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
+# Debug mode (set PNDBOT_DEBUG=True in environment to enable)
+DEBUG_MODE = os.getenv("PNDBOT_DEBUG", "False").lower() == "true"
+
 # Import dependencies with graceful fallback
 SENTENCE_TRANSFORMERS_AVAILABLE = False
 QDRANT_AVAILABLE = False
@@ -40,12 +43,20 @@ with warnings.catch_warnings():
     try:
         from sentence_transformers import SentenceTransformer, CrossEncoder
         SENTENCE_TRANSFORMERS_AVAILABLE = True
-    except ImportError:
+        if DEBUG_MODE:
+            print("[DEBUG] sentence-transformers imported successfully")
+    except ImportError as e:
+        if DEBUG_MODE:
+            print(f"[DEBUG] sentence-transformers ImportError: {e}")
         SentenceTransformer = None  # type: ignore
         CrossEncoder = None  # type: ignore
-    except Exception:
+        SENTENCE_TRANSFORMERS_AVAILABLE = False
+    except Exception as e:
+        if DEBUG_MODE:
+            print(f"[DEBUG] sentence-transformers Exception: {e}")
         SentenceTransformer = None  # type: ignore
         CrossEncoder = None  # type: ignore
+        SENTENCE_TRANSFORMERS_AVAILABLE = False
 
 try:
     from qdrant_client import QdrantClient
@@ -79,9 +90,6 @@ EMBED_MODEL = os.getenv("PNDBOT_EMBED_MODEL", "sentence-transformers/all-MiniLM-
 
 # CRITICAL: Cross-encoder for semantic reranking
 RERANKER_MODEL = os.getenv("PNDBOT_RERANKER", "cross-encoder/ms-marco-MiniLM-L-6-v2")
-
-# Debug mode (set PNDBOT_DEBUG=True in environment to enable)
-DEBUG_MODE = os.getenv("PNDBOT_DEBUG", "False").lower() == "true"
 
 
 # ============================================================================
@@ -419,9 +427,14 @@ def ingest_pdf_sentence_level(
 
     # Check dependencies are actually loaded
     if SentenceTransformer is None:
-        raise RuntimeError("SentenceTransformer not loaded - sentence-transformers import failed")
+        error_msg = "SentenceTransformer not loaded - sentence-transformers import failed"
+        if DEBUG_MODE:
+            print(f"[DEBUG] {error_msg}")
+            print(f"[DEBUG] SENTENCE_TRANSFORMERS_AVAILABLE: {SENTENCE_TRANSFORMERS_AVAILABLE}")
+            print(f"[DEBUG] Try: pip install sentence-transformers")
+        raise RuntimeError(error_msg)
     if QdrantClient is None:
-        raise RuntimeError("QdrantClient not loaded - qdrant-client import failed")
+        raise RuntimeError("QdrantClient not loaded - qdrant-client import failed. Try: pip install qdrant-client")
     if VectorParams is None or Distance is None or PointStruct is None:
         raise RuntimeError("Qdrant models not loaded - qdrant-client.http.models import failed")
 
