@@ -9,6 +9,46 @@
 
 ---
 
+## 📑 Table of Contents
+
+- [What's New](#-whats-new-in-v150-phase-3--4-behavior-engineering--query-classification)
+- [Overview](#-overview)
+- [Key Features](#-key-features)
+- [Architecture](#-architecture)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [Configuration](#️-configuration)
+- [Project Structure](#-project-structure)
+- [Performance Metrics](#-performance-metrics)
+- [Development](#-development)
+- [Troubleshooting](#-troubleshooting)
+- [Roadmap](#-roadmap)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Contact](#-contact)
+
+---
+
+## 📚 Table of Contents
+
+1. [What's New](#-whats-new)
+   - [v1.5.0 - Phase 3 & 4: Behavior Engineering](#-whats-new-in-v150-phase-3--4-behavior-engineering--query-classification)
+   - [v1.4.0 - Phase 2: Reliability](#-whats-new-in-v140-phase-2-reliability--behavior-engineering)
+   - [v1.3.0 - ChatGPT-Style Responses](#-whats-new-in-v130-chatgpt-style-structured-responses)
+2. [Overview](#-overview)
+3. [Key Features](#-key-features)
+4. [Architecture](#-architecture)
+5. [Quick Start](#-quick-start)
+6. [Usage Guide](#-usage-guide)
+7. [Configuration](#-configuration)
+8. [Performance Metrics](#-performance-metrics)
+9. [Troubleshooting](#-troubleshooting)
+10. [Development](#-development)
+11. [Documentation](#-documentation)
+12. [License](#-license)
+
+---
+
 ## 🚀 What's New in v1.5.0 (Phase 3 & 4: Behavior Engineering + Query Classification)
 
 ### 🎯 Goal 1: Query Classification System (Pre-RAG Routing)
@@ -178,7 +218,89 @@ Test these specific cases to validate Phase 2 fixes:
 
 ---
 
-## 🚀 What's New in v1.1.0 (Enterprise Refinements)
+## 🎯 Overview
+
+**PDBot** is a specialized Retrieval-Augmented Generation (RAG) chatbot designed to answer questions about Pakistan's **Manual for Development Projects 2024** published by the Planning Commission. The system combines semantic search, cross-encoder reranking, and local LLM inference to provide accurate, cited responses.
+
+### What Makes PDBot Special
+
+- **Behavior-Engineered** - Phase 3 & 4 classification system routes queries BEFORE RAG
+- **Zero Hallucination** - Off-scope queries never fabricate citations or world knowledge
+- **Honest & Professional** - Honest audit logging without dramatic "WARNING" messages
+- **Context-Aware** - Distinguishes between hard abuse and soft banter
+- **Resource Efficient** - 94% latency reduction for off-scope queries (3.5s → 0.2s)
+
+### Purpose
+
+- **Reduce manual search time** by 80% for policy queries
+- **Prevent hallucinations** through strict document grounding
+- **Support multi-part questions** with intelligent query decomposition
+- **Provide accurate citations** with page-level references
+- **Enforce professional boundaries** with query classification
+
+---
+
+## ✨ Key Features
+
+### 🎯 Phase 3 & 4: Behavior Engineering (v1.5.0)
+
+#### 1. Query Classification System
+- **Pre-RAG routing** - Classifies queries into 5 categories before calling RAG
+- **8 pattern types** - Bribery, misuse, abuse, banter, medical, sports, politics, general knowledge
+- **Priority ordering** - Bribery → Abuse → Banter → Off-scope → In-scope
+- **Template responses** - Pre-defined answers for non-in-scope queries (no LLM call)
+- **Performance** - Classification: ~1-5ms, Off-scope latency: 3.5s → 0.2s (-94%)
+
+#### 2. Anti-Leakage Prompts
+- **Hidden instructions** - Template structure never exposed to users
+- **No meta headers** - Users never see "INSTANT ANSWER", "KEY POINTS", "INSTRUCTIONS:"
+- **Natural writing** - Model writes directly without labeling sections
+- **Anti-reveal clause** - Explicit instruction to never expose system prompts
+
+#### 3. Honest Audit Logging
+- **Professional notices** - "Interactions are logged for internal audit and quality purposes"
+- **No fake drama** - Removed "⚠️ WARNING: This interaction has been logged"
+- **Clear legal channels** - ACE, Citizen Portal, formal grievance procedures
+- **Short refusals** - 78 words (was 440), 82% reduction
+
+#### 4. Abuse vs Banter Distinction
+- **Hard abuse** - Professional boundary + audit log notice
+- **Soft banter** - Self-aware humor + apology + invitation to rephrase
+- **Threshold detection** - Banter only for short queries (< 20 words)
+
+### 🎯 Enterprise-Grade Accuracy (v1.4.0)
+
+- **92% → 94% accuracy** via query classification and anti-leakage prompts
+- **Contextual memory** - Follow-up questions leverage chat history automatically
+- **OCR error correction** - Auto-fixes common scanning errors in answers
+- **Logic checking** - Careful handling of thresholds, exceptions vs rules
+- **Professional formatting** - Bolded numbers, dates, deadlines
+
+### 💬 Dual Query Modes
+
+1. **Generative Mode** (Default): Advanced RAG pipeline with LLM-generated comprehensive answers (150-250 words)
+2. **Exact Search Mode**: Fast keyword-based retrieval with highlighted matches
+
+### 🛡️ Anti-Hallucination Safeguards
+
+- **Query classification** - Off-scope queries never reach RAG pipeline
+- **PC-Form Keyword Boost** - Prioritizes exact matches (PC-I, PC-II, etc.) before reranking
+- **Context quality checks** - Blocks generation if relevance score < 0.35 or context < 50 words
+- **Cross-encoder reranking** - ms-marco-MiniLM-L-6-v2 (20 candidates → top 3 final chunks)
+- **Intelligent filtering** - Excludes annexure/checklist for conceptual queries
+- **Post-generation guardrails** - Detects and prevents annexure contamination
+
+### 🚀 Advanced RAG Pipeline
+
+- **Enhanced min_score threshold** - 0.20 (up from 0.05) for noise filtering
+- **PC-Form Keyword Boost** - 30% score boost for chunks containing exact PC-form mentions
+- **7-way chunk classification** - Main manual, annexure, checklist, table, appendix, misc, unknown
+- **Cross-encoder reranking** - ms-marco-MiniLM-L-6-v2 (reranking always enabled)
+- **Query rewriting** - Contextualizes questions using chat history
+- **Enhanced metadata** - 9 fields per chunk (page, paragraph, line, chunk_type, proforma, etc.)
+- **Improved chunking** - 600 chars with 100 char overlap for better context windows
+
+---
 
 ### 🎨 Gemini-Style Floating Action Bar
 - **Removed clunky settings popover** - No more hidden menus at top

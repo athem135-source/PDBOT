@@ -2193,7 +2193,11 @@ The vector database (Qdrant) is not responding. This prevents searching the manu
             answer = generate_answer_generative(question)
         except Exception as _e_gen:
             logging.exception("Generative pipeline failed")
-            answer = "Not available in the provided document."
+            if DEBUG_MODE:
+                import traceback
+                print(f"[DEBUG] Generative pipeline error: {_e_gen}")
+                print(traceback.format_exc())
+            answer = f"❌ **Error generating answer:** {str(_e_gen)}\n\nPlease try again or contact support if the problem persists."
 
     # Build HTML card and citations
     # Persist last Q/A context for inline Regenerate button visibility and behavior
