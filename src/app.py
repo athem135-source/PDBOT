@@ -220,7 +220,7 @@ except Exception:
     pass
 
 # Default model/control knobs (overridden later by UI controls if present)
-model_name: str = os.getenv("OLLAMA_MODEL", "tinyllama")
+model_name: str = os.getenv("OLLAMA_MODEL", "mistral:7b")
 top_k: int = 6
 max_tokens: int = 768
 temperature: float = 0.2
@@ -677,7 +677,7 @@ if "warmup_done" not in st.session_state:
     try:
         import requests as _rq
         _ollama_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-        _model = os.getenv("OLLAMA_MODEL", "tinyllama")
+        _model = os.getenv("OLLAMA_MODEL", "mistral:7b")
         _rq.post(f"{_ollama_url}/api/generate", json={
             "model": _model,
             "prompt": "hello",
@@ -1894,7 +1894,7 @@ def generate_answer_generative(question: str) -> str:
     base_answer = ""
     try:
         if engine == "LLM (Ollama)":
-            gen = LocalModel(model_name=globals().get("model_name", os.getenv("OLLAMA_MODEL", "tinyllama")), backend="ollama")
+            gen = LocalModel(model_name=globals().get("model_name", os.getenv("OLLAMA_MODEL", "mistral:7b")), backend="ollama")
             try:
                 probe = gen.ollama_status()
                 if not probe.get("alive"):
@@ -2138,7 +2138,7 @@ def generate_answer(question: str) -> tuple[str, list[str]]:
         _engine = st.session_state.engine if "engine" in st.session_state else "LLM (Ollama)"
         st.session_state["last_meta"] = {
             "backend": ("ollama" if _engine == "LLM (Ollama)" else "pretrained"),
-            "model": getattr(locals().get("generator", None), "model_name", os.getenv("OLLAMA_MODEL", "tinyllama")),
+            "model": getattr(locals().get("generator", None), "model_name", os.getenv("OLLAMA_MODEL", "mistral:7b")),
             "max_new_tokens": int(globals().get("max_tokens", 768)),
             "top_k": int(globals().get("top_k", 6)),
             "exact_mode": str(st.session_state.get("answer_mode", "Generative")).lower().startswith("exact"),
@@ -2305,9 +2305,9 @@ with st.sidebar:
 
             engine = st.session_state.engine
             if engine == "LLM (Ollama)":
-                model_name = st.text_input("Ollama model", value=os.getenv("OLLAMA_MODEL", "tinyllama"))
+                model_name = st.text_input("Ollama model", value=os.getenv("OLLAMA_MODEL", "mistral:7b"))
             else:
-                model_name = st.text_input("Ollama model (for reference)", value=os.getenv("OLLAMA_MODEL", "tinyllama"), help="Not used in Pretrained mode")
+                model_name = st.text_input("Ollama model (for reference)", value=os.getenv("OLLAMA_MODEL", "mistral:7b"), help="Not used in Pretrained mode")
             # Answer mode control is available in the Chat input bar.
             # FIX #10: Increased defaults and ranges for better retrieval
             top_k = st.slider("Top-K context chunks", 1, 20, 10)
@@ -2518,7 +2518,7 @@ with st.sidebar:
 
 # State
 if "model_name" not in globals():
-    model_name = os.getenv("OLLAMA_MODEL", "tinyllama")
+    model_name = os.getenv("OLLAMA_MODEL", "mistral:7b")
 if "top_k" not in globals():
     top_k = 6
 if "max_tokens" not in globals():
