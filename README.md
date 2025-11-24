@@ -53,6 +53,8 @@
 
 ## 🚀 What's New in v1.5.0 (Phase 3 & 4: Behavior Engineering + Query Classification)
 
+> **📖 Full Release Notes:** See [RELEASE_v1.5.0.md](RELEASE_v1.5.0.md) for comprehensive technical details, code examples, and migration guide.
+
 ### 🎯 Goal 1: Query Classification System (Pre-RAG Routing)
 - **Smart classifier** - Routes queries into 5 categories BEFORE calling RAG
 - **Zero fake citations** - Off-scope queries never fabricate `[p.N/A]` references
@@ -1034,6 +1036,8 @@ pytest tests/ --cov=src --cov-report=html
 ### v1.5.0 - Phase 3 & 4: Behavior Engineering (November 2024)
 **🎯 Query Classification + Anti-Leakage + Honest Logging**
 
+> **📖 See [RELEASE_v1.5.0.md](RELEASE_v1.5.0.md) for full release notes with code examples and technical details.**
+
 **Goal 1: Query Classification System**
 - ✅ Pre-RAG routing: 5 categories (bribery, abuse, banter, off-scope, in-scope)
 - ✅ Zero fake citations for off-scope queries
@@ -1288,8 +1292,10 @@ You are free to use, modify, and distribute this software for any purpose, comme
 
 ### Documentation
 - **User Guide:** This README
-- **Architecture:** See [Architecture](#architecture) section
-- **Troubleshooting:** See [Troubleshooting](#troubleshooting) section
+- **Release Notes:** [RELEASE_v1.5.0.md](RELEASE_v1.5.0.md) - Latest release details
+- **Architecture:** [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) - Detailed module documentation
+- **Roadmap:** [ROADMAP.md](ROADMAP.md) - Version history and future plans
+- **Troubleshooting:** See [Troubleshooting](#-troubleshooting) section
 
 ### Contact
 - **GitHub Issues:** [Report bugs or request features](https://github.com/athem135-source/PDBOT/issues)
