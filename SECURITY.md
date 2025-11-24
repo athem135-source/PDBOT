@@ -17,14 +17,14 @@ For licensing inquiries or authorized use requests, contact:
 
 ## Supported Versions
 
-We actively support the following versions of PDBot with security updates:
+We actively support **ONLY the latest version** of PDBot with security updates. Older versions are not supported.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.3.x   | :white_check_mark: |
-| 1.2.x   | :white_check_mark: |
-| 1.1.x   | :x:                |
-| 1.0.x   | :x:                |
+| Version | Supported          | Status |
+| ------- | ------------------ | ------ |
+| 1.3.x (Latest)   | :white_check_mark: | Active Support |
+| 1.2.x and earlier   | :x:                | No longer supported |
+
+**Security Policy:** Only the most recent release receives security patches. Users must upgrade to the latest version to receive security updates.
 
 ## Security Features
 
