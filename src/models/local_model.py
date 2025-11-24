@@ -183,7 +183,8 @@ class LocalModel:
             status["alive"] = True
             tags = r.json().get("models", []) if r.headers.get("content-type", "").startswith("application/json") else []
             names = [m.get("name", "") for m in tags]
-            status["has_model"] = any(n.split(":")[0] == self._ollama_model for n in names)
+            # Check if model exists (compare full name or base name)
+            status["has_model"] = any(n == self._ollama_model or n.split(":")[0] == self._ollama_model.split(":")[0] for n in names)
         except Exception:
             pass
         return status
