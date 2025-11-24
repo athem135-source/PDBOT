@@ -26,6 +26,8 @@ from dataclasses import dataclass
 
 # Suppress compatibility warnings
 warnings.filterwarnings("ignore", category=Warning)
+warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
@@ -38,6 +40,7 @@ QDRANT_AVAILABLE = False
 PYPDF_AVAILABLE = False
 
 # Suppress torch warnings that interfere with imports
+# NOTE: torch 2.5.1 has a known warning about __path__._path that doesn't affect functionality
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     try:
@@ -426,12 +429,13 @@ def ingest_pdf_sentence_level(
         return 0
 
     # Check dependencies are actually loaded
-    if SentenceTransformer is None:
+    if SentenceTransformer is None or not SENTENCE_TRANSFORMERS_AVAILABLE:
         error_msg = "SentenceTransformer not loaded - sentence-transformers import failed"
         if DEBUG_MODE:
             print(f"[DEBUG] {error_msg}")
+            print(f"[DEBUG] SentenceTransformer is None: {SentenceTransformer is None}")
             print(f"[DEBUG] SENTENCE_TRANSFORMERS_AVAILABLE: {SENTENCE_TRANSFORMERS_AVAILABLE}")
-            print(f"[DEBUG] Try: pip install sentence-transformers")
+            print(f"[DEBUG] Try: pip install --upgrade sentence-transformers torch")
         raise RuntimeError(error_msg)
     if QdrantClient is None:
         raise RuntimeError("QdrantClient not loaded - qdrant-client import failed. Try: pip install qdrant-client")
