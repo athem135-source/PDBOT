@@ -2,7 +2,8 @@
 setlocal EnableDelayedExpansion
 
 REM ============================================
-REM PDBot Run Script - v0.6.0
+REM PDBot Run Script - v1.4.0
+REM Phase 2: Reliability & Behavior Engineering
 REM Quick launch with automatic setup if needed
 REM ============================================
 
@@ -47,9 +48,9 @@ IF %ERRORLEVEL% NEQ 0 (
   echo [OK] Ollama ready
 )
 
-curl --silent --max-time 2 http://localhost:6333/health >NUL 2>&1
+curl --silent --max-time 2 http://localhost:6338/health >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
-  echo [WARN] Qdrant not running - start with: docker run -p 6333:6333 qdrant/qdrant
+  echo [WARN] Qdrant not running - start with: docker run -d -p 6338:6333 qdrant/qdrant
   set SERVICES_OK=0
 ) ELSE (
   echo [OK] Qdrant ready

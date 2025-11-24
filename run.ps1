@@ -1,5 +1,6 @@
 # ============================================
-# PDBot Run Script - v1.1.0 (PowerShell)
+# PDBot Run Script - v1.4.0 (PowerShell)
+# Phase 2: Reliability & Behavior Engineering
 # Quick launch with automatic setup if needed
 # ============================================
 
@@ -58,17 +59,17 @@ try {
     $servicesOk = $false
 }
 
-# Check Qdrant
+# Check Qdrant (default port 6338 as per app.py)
 try {
-    $response = Invoke-WebRequest -Uri "http://localhost:6333/health" -TimeoutSec 2 -UseBasicParsing -ErrorAction SilentlyContinue
+    $response = Invoke-WebRequest -Uri "http://localhost:6338/health" -TimeoutSec 2 -UseBasicParsing -ErrorAction SilentlyContinue
     if ($response.StatusCode -eq 200) {
         Write-Host "[OK] Qdrant ready`n" -ForegroundColor Green
     } else {
-        Write-Host "[WARN] Qdrant not responding - start with: docker run -p 6333:6333 qdrant/qdrant`n" -ForegroundColor Yellow
+        Write-Host "[WARN] Qdrant not responding - start with: docker run -d -p 6338:6333 qdrant/qdrant`n" -ForegroundColor Yellow
         $servicesOk = $false
     }
 } catch {
-    Write-Host "[WARN] Qdrant not responding - start with: docker run -p 6333:6333 qdrant/qdrant`n" -ForegroundColor Yellow
+    Write-Host "[WARN] Qdrant not responding - start with: docker run -d -p 6338:6333 qdrant/qdrant`n" -ForegroundColor Yellow
     $servicesOk = $false
 }
 
