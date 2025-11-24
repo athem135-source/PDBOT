@@ -122,8 +122,24 @@ def get_embedder() -> Optional[SentenceTransformer]:  # type: ignore[valid-type]
 
 
 # ============================================================================
-# DATA STRUCTURES
+# DATA STRUCTURES & EXCEPTIONS
 # ============================================================================
+
+# Custom exceptions for better error handling
+class RetrievalBackendError(Exception):
+    """Raised when vector database (Qdrant) is unavailable or fails."""
+    pass
+
+class EmbeddingModelError(Exception):
+    """Raised when embedding model fails to initialize or encode."""
+    pass
+
+@dataclass
+class SearchResult:
+    """Structured result from retrieval operations."""
+    chunks: List[Dict[str, Any]]
+    error: Optional[str] = None
+    error_type: Optional[str] = None  # 'backend_down', 'embedding_failed', 'no_results'
 
 @dataclass
 class ChunkMetadata:
@@ -642,8 +658,17 @@ def search_sentences(
     if model is None:
         raise RuntimeError("Failed to initialize embedding model")
     qvec = model.encode([query], normalize_embeddings=True)[0]
-    client = _connect_qdrant(qdrant_url)
+    
+    # Connect to Qdrant with proper error handling
+    try:
+        client = _connect_qdrant(qdrant_url)
+    except Exception as e:
+        error_msg = f"Cannot connect to Qdrant at {qdrant_url}"
+        if DEBUG_MODE:
+            print(f"[DEBUG] {error_msg}: {e}")
+        raise RetrievalBackendError(error_msg) from e
 
+    # Search with structured error handling
     try:
         results = client.search(
             collection_name=COLLECTION,
@@ -651,9 +676,10 @@ def search_sentences(
             limit=initial_k
         )
     except Exception as e:
+        error_msg = f"Qdrant search failed for collection '{COLLECTION}'"
         if DEBUG_MODE:
-            print(f"[DEBUG] Qdrant search failed: {e}")
-        return []
+            print(f"[DEBUG] {error_msg}: {e}")
+        raise RetrievalBackendError(error_msg) from e
     
     # Convert to dict format
     chunks: List[Dict[str, Any]] = []

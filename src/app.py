@@ -405,6 +405,7 @@ try:
     from src.rag_langchain import search_sentences as search
     from src.rag_langchain import mmr_rerank, dedup_chunks, build_context
     from src.rag_langchain import COLLECTION as RAG_COLLECTION
+    from src.rag_langchain import RetrievalBackendError, EmbeddingModelError
     _RAG_OK = True
     _RAG_IMPORT_ERR = None
 except Exception as _e:
@@ -2007,6 +2008,8 @@ def generate_answer(question: str) -> tuple[str, list[str]]:
     context = ""
     min_score = 0.15
     use_qdrant = bool(st.session_state.get("indexed_ok") or int(st.session_state.get("last_index_count") or 0) > 0)
+    backend_error = None  # Track if backend fails
+    
     if use_qdrant:
         try:
             if not _RAG_OK or search is None:  # type: ignore
@@ -2023,9 +2026,19 @@ def generate_answer(question: str) -> tuple[str, list[str]]:
             except TypeError:
                 hits = search(question, top_k=eff_top_k, qdrant_url=_qdrant_url())  # type: ignore
             context = "\n\n".join([h.get("text", "") for h in hits])
-        except Exception:
+        except RetrievalBackendError as e:
+            # Vector database is down - show clear error
+            backend_error = str(e)
             hits = []
             context = ""
+            if DEBUG_MODE:
+                print(f"[DEBUG] Backend error: {e}")
+        except Exception as e:
+            # Unexpected error - log but continue
+            hits = []
+            context = ""
+            if DEBUG_MODE:
+                print(f"[DEBUG] Unexpected retrieval error: {e}")
     if (not hits) and (st.session_state.get("raw_pages") or []):
         try:
             pages_full = st.session_state.get("raw_pages") or []
@@ -2054,6 +2067,24 @@ def generate_answer(question: str) -> tuple[str, list[str]]:
 
     # Answer
     citations: list[str] = []
+    
+    # Check for backend errors and return clear message
+    if backend_error:
+        answer = f"""⚠️ **System Error: Retrieval Backend Unavailable**
+
+The vector database (Qdrant) is not responding. This prevents searching the manual.
+
+**Error:** {backend_error}
+
+**What to do:**
+1. Check if Qdrant is running: `docker ps | grep qdrant`
+2. Start Qdrant if needed: `docker start pndbot-qdrant`
+3. Or restart: `docker run -d -p 6338:6333 qdrant/qdrant`
+4. Contact IT support if the problem persists
+
+*This is NOT a "manual doesn't cover this" situation - the system cannot search right now.*"""
+        return answer, []
+    
     if is_exact:
         pages = st.session_state.get("raw_pages") or []
         locs = find_exact_locations(question, pages, max_results=max(25, eff_top_k * 5)) if pages else []
