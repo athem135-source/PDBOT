@@ -22,6 +22,8 @@
 - [Performance Metrics](#-performance-metrics)
 - [Development](#-development)
 - [Troubleshooting](#-troubleshooting)
+- [Known Issues](#️-known-issues)
+- [Testing & Validation](#-testing--validation)
 - [Roadmap](#-roadmap)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -325,79 +327,6 @@ Test these specific cases to validate Phase 2 fixes:
 - **Safe fallback** - Returns original query on any errors
 
 ---
-
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Key Features](#key-features)
-- [Architecture](#architecture)
-- [Prerequisites](#prerequisites)
-- [Quick Start](#quick-start)
-  - [Local Setup (Recommended for Development)](#local-setup-recommended-for-development)
-  - [Docker Setup (Production)](#docker-setup-production)
-- [Configuration](#configuration)
-- [Usage Guide](#usage-guide)
-- [Project Structure](#project-structure)
-- [Troubleshooting](#troubleshooting)
-- [Testing & Validation](#testing--validation)
-- [Performance Metrics](#performance-metrics)
-- [Development](#development)
-- [Version History](#version-history)
-- [Contributing](#contributing)
-- [License](#license)
-
----
-
-## 🎯 Overview
-
-**PDBot** is a RAG-powered chatbot designed to answer questions about government project planning procedures, proforma requirements (PC-I through PC-V), approval workflows, and compliance guidelines from the Planning & Development Commission Manual.
-
-### Purpose
-- **Reduce manual search time** by 80% for policy queries
-- **Prevent hallucinations** through strict document grounding
-- **Support multi-part questions** with intelligent query decomposition
-- **Provide accurate citations** with page-level references
-
----
-
-## ✨ Key Features
-
-### 🎯 Enterprise-Grade Accuracy (v1.0.0)
-- **90% accuracy target** via min_score boost (0.20), PC-form filtering, and polished prompts
-- **Contextual memory** - Follow-up questions leverage chat history automatically
-- **OCR error correction** - Auto-fixes common scanning errors in answers
-- **Logic checking** - Careful handling of thresholds, exceptions vs rules
-- **Professional formatting** - Bolded numbers, dates, deadlines
-
-### 💬 Gemini-Style Floating UI (v1.1.0)
-- **Native chat messages** - Streamlit's built-in chat with auto-scroll and avatars
-- **Streaming responses** - Live word-by-word typing effect (50 words/sec)
-- **True floating action bar** - CSS `:has()` selector teleports pills to bottom
-  - Pills use glass effect (backdrop-filter: blur) with 80% opacity
-  - Hover animations with smooth transitions
-  - Positioned at fixed `bottom: 80px` above chat input
-- **Quick action buttons** - 🆕 New | 🧹 Clear | ↻ Regen | 🔄 Toggle mode
-- **Professional design** - Rounded 20px pills with subtle shadows
-- **Sticky input bar** - Always visible, auto-growing textarea
-- **Theme-adaptive** - Automatically switches between light/dark pill styles
-
-### Dual Query Modes
-1. **Generative Mode** (Default): Advanced RAG pipeline with LLM-generated comprehensive answers (150-250 words)
-2. **Exact Search Mode**: Fast keyword-based retrieval with highlighted matches
-
-### Anti-Hallucination Safeguards
-- **PC-Form Keyword Boost** - Prioritizes exact matches (PC-I, PC-II, etc.) before reranking
-- **Context quality checks**: Blocks generation if relevance score < 0.35 or context < 50 words
-- **Cross-encoder reranking**: ms-marco-MiniLM-L-6-v2 (20 candidates → top 3 final chunks)
-- **Intelligent filtering**: Excludes annexure/checklist for conceptual queries
-- **Post-generation guardrails**: Detects and prevents annexure contamination
-
-### Advanced RAG Pipeline (v1.0.0)
-- **Enhanced min_score threshold**: 0.20 (up from 0.05) for noise filtering
-- **PC-Form Keyword Boost**: 30% score boost for chunks containing exact PC-form mentions
-- **7-way chunk classification**: Main manual, annexure, checklist, table, appendix, misc, unknown
-- **Cross-encoder reranking**: ms-marco-MiniLM-L-6-v2 (reranking always enabled)
-- **Query rewriting**: Contextualizes questions using chat history
 - **Enhanced metadata**: 9 fields per chunk (page, paragraph, line, chunk_type, proforma, etc.)
 - **Improved chunking**: 600 chars with 100 char overlap for better context windows
 
@@ -875,6 +804,53 @@ curl http://localhost:8501/_stcore/health
 
 ---
 
+## ⚠️ Known Issues
+
+### Current Limitations (v1.5.0)
+
+| Issue | Status | Workaround |
+|-------|--------|------------|
+| **LangChain not installed** | ℹ️ Informational | Optional dependency - RAG works without it |
+| **Query failures with "Something went wrong"** | 🔧 Under Investigation | Enable DEBUG_MODE to see actual error |
+| **Ollama connection errors** | ⚙️ Configuration | Ensure `ollama serve` is running on port 11434 |
+| **Model not found (mistral:latest)** | ⚙️ Setup | Run `ollama pull mistral:latest` to download model |
+| **Embedding progress bars clutter output** | 🎨 UI Issue | Expected behavior during indexing (747 chunks) |
+| **Port conflicts (8501/8503/8504)** | 🔧 Environment | Streamlit auto-increments port if busy |
+
+### Resolved Issues
+
+✅ **Fixed in v1.5.0:**
+- ✅ Generic error messages (now shows actual exceptions in DEBUG_MODE)
+- ✅ Missing README table of contents (added comprehensive TOC)
+- ✅ Instruction leakage in responses (anti-leakage prompts implemented)
+- ✅ Off-scope queries causing hallucinations (pre-RAG classification system)
+- ✅ Fake citations for non-manual questions (classification prevents RAG calls)
+
+✅ **Fixed in v1.4.0:**
+- ✅ System prompt leakage (Mistral 7B optimization)
+- ✅ Over-aggressive context filtering (relaxed thresholds)
+- ✅ Poor annexure parsing (PyMuPDF priority)
+- ✅ Short context refusals (5-word minimum instead of 15)
+
+✅ **Fixed in v1.3.0:**
+- ✅ Unstructured responses (3-tier answer format)
+- ✅ Slow inference with TinyLlama (upgraded to Mistral 7B)
+- ✅ Inconsistent formatting (professional style guide)
+
+### Reporting Issues
+
+**Found a bug?** Please report it:
+1. Check [Known Issues](#-known-issues) first
+2. Enable DEBUG_MODE: `$env:PNDBOT_DEBUG="True"`
+3. Reproduce the issue and copy error output
+4. Open GitHub Issue with:
+   - Steps to reproduce
+   - Expected vs actual behavior
+   - Error messages/screenshots
+   - Environment details (OS, Python version, Ollama version)
+
+---
+
 ## ✅ Testing & Validation
 
 ### Phase 2 Critical Tests (v1.4.0)
@@ -1310,7 +1286,14 @@ A: The floating action bar (v1.1.0) uses CSS fixed positioning at `bottom: 80px`
 
 ---
 
-**Last Updated:** November 21, 2025  
-**Current Version:** v1.1.0 Enterprise Refinements  
+**Last Updated:** November 25, 2025  
+**Current Version:** v1.5.0 (Phase 3 & 4: Behavior Engineering)  
 **Maintained By:** [@athem135-source](https://github.com/athem135-source)  
 **Repository:** [github.com/athem135-source/PDBOT](https://github.com/athem135-source/PDBOT)
+
+### Recent Updates
+- ✅ **v1.5.0** - Query classification, anti-leakage prompts, honest audit logging, abuse/banter distinction
+- ✅ **v1.4.0** - Mistral 7B optimization, relaxed context filtering, PyMuPDF parsing
+- ✅ **v1.3.0** - 3-tier structured responses, Mistral 7B upgrade, professional formatting
+- ✅ **v1.2.0** - Red line protocol, OCR correction, hardcoded rules
+- ✅ **v1.1.0** - Gemini-style floating UI, streaming responses, The Polisher prompt
