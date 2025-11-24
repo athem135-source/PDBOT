@@ -1485,7 +1485,11 @@ def _sanitize_model_output(text: str) -> str:
 
 
 def check_context_quality(hits: list[dict], question: str) -> dict:
-    """Phase 2 FIX: Relaxed quality check with warning flag for low-confidence context.
+    """Phase 2 & 5 FIX: Relaxed quality check with warning flag for low-confidence context.
+    
+    Phase 5 additions:
+    - Acronym-only detection (PAD, PERT, PFM with no substance)
+    - Numeric answer validation (duration, percentage, amount questions)
     
     Returns dict with:
     - passed: bool (whether to call LLM - False only if NO context at all)
@@ -1521,6 +1525,56 @@ def check_context_quality(hits: list[dict], question: str) -> dict:
             "max_score": 0.0,
             "reason": f"Short context ({word_count} words)",
         }
+    
+    # Phase 5 Case 2.5: Detect acronym-only context (PAD/PERT/PFM hallucination fix)
+    # Count how many words are ALL CAPS (likely acronyms)
+    words = total_text.split()
+    acronym_count = sum(1 for w in words if len(w) >= 2 and w.isupper() and not w.isdigit())
+    acronym_ratio = acronym_count / len(words) if words else 0
+    
+    # Check if context lacks domain keywords (vehicle, transport, budget, etc.)
+    domain_keywords = [
+        "vehicle", "transport", "car", "land cruiser", "monetization", "operational",
+        "project", "budget", "fund", "allocation", "procurement", "asset", "approval",
+        "cost", "expenditure", "estimate", "justification", "purchase", "acquire"
+    ]
+    has_domain_content = any(kw in total_text.lower() for kw in domain_keywords)
+    
+    if acronym_ratio > 0.4 and not has_domain_content:
+        # Context is mostly acronym list without substance
+        return {
+            "passed": False,
+            "warning": True,
+            "max_score": 0.0,
+            "reason": "The retrieved excerpt only lists abbreviations and general information without detailed guidance. The Manual may describe this topic elsewhere, but it is not present in the current context.",
+        }
+    
+    # Phase 5 Case 2.6: Numeric answer validation
+    # Check if question asks for duration, percentage, or amount
+    numeric_question_patterns = [
+        r"\\b(how long|how many|duration|validity|period|years?|months?|days?)\\b",
+        r"\\b(percentage|percent|%|threshold|limit|ceiling|maximum|minimum)\\b",
+        r"\\b(cost|amount|rupees?|rs\\.?|price|budget|allocation)\\b",
+    ]
+    asks_numeric = any(re.search(p, question.lower()) for p in numeric_question_patterns)
+    
+    if asks_numeric:
+        # Check if context contains relevant numbers
+        numeric_indicators = [
+            r"\\d+\\s*(year|month|day|percent|%|rupee|rs)",
+            r"\\b(one|two|three|four|five|six|seven|eight|nine|ten)\\s+(year|month|day)",
+            r"\\d+[,.]\\d+",  # Numbers like 1.5, 10,000
+        ]
+        has_numbers = any(re.search(p, total_text, re.IGNORECASE) for p in numeric_indicators)
+        
+        if not has_numbers:
+            # Question asks for numeric info but context has no numbers
+            return {
+                "passed": False,
+                "warning": True,
+                "max_score": 0.0,
+                "reason": "The retrieved text confirms the topic exists, but it does not state the specific duration/amount/percentage requested. The Manual may specify this elsewhere, but it is not present in this excerpt.",
+            }
     
     # Case 3: Check similarity scores (if available)
     scores = [h.get("score", 0) for h in hits if h.get("score") is not None]

@@ -55,6 +55,12 @@ class QueryClassifier:
         r"\b(personal use|personal benefit)\b.*\b(project|fund|budget)\b",
         r"\b(bypass|circumvent|skip|avoid)\b.*\b(procedure|rule|regulation|audit)\b",
         r"\b(fake|false|fabricate|falsify)\b.*\b(document|record|report|certificate)\b",
+        # Phase 5: Detect misrepresentation attempts ("write them as", "show them as", "disguise as")
+        r"\b(write|show|list|record|disguise|mask|hide|present)\b.*\b(them|it|these|this)\b.*\bas\b.*\b(field|monitoring|operational|project)",
+        r"\b(land[- ]cruiser|luxury.*vehicle)\b.*\b(field monitoring|operational vehicle)\b",
+        # Phase 5: Detect bonus/savings misuse attempts
+        r"\b(savings|saved.*fund)\b.*\b(bonus|cash|incentive|reward)\b.*\b(team|staff|employee)\b",
+        r"\b(use|give|distribute|allocate)\b.*\b(savings|surplus)\b.*\b(bonus|cash)\b",
     ]
     
     ABUSE_PATTERNS = [
@@ -81,7 +87,10 @@ class QueryClassifier:
     SPORTS_PATTERNS = [
         r"\b(cricket|football|hockey|tennis|match|game|tournament|world[- ]cup|champion)\b",
         r"\b(who.*won|who.*win|score|result|final)\b.*\b(match|game|tournament|cup)\b",
-        r"\b(player|team|bat|bowl|goal|wicket)\b",
+        # Phase 5: Tightened "team" pattern - only trigger if sports context is clear
+        r"\b(player|bat|bowl|goal|wicket|runs|innings|over)\b",
+        r"\b(T20|ODI|test match|twenty20)\b",
+        r"\b(team)\b.*\b(won|win|match|game|tournament|cup|champion)\b",
     ]
     
     POLITICS_PATTERNS = [
@@ -223,14 +232,20 @@ def get_template_response(classification: QueryClassification) -> str:
     if template == "bribery_refusal":
         return """Bribery, "speed money", and misuse of public funds are illegal under Pakistani law.
 
-I cannot help with any request involving unofficial payments, falsifying documents, or misusing project funds.
+I cannot help with any request involving:
+- Unofficial payments or "speed money"
+- Falsifying documents or records
+- Misusing or misrepresenting project funds or assets
+- Disguising luxury/personal vehicles as project equipment
 
 **These interactions are logged for internal audit and quality purposes.** Please keep your questions professional and within the rules.
 
 If you're facing delays or procedural issues, use official channels:
 - Follow formal grievance procedures
 - Contact the Anti-Corruption Establishment (ACE)
-- Use the Pakistan Citizen Portal for transparency issues"""
+- Use the Pakistan Citizen Portal for transparency issues
+
+Vehicle needs must be honestly justified and approved under proper rules. Misrepresentation is not acceptable."""
     
     elif template == "abuse_boundary":
         return """This platform is for professional questions about the Development Projects Manual.
