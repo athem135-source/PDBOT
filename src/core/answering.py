@@ -31,14 +31,17 @@ class AnswerResult:
     backend_error: Optional[str] = None  # Set if retrieval failed
 
 
-def check_context_quality(context: str, question: str, min_words: int = 15) -> Tuple[bool, Optional[str]]:
+def check_context_quality(context: str, question: str, min_words: int = 5) -> Tuple[bool, Optional[str]]:
     """
-    Check if retrieved context is sufficient for answering.
+    Phase 2 FIX: Check if retrieved context is sufficient for answering.
+    
+    Lowered min_words from 15 to 5 to allow single-sentence answers
+    (land acquisition dates, thresholds, etc.).
     
     Args:
         context: Retrieved text from manual
         question: User's question
-        min_words: Minimum context words required
+        min_words: Minimum context words required (default: 5, was 15)
     
     Returns:
         (is_sufficient, refusal_reason)
@@ -50,9 +53,9 @@ def check_context_quality(context: str, question: str, min_words: int = 15) -> T
     if len(words) < min_words:
         return False, f"Insufficient context ({len(words)} words, need {min_words}+)"
     
-    # Check for meaningful content (not just stopwords)
+    # Relaxed meaningful content check - allow shorter contexts
     meaningful_words = [w for w in words if len(w) > 3 and not w.lower() in {'the', 'and', 'for', 'that', 'this', 'with'}]
-    if len(meaningful_words) < min_words // 2:
+    if len(meaningful_words) < max(2, min_words // 3):  # More lenient: need only 1/3 meaningful words
         return False, "Context lacks meaningful content"
     
     return True, None

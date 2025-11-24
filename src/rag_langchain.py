@@ -298,16 +298,56 @@ def create_chunk_metadata(text: str, page: int) -> ChunkMetadata:
 # ============================================================================
 
 def _read_pdf_pages(pdf_path: str) -> List[str]:
-    """Extract text from PDF pages."""
+    """Phase 2 FIX: Extract text from PDF pages with parser priority.
+    
+    Parser priority (for better annexure/checklist extraction):
+    1. Try pymupdf (fitz) first - better OCR and table handling
+    2. Fall back to pypdf if pymupdf not available
+    
+    Returns: List of page texts (one string per page)
+    """
     pages: List[str] = []
-    if PdfReader is not None:
-        reader = PdfReader(pdf_path)
-        for pg in reader.pages:
-            try:
-                txt = pg.extract_text() or ""
-            except Exception:
-                txt = ""
+    
+    # Try pymupdf first (better quality for scanned documents)
+    try:
+        import fitz  # PyMuPDF
+        doc = fitz.open(pdf_path)
+        for page_num in range(len(doc)):
+            page = doc.load_page(page_num)
+            txt = page.get_text("text") or ""
             pages.append(txt)
+        doc.close()
+        
+        if DEBUG_MODE:
+            print(f"[DEBUG] PDF read using pymupdf ({len(pages)} pages)")
+        return pages
+    except ImportError:
+        # pymupdf not installed, fall back to pypdf
+        if DEBUG_MODE:
+            print("[DEBUG] pymupdf not available, falling back to pypdf")
+    except Exception as e:
+        # pymupdf failed for some reason, fall back to pypdf
+        if DEBUG_MODE:
+            print(f"[DEBUG] pymupdf failed ({e}), falling back to pypdf")
+    
+    # Fallback: pypdf
+    if PdfReader is not None:
+        try:
+            reader = PdfReader(pdf_path)
+            for pg in reader.pages:
+                try:
+                    txt = pg.extract_text() or ""
+                except Exception:
+                    txt = ""
+                pages.append(txt)
+            
+            if DEBUG_MODE:
+                print(f"[DEBUG] PDF read using pypdf ({len(pages)} pages)")
+        except Exception as e:
+            if DEBUG_MODE:
+                print(f"[DEBUG] pypdf failed: {e}")
+            pages = []
+    
     return pages
 
 

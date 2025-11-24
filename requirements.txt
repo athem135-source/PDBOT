@@ -1,6 +1,6 @@
 # ============================================
-# PDBot Requirements - v1.1.0
-# Enterprise RAG with LLM-Based Contextual Memory
+# PDBot Requirements - v1.4.0
+# Enterprise RAG with Phase 2 Reliability Improvements
 # ============================================
 
 # ---- Frontend & UI ----
@@ -8,7 +8,8 @@ streamlit>=1.36.0              # Interactive web UI framework for chatbot interf
 requests>=2.32.0               # HTTP library for API calls (Ollama, Qdrant health checks)
 
 # ---- Document Processing ----
-pypdf>=4.2.0                   # PDF text extraction for manual ingestion
+pypdf>=4.2.0                   # PDF text extraction for manual ingestion (fallback parser)
+PyMuPDF>=1.24.0                # Primary PDF parser (better OCR and table handling for annexures)
 
 # ---- LLM Backend ----
 transformers>=4.44.2           # Hugging Face transformers for tokenization and embeddings
