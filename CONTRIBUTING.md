@@ -2,16 +2,16 @@
 
 ## ⚠️ PROPRIETARY SOFTWARE NOTICE
 
-**PDBot is proprietary software owned by the Planning & Development Commission, Government of Pakistan.**
+**PDBot is proprietary software owned by Hassan Arif Afridi, developed for the Planning & Development Commission, Government of Pakistan.**
 
-This software is **NOT open source**. Contributions are restricted to authorized government personnel and approved contractors only.
+This software is **NOT open source**. Contributions are restricted to authorized personnel and approved collaborators only.
 
 ### Licensing & Access
 
 For authorization requests or licensing inquiries, contact:
-- **Hassan Arif Afridi**
+- **Hassan Arif Afridi (Copyright Holder)**
 - **Email:** hassanarifafridi@gmail.com
-- **Organization:** Planning & Development Commission, Government of Pakistan
+- **Client:** Planning & Development Commission, Government of Pakistan
 
 ---
 

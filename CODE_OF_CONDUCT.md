@@ -136,12 +136,12 @@ For questions or concerns about this Code of Conduct, please contact:
 
 ## Licensing Notice
 
-**PROPRIETARY SOFTWARE - GOVERNMENT USE ONLY**
+**PROPRIETARY SOFTWARE - RESTRICTED USE**
 
-This software is proprietary to the Planning & Development Commission, Government of Pakistan. Unauthorized use, distribution, or modification is strictly prohibited.
+This software is the proprietary work of Hassan Arif Afridi, developed for use by the Planning & Development Commission, Government of Pakistan. Unauthorized use, distribution, or modification is strictly prohibited.
 
 For licensing inquiries or authorized use requests, contact:
-- **Hassan Arif Afridi**
+- **Hassan Arif Afridi (Copyright Holder)**
 - **Email:** hassanarifafridi@gmail.com
 
 ---
