@@ -9,6 +9,13 @@
 
 PDBot v1.5.0 represents a major quality improvement focused on **eliminating hallucinations**, **tightening classification**, and **enforcing ethical boundaries**. This release ensures the bot never fabricates citations, properly detects misuse attempts, and maintains professional boundaries across all interactions.
 
+**What's New:**
+- ✅ Enhanced misuse detection for fund/asset disguise attempts
+- ✅ Acronym-only context detection prevents PAD/PERT/PFM hallucinations
+- ✅ Numeric answer validation prevents inventing durations/amounts
+- ✅ Fixed classification errors (savings/bonus no longer classified as "sports")
+- ✅ **Contextual intelligence**: Gracefully handles off-topic questions with creative analogies while staying grounded in Manual content
+
 ---
 
 ## ✨ Key Features & Improvements
@@ -83,6 +90,16 @@ Tightened sports detection to prevent false positives on financial/HR questions.
 **Previous Behavior**: Misclassified as "sports" (absurd)
 
 **New Behavior**: Correctly routes to misuse detection or in-scope financial guidance
+
+### 5. **Contextual Intelligence for Off-Topic Queries**
+PDBot demonstrates smart handling of unusual questions by providing creative analogies while staying grounded in Manual content.
+
+**Example Query**:
+> How do I make a burger? (asked as if PDBot were a chef bot)
+
+**Behavior**: Instead of a simple refusal, PDBot creatively draws an analogy between project management and burger-making, mapping PC-I components to burger ingredients while citing actual Manual pages (p.164, p.83). This shows contextual awareness and helpfulness even when technically out-of-scope.
+
+**Why This Matters**: Demonstrates the bot can handle edge cases gracefully, maintaining user engagement without compromising domain focus or factual accuracy.
 
 ---
 
