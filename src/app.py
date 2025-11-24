@@ -677,7 +677,7 @@ if "warmup_done" not in st.session_state:
     try:
         import requests as _rq
         _ollama_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-        _model = os.getenv("OLLAMA_MODEL", "mistral:7b")
+        _model = os.getenv("OLLAMA_MODEL", "mistral:latest")
         _rq.post(f"{_ollama_url}/api/generate", json={
             "model": _model,
             "prompt": "hello",
