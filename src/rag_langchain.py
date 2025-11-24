@@ -85,6 +85,43 @@ DEBUG_MODE = os.getenv("PNDBOT_DEBUG", "False").lower() == "true"
 
 
 # ============================================================================
+# MODEL CACHING (PERFORMANCE FIX #1)
+# ============================================================================
+# Global caches to avoid re-instantiating heavy models on every query.
+# Thread-safe for typical Streamlit single-process usage.
+
+_embedder_cache = None
+_reranker_cache = None  # Declared here, initialized later
+
+
+def get_embedder() -> Optional[SentenceTransformer]:  # type: ignore[valid-type]
+    """
+    Get or initialize the embedding model (SentenceTransformer).
+    
+    Returns cached instance to avoid expensive re-initialization.
+    Typically loads once per process (~500ms), then reused for all queries.
+    
+    Thread safety: Adequate for Streamlit's single-process model.
+    For multi-threaded production, consider adding threading.Lock.
+    """
+    global _embedder_cache
+    if _embedder_cache is None:
+        if not SENTENCE_TRANSFORMERS_AVAILABLE:
+            if DEBUG_MODE:
+                print("[DEBUG] SentenceTransformers not available")
+            return None
+        try:
+            _embedder_cache = SentenceTransformer(EMBED_MODEL)
+            if DEBUG_MODE:
+                print(f"[DEBUG] Loaded embedder: {EMBED_MODEL}")
+        except Exception as e:
+            if DEBUG_MODE:
+                print(f"[DEBUG] Failed to load embedder: {e}")
+            return None
+    return _embedder_cache
+
+
+# ============================================================================
 # DATA STRUCTURES
 # ============================================================================
 
@@ -332,8 +369,10 @@ def ingest_pdf_sentence_level(
     if VectorParams is None or Distance is None or PointStruct is None:
         raise RuntimeError("Qdrant models not loaded - qdrant-client.http.models import failed")
 
-    # Initialize models
-    model = SentenceTransformer(EMBED_MODEL)
+    # Initialize models (cached)
+    model = get_embedder()
+    if model is None:
+        raise RuntimeError("Failed to initialize embedding model")
     dim = int(model.get_sentence_embedding_dimension() or 384)
     client = _connect_qdrant(qdrant_url)
 
@@ -500,8 +539,6 @@ def filter_chunks_by_rules(
 # CROSS-ENCODER SEMANTIC RERANKING (FIX #4 - GAME CHANGER)
 # ============================================================================
 
-_reranker_cache = None
-
 def get_reranker() -> Optional[CrossEncoder]:  # type: ignore[valid-type]
     """Get or initialize the cross-encoder reranker model."""
     global _reranker_cache
@@ -601,7 +638,9 @@ def search_sentences(
     # Step 1: Initial retrieval (get 20 candidates)
     initial_k = 20  # Cast wider net initially
     
-    model = SentenceTransformer(EMBED_MODEL)
+    model = get_embedder()
+    if model is None:
+        raise RuntimeError("Failed to initialize embedding model")
     qvec = model.encode([query], normalize_embeddings=True)[0]
     client = _connect_qdrant(qdrant_url)
 
@@ -772,7 +811,11 @@ def mmr_rerank(
         return []
     
     texts = [c.get("text", "") for c in items]
-    model = SentenceTransformer(EMBED_MODEL)  # type: ignore[misc]
+    model = get_embedder()
+    if model is None:
+        if DEBUG_MODE:
+            print("[DEBUG] Embedder not available for MMR")
+        return items[:top_k]  # Fallback: return first k items
     vecs = model.encode(texts, normalize_embeddings=True)
     
     def cos(a, b):
