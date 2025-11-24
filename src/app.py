@@ -1977,17 +1977,24 @@ def append_and_save_chat(q: str, answer_html: str) -> None:
         pass
 
 def stream_response(text: str):
-    """ENTERPRISE FEATURE: Stream text word-by-word for Gemini-style live typing effect.
+    """Stream text word-by-word (configurable delay for typing effect).
     
-    Yields: Individual words with slight delay for natural typing feel.
+    Set PDBOT_STREAM_DELAY_MS=0 for instant display (default).
+    Set PDBOT_STREAM_DELAY_MS=20 for 50 words/sec typing effect.
+    
+    Yields: Individual words with optional delay.
     """
     import time
+    delay_ms = int(os.getenv("PDBOT_STREAM_DELAY_MS", "0"))
+    delay_sec = delay_ms / 1000.0
+    
     words = text.split()
     for i, word in enumerate(words):
         # Add space except for last word
         yield word + (" " if i < len(words) - 1 else "")
-        # Slight delay for natural typing (adjust speed here)
-        time.sleep(0.02)  # 20ms per word = ~50 words/second
+        # Optional delay for typing effect (0 = instant)
+        if delay_sec > 0:
+            time.sleep(delay_sec)
 
 def generate_answer(question: str) -> tuple[str, list[str]]:
     # Retrieve
