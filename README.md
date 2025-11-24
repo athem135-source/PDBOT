@@ -2,7 +2,7 @@
 
 ![Version](https://img.shields.io/badge/version-1.3.0--enterprise-blue)
 ![Python](https://img.shields.io/badge/python-3.12%2B-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+![License](https://img.shields.io/badge/license-Proprietary-red)
 ![Accuracy](https://img.shields.io/badge/accuracy-90%25-brightgreen)
 
 **🏆 Enterprise-grade document-grounded chatbot for querying the Planning & Development Commission Manual using advanced RAG with LLM-based contextual memory and Gemini-style floating UI.**
