@@ -1,6 +1,6 @@
 # ============================================
-# PDBot Requirements - v1.4.0
-# Enterprise RAG with Phase 2 Reliability Improvements
+# PDBot Requirements - v1.5.0
+# Phase 3 & 4 Behavior Engineering + Query Classification
 # ============================================
 
 # ---- Frontend & UI ----
@@ -32,3 +32,11 @@ qdrant-client>=1.9.0           # Qdrant vector DB client for semantic search
 # ---- Compatibility Fixes ----
 # Note: Keras 3 is not compatible with sentence-transformers
 # If keras is installed, uninstall it with: pip uninstall -y keras
+
+# ============================================
+# v1.5.0 Changes (Phase 3 & 4 Behavior Fixes):
+# - Query classification system (off-scope, abuse, banter, bribery)
+# - Anti-leakage prompts (no visible template headers)
+# - Honest audit logging notices
+# - Separate banter handling for "stupid bot" comments
+# ============================================

@@ -1,6 +1,6 @@
 # ============================================
-# PDBot Run Script - v1.4.0 (PowerShell)
-# Phase 2: Reliability & Behavior Engineering
+# PDBot Run Script - v1.5.0 (PowerShell)
+# Phase 3 & 4: Behavior Engineering + Query Classification
 # Quick launch with automatic setup if needed
 # ============================================
 

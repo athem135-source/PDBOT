@@ -55,11 +55,23 @@ with warnings.catch_warnings():
         CrossEncoder = None  # type: ignore
         SENTENCE_TRANSFORMERS_AVAILABLE = False
     except Exception as e:
+        # Log but don't fail - warnings/deprecations are non-fatal
         if DEBUG_MODE:
-            print(f"[DEBUG] sentence-transformers Exception: {e}")
-        SentenceTransformer = None  # type: ignore
-        CrossEncoder = None  # type: ignore
-        SENTENCE_TRANSFORMERS_AVAILABLE = False
+            print(f"[DEBUG] sentence-transformers Exception (may be non-fatal): {e}")
+        # Verify if import actually succeeded
+        try:
+            from sentence_transformers import SentenceTransformer, CrossEncoder
+            SENTENCE_TRANSFORMERS_AVAILABLE = True
+            if DEBUG_MODE:
+                print("[DEBUG] sentence-transformers import verified after exception")
+        except:
+            SentenceTransformer = None  # type: ignore
+            CrossEncoder = None  # type: ignore
+            SENTENCE_TRANSFORMERS_AVAILABLE = False
+
+# Final verification at module level
+if DEBUG_MODE and SENTENCE_TRANSFORMERS_AVAILABLE:
+    print(f"[DEBUG] Module-level check: SentenceTransformer available = {SentenceTransformer is not None}")
 
 try:
     from qdrant_client import QdrantClient

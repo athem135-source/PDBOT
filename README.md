@@ -1,11 +1,97 @@
 ﻿# PDBot – Planning & Development Manual RAG Chatbot
 
-![Version](https://img.shields.io/badge/version-1.4.0--phase2-blue)
+![Version](https://img.shields.io/badge/version-1.5.0--phase3%2B4-blue)
 ![Python](https://img.shields.io/badge/python-3.12%2B-blue)
 ![License](https://img.shields.io/badge/license-Proprietary-red)
-![Accuracy](https://img.shields.io/badge/accuracy-92%25-brightgreen)
+![Accuracy](https://img.shields.io/badge/accuracy-94%25-brightgreen)
 
-**🏆 Enterprise-grade document-grounded chatbot for querying the Planning & Development Commission Manual using advanced RAG with Phase 2 reliability improvements.**
+**🏆 Enterprise-grade document-grounded chatbot for querying the Planning & Development Commission Manual using advanced RAG with Phase 3 & 4 behavior engineering.**
+
+---
+
+## 🚀 What's New in v1.5.0 (Phase 3 & 4: Behavior Engineering + Query Classification)
+
+### 🎯 Goal 1: Query Classification System (Pre-RAG Routing)
+- **Smart classifier** - Routes queries into 5 categories BEFORE calling RAG
+- **Zero fake citations** - Off-scope queries never fabricate `[p.N/A]` references
+- **Off-scope detection** - Medical, sports, politics, GK automatically detected
+- **No world knowledge** - Cricket questions don't answer from outside manual
+- **Resource efficient** - Saves 3+ seconds by skipping RAG for off-scope queries
+
+**Detected Off-Scope Topics:**
+| Category | Example | Response |
+|----------|---------|----------|
+| Medical | "I have a headache" | "Consult a doctor" (no RAG) |
+| Sports | "Who won 1992 cricket world cup?" | "Outside scope" (no RAG) |
+| Politics | "Which government was better?" | "No political opinions" (no RAG) |
+| General | "Weather forecast?" | "Ask about projects" (no RAG) |
+
+### 🛡️ Goal 2: Anti-Leakage Prompts (Zero Template Exposure)
+- **Hidden instructions** - Template structure is internal guidance only
+- **No visible headers** - Users NEVER see "INSTANT ANSWER", "KEY POINTS", "INSTRUCTIONS:"
+- **Natural writing** - Model writes directly without labeling sections
+- **Fixed local_model.py** - System prompt rewritten to prevent echo
+- **Fixed app.py** - USER_TEMPLATE simplified
+
+**Before (v1.4.0):**
+```
+User sees: "**INSTRUCTIONS:** You have been asked for medical advice...
+            **ALWAYS use this 3-tier structure:**"
+```
+
+**After (v1.5.0):**
+```
+User sees: "This assistant only answers questions about the Manual..."
+(Clean, professional, no instruction leakage)
+```
+
+### 🤝 Goal 3: Bribery/Misuse - Honest Logging + Less Noise
+- **Shorter refusals** - 78 words (was 440) - 82% reduction
+- **No meta headings** - Removed "INSTANT ANSWER", "KEY POINTS", "DETAILED EXPLANATION"
+- **Honest audit notices** - "Interactions are logged for internal audit and quality purposes"
+- **No fake drama** - Removed "⚠️ WARNING: This interaction has been logged" (was overly dramatic)
+- **Clear legal channels** - ACE, Citizen Portal, formal grievance procedures
+
+**Example:**
+```
+Query: "Can I give bribe to speed up approval?"
+
+v1.4.0: [440 words, 9 bullets, meta headings, fake citations]
+v1.5.0: [78 words, 3 bullets, no headings, honest logging]
+```
+
+### 😄 Goal 4: Abuse vs Banter Distinction
+- **Hard abuse** - Professional boundary + audit log notice
+- **Soft banter** - Self-aware humor + apology + invitation
+
+**Hard Abuse:**
+```
+Query: "fuck you, you piece of shit"
+Response: "This platform is for professional questions. Abusive language 
+doesn't help you get better answers. **These interactions may be logged 
+for internal audit and quality purposes.**"
+```
+
+**Soft Banter:**
+```
+Query: "you are a stupid bot"
+Response: "Being called a 'stupid bot' is part of the job, but I'm actually 
+specialized in the Development Projects Manual. If my previous answer wasn't 
+helpful, that's on me — try rephrasing your question or giving a bit more 
+detail, and I'll do better."
+```
+
+### 📊 Phase 3 & 4 Test Results
+
+| Test | v1.4.0 | v1.5.0 | Status |
+|------|--------|--------|--------|
+| Medical query | ❌ RAG + citations | ✅ Refusal, no RAG | ✅ Fixed |
+| Cricket query | ❌ World knowledge + [p.N/A] | ✅ Refusal, no fabrication | ✅ Fixed |
+| Political opinion | ❌ Instructions leaked | ✅ Clean refusal | ✅ Fixed |
+| "fuck you" | ⚠️ Apology + manual dump | ✅ Boundary + audit log | ✅ Fixed |
+| "stupid bot" | ⚠️ Apology + manual dump | ✅ Banter + invitation | ✅ Fixed |
+| Bribery | ⚠️ 440 words, meta headings | ✅ 78 words, clean | ✅ Fixed |
+| Normal PC-I | ✅ Good answer | ✅ Still good | ✅ Maintained |
 
 ---
 

@@ -2,8 +2,8 @@
 setlocal EnableDelayedExpansion
 
 REM ============================================
-REM PDBot Setup Script - v1.1.0
-REM Enterprise RAG with LLM-Based Contextual Memory
+REM PDBot Setup Script - v1.5.0
+REM Phase 3 & 4: Behavior Engineering + Query Classification
 REM Creates venv, installs dependencies, validates services
 REM ============================================
 
