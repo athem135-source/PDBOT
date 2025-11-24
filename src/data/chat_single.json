@@ -518,5 +518,45 @@
   {
     "role": "assistant",
     "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>• NHA etc.\n• for goods/works/services to be procured for development projects by all federal entities.\n• The project cost may need a revision because of certain factors, which also include a change in \nscope during implementation and cost overruns.\n• In case of revision o f the project, detailed \njustification for changes in scope and cost must be provided separately along-with clear reasons \nof revision.\n• Instructions of the ECNEC about project cost revision are presented in Box 1.\n• PROJECT FINANCING \n2.57 The sponsoring agency provides a detailed justification (for example, public good, market failu\n• In case of revision o f the project, detailed  justification for changes in scope and cost must be provided separately along-with clear reasons  of revision.\n• The project cost may need a revision because of certain factors, which also include a change in  scope during implementation and cost overruns. [p.61, p.72]\n• quantities \nand expenditures.\n• Reasons for revision should also be given along \nwith justification.\n\nSources:\n[1] Manual for Development Projects 2024, p.61\n[2] Manual for Development Projects 2024, p.61\n[3] Manual for Development Projects 2024, p.61\n[4] Manual for Development Projects 2024, p.61\n[5] Manual for Development Projects 2024, p.72</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is PC-I?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>(ollama error: /api/generate not found, but these endpoints exist: ['/api/tags'])\n\n• The PC-I shall be prepared upon recommendations of PC-II  b.\n• planned (as  given in PC-I) are provided.\n• MA \n2.42 The Planning Commission proforma I (generally called P C-I) is the primary project \ndocument, and its preparation is a key step in project preparation and processing.\n• The sponsoring \nagency is expected to spend adequate time and resources in preparing this document to avoid \ncomplications during project implement ation resulting in delays in project completion and cost \noverruns.\n• The PC-I is used both for new projects and revision of ongoing projects.\n• The Proforma \ncomprises of three parts: \ni.\n• In case it differs from the PC-I, the details may  be provided. [p.152, p.137, p.55]\n\nSources:\n[1] Manual for Development Projects 2024, p.152\n[2] Manual for Development Projects 2024, p.137\n[3] Manual for Development Projects 2024, p.55\n[4] Manual for Development Projects 2024, p.144</div>"
+  },
+  {
+    "role": "user",
+    "content": "explain the policy regarding land acquisition for mega projects"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/><div class='card warn'>⚠️ <strong>Answer:</strong><br/>**Insufficient context (9 words, need 15+)**<br/>Try rephrasing your question or use Exact Search mode to locate precise passages.<br/><br/>Sources:\n[1] Manual for Development Projects 2024, p.113</div></div>"
+  },
+  {
+    "role": "user",
+    "content": "Provide the checklist for the Project Concept Note (PCN)."
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/><div class='card warn'>⚠️ <strong>Answer:</strong><br/>**Very low relevance (max: 0.18). Please rephrase your question.**<br/>Try rephrasing your question or use Exact Search mode to locate precise passages.<br/><br/>Sources:\n[1] Manual for Development Projects 2024, p.113\n[2] Manual for Development Projects 2024, p.186\n[3] Manual for Development Projects 2024, p.117\n[4] Manual for Development Projects 2024, p.158\n[5] Manual for Development Projects 2024, p.100\n[6] Manual for Development Projects 2024, p.5\n[7] Manual for Development Projects 2024, p.184\n[8] Manual for Development Projects 2024, p.184</div></div>"
+  },
+  {
+    "role": "user",
+    "content": "Define the term 'PPS' in the context of project posts"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/><div class='card warn'>⚠️ <strong>Answer:</strong><br/>**Insufficient context (9 words, need 15+)**<br/>Try rephrasing your question or use Exact Search mode to locate precise passages.<br/><br/>Sources:\n[1] Manual for Development Projects 2024, p.45</div></div>"
+  },
+  {
+    "role": "user",
+    "content": "What is PC-I?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>**INSTRUCTIONS:**\n1. Read the context carefully and correct any OCR errors in your output. 2. Pay attention to logic and thresholds (e.g., 'greater than' vs 'less than'). 3. If info is missing, say so clearly.\n\n• The PC-I shall be prepared upon recommendations of PC-II  b.\n• planned (as  given in PC-I) are provided.\n• MA \n2.42 The Planning Commission proforma I (generally called P C-I) is the primary project \ndocument, and its preparation is a key step in project preparation and processing.\n• The sponsoring \nagency is expected to spend adequate time and resources in preparing this document to avoid \ncomplications during project implement ation resulting in delays in project completion and cost \noverruns.\n• The PC-I is used both for new projects and revision of ongoing projects.\n• The Proforma \ncomprises of three parts: \ni.\n• In case it differs from the PC-I, the details may  be provided. [p.152, p.137, p.55]\n\nSources:\n[1] Manual for Development Projects 2024, p.152\n[2] Manual for Development Projects 2024, p.137\n[3] Manual for Development Projects 2024, p.55\n[4] Manual for Development Projects 2024, p.144</div>"
   }
 ]

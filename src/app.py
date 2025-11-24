@@ -408,6 +408,18 @@ try:
     from src.rag_langchain import RetrievalBackendError, EmbeddingModelError
     _RAG_OK = True
     _RAG_IMPORT_ERR = None
+    
+    # Optional: New modular answer composition (set PDBOT_USE_MODULAR_ANSWERING=1 to enable)
+    try:
+        from src.core.answering import (
+            compose_answer_with_context_check,
+            AnswerResult,
+            check_context_quality as check_context_quality_v2,
+            format_citations as format_citations_v2,
+        )
+        _MODULAR_ANSWERING_AVAILABLE = True
+    except ImportError:
+        _MODULAR_ANSWERING_AVAILABLE = False
 except Exception as _e:
     # FIXED: Show warning instead of silent failure; provide fallbacks
     _RAG_OK = False

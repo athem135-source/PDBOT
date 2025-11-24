@@ -3,6 +3,14 @@ Core answer generation and composition logic for PDBot.
 
 Extracted from app.py to improve maintainability and testability.
 Handles LLM integration, context quality checks, and answer formatting.
+
+STATUS: Module created but not yet integrated into app.py.
+        Currently app.py imports this module but uses legacy compose_answer().
+        Future: Replace inline logic with compose_answer_with_context_check().
+        
+USAGE:
+    Enable with environment variable: PDBOT_USE_MODULAR_ANSWERING=1
+    or integrate directly by replacing generate_answer_generative() logic.
 """
 from __future__ import annotations
 
