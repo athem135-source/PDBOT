@@ -1,15 +1,39 @@
 # Contributing to PDBot
 
-Thank you for your interest in contributing to PDBot! This document provides guidelines for contributing to the project.
+## ⚠️ PROPRIETARY SOFTWARE NOTICE
 
-## 🚀 Quick Start
+**PDBot is proprietary software owned by the Planning & Development Commission, Government of Pakistan.**
 
-1. **Fork the repository**
+This software is **NOT open source**. Contributions are restricted to authorized government personnel and approved contractors only.
+
+### Licensing & Access
+
+For authorization requests or licensing inquiries, contact:
+- **Hassan Arif Afridi**
+- **Email:** hassanarifafridi@gmail.com
+- **Organization:** Planning & Development Commission, Government of Pakistan
+
+---
+
+## Guidelines for Authorized Contributors
+
+If you are an authorized contributor, this document provides guidelines for contributing to the project.
+
+## 🚀 Quick Start (Authorized Personnel Only)
+
+**IMPORTANT:** You must be an authorized government employee or approved contractor to contribute.
+
+1. **Request Authorization**
+   - Contact: hassanarifafridi@gmail.com
+   - Provide: Name, Organization, Purpose
+   - Wait for approval before proceeding
+
+2. **Fork the repository** (after authorization)
    ```bash
    gh repo fork athem135-source/PDBOT
    ```
 
-2. **Clone your fork**
+3. **Clone your fork**
    ```bash
    git clone https://github.com/YOUR_USERNAME/PDBOT.git
    cd PDBOT
@@ -281,9 +305,10 @@ Instances of unacceptable behavior may be reported to the project maintainers. A
 
 ## 📧 Contact
 
-- **GitHub Issues:** https://github.com/athem135-source/PDBOT/issues
-- **Discussions:** https://github.com/athem135-source/PDBOT/discussions
-- **Email:** planning.pdbot@gmail.com (for sensitive issues)
+- **GitHub Issues:** https://github.com/athem135-source/PDBOT/issues (authorized users only)
+- **Discussions:** https://github.com/athem135-source/PDBOT/discussions (authorized users only)
+- **Licensing & Authorization:** hassanarifafridi@gmail.com
+- **Technical Issues:** hassanarifafridi@gmail.com
 
 ## 🏆 Recognition
 

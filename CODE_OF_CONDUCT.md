@@ -131,8 +131,18 @@ https://www.contributor-covenant.org/translations.
 ## Contact
 
 For questions or concerns about this Code of Conduct, please contact:
-- **Email:** planning.pdbot@gmail.com
+- **Email:** hassanarifafridi@gmail.com
 - **GitHub Issues:** https://github.com/athem135-source/PDBOT/issues
+
+## Licensing Notice
+
+**PROPRIETARY SOFTWARE - GOVERNMENT USE ONLY**
+
+This software is proprietary to the Planning & Development Commission, Government of Pakistan. Unauthorized use, distribution, or modification is strictly prohibited.
+
+For licensing inquiries or authorized use requests, contact:
+- **Hassan Arif Afridi**
+- **Email:** hassanarifafridi@gmail.com
 
 ---
 
