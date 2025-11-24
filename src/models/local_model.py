@@ -39,7 +39,7 @@ class LocalModel:
         self._task_pipe: Optional[Tuple[str, object]] = None
         self._ollama_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
         # Prefer explicit model_name for Ollama when provided, else env default
-        self._ollama_model = (model_name or os.getenv("OLLAMA_MODEL", "mistral:7b")) if self.backend == "ollama" else os.getenv("OLLAMA_MODEL", "mistral:7b")
+        self._ollama_model = (model_name or os.getenv("OLLAMA_MODEL", "mistral:latest")) if self.backend == "ollama" else os.getenv("OLLAMA_MODEL", "mistral:latest")
 
     def load_model(self):
         if self.backend == "ollama":

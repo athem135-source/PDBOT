@@ -19,6 +19,9 @@ os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
 _ROOT = os.path.dirname(os.path.abspath(__file__))
 _AVATAR_PATH = os.path.join(_ROOT, "assets", "pakistan_emblem.png")
 
+# Debug mode from environment variable
+DEBUG_MODE = os.getenv("PNDBOT_DEBUG", "").lower() == "true"
+
 import streamlit as st
 import re
 from typing import Any, TYPE_CHECKING, cast
@@ -220,7 +223,7 @@ except Exception:
     pass
 
 # Default model/control knobs (overridden later by UI controls if present)
-model_name: str = os.getenv("OLLAMA_MODEL", "mistral:7b")
+model_name: str = os.getenv("OLLAMA_MODEL", "mistral:latest")
 top_k: int = 6
 max_tokens: int = 768
 temperature: float = 0.2
@@ -2858,7 +2861,12 @@ with tab_chat:
                     except Exception:
                         pass
                     with st.chat_message("assistant"):
-                        st.error("Something went wrong while generating the answer. Please try again.")
+                        debug_enabled = os.getenv("PNDBOT_DEBUG", "").lower() == "true"
+                        if debug_enabled:
+                            import traceback
+                            st.error(f"❌ **Error:** {str(e)}\n\n```\n{traceback.format_exc()}\n```")
+                        else:
+                            st.error(f"⚠️ Something went wrong: {str(e)}\n\nPlease try again or enable DEBUG mode for details.")
 
         # Intercept ask handled directly by input handler above
 
