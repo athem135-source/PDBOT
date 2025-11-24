@@ -557,7 +557,7 @@ def _load_builtin_manual(force: bool = False):
     else:
         st.error("Manual could not be read. Install 'langchain-community' or 'pypdf' to enable PDF reading.")
 
-_HEADER = "<h1 style='margin-bottom:0; font-weight:800;'>PDBOT</h1><p style='opacity:.5;margin-top:0px;font-size:0.9em;'>v1.1.0</p><p style='opacity:.8;margin-top:4px'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</p>"
+_HEADER = "<h1 style='margin-bottom:0; font-weight:800;'>PDBOT</h1><p style='opacity:.5;margin-top:0px;font-size:0.9em;'>v1.5.0</p><p style='opacity:.8;margin-top:4px'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</p>"
 # Single, hardcoded default logo path: place your logo at this location and it will be used automatically
 # Prefer explicit light-theme logo filename for white theme
 HARDCODED_LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "branding_logo-black.png")
@@ -681,7 +681,7 @@ def render_brand_header():
     else:
         html.append("<div class='brand-logo' style='font-weight:700;opacity:.9'>Planning &amp; Development</div>")
     html.append("<div class='brand-title'>PDBOT</div>")
-    html.append("<div style='text-align:center; opacity:0.5; margin-top:4px; font-size:0.9em;'>v1.3.0</div>")
+    html.append("<div style='text-align:center; opacity:0.5; margin-top:4px; font-size:0.9em;'>v1.5.0</div>")
     html.append("</div>")  # close brand-card
     html.append("<div class='brand-sub'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</div>")
     html.append("</div>")
