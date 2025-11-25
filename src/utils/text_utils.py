@@ -354,19 +354,46 @@ def extract_factual_items(query: str, chunks: List[str], max_items: int = 5) -> 
 
 # --- Generative helpers ---
 def render_citations(citations: List[Dict[str, Any]], manual_title: str = "Manual for Development Projects 2024") -> str:
-    """Render a Sources block in the format:
-    Sources:
-    [1] Manual for Development Projects 2024, p.xx
-    [2] Manual for Development Projects 2024, p.yy
-    """
+    \"\"\"Render a Sources block in the proper format (v1.8.0 fix).
+    
+    Format:
+    Source: Manual for Development Projects 2024, p.XX
+    
+    NEVER outputs:
+    - [5] or bracketed numbers
+    - Page N/A or placeholder values
+    - Multiple entries (just first 1-3 sources)
+    
+    Args:
+        citations: List of citation dicts with 'page' key
+        manual_title: Title of the manual
+    
+    Returns:
+        Formatted citation string
+    \"\"\"
     if not citations:
-        return "Sources:\n(none)"
-    lines = ["Sources:"]
-    for c in citations:
-        n = c.get("n") or c.get("index") or "?"
-        p = c.get("page") or "?"
-        lines.append(f"[{n}] {manual_title}, p.{p}")
-    return "\n".join(lines)
+        return \"\"
+    
+    # Take only first citation (single source format)
+    # Filter out invalid pages
+    valid_citations = []
+    for c in citations[:3]:  # Max 3 sources
+        page = c.get(\"page\")
+        if page and str(page).replace(\".\", \"\").replace(\",\", \"\").isdigit():
+            valid_citations.append(c)
+    
+    if not valid_citations:
+        return \"\"
+    
+    # Format as: Source: Manual for Development Projects 2024, p.X
+    if len(valid_citations) == 1:
+        page = valid_citations[0].get(\"page\", \"?\")
+        return f\"\\n\\nSource: {manual_title}, p.{page}\"
+    else:
+        # Multiple sources: Source: Manual for Development Projects 2024, p.X, p.Y
+        pages = [str(c.get(\"page\", \"?\")) for c in valid_citations]
+        page_list = \", p.\".join(pages)
+        return f\"\\n\\nSource: {manual_title}, p.{page_list}\"
 
 
 def to_markdown_table(headers: List[str], rows: List[List[Any]]) -> str:
