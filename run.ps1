@@ -59,16 +59,23 @@ try {
     $servicesOk = $false
 }
 
-# Check Qdrant (default port 6338 as per app.py)
-try {
-    $response = Invoke-WebRequest -Uri "http://localhost:6338/health" -TimeoutSec 2 -UseBasicParsing -ErrorAction SilentlyContinue
-    if ($response.StatusCode -eq 200) {
-        Write-Host "[OK] Qdrant ready`n" -ForegroundColor Green
-    } else {
-        Write-Host "[WARN] Qdrant not responding - start with: docker run -d -p 6338:6333 qdrant/qdrant`n" -ForegroundColor Yellow
-        $servicesOk = $false
+# Check Qdrant (default port 6338 as per app.py) with retry
+$qdrantOk = $false
+for ($i = 1; $i -le 3; $i++) {
+    try {
+        $response = Invoke-WebRequest -Uri "http://localhost:6338/health" -TimeoutSec 2 -UseBasicParsing -ErrorAction SilentlyContinue
+        if ($response.StatusCode -eq 200) {
+            Write-Host "[OK] Qdrant ready`n" -ForegroundColor Green
+            $qdrantOk = $true
+            break
+        }
+    } catch {
+        if ($i -lt 3) {
+            Start-Sleep -Milliseconds 500
+        }
     }
-} catch {
+}
+if (-not $qdrantOk) {
     Write-Host "[WARN] Qdrant not responding - start with: docker run -d -p 6338:6333 qdrant/qdrant`n" -ForegroundColor Yellow
     $servicesOk = $false
 }

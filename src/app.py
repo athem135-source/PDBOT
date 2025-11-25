@@ -506,6 +506,21 @@ def _load_builtin_manual(force: bool = False):
     already_have_pages = bool(st.session_state.get("raw_pages"))
     already_indexed = bool(int(st.session_state.get("last_index_count") or 0) > 0)
     if not force and same_manual and (already_have_pages or already_indexed):
+        # Update count from Qdrant if available (in case collection was rebuilt externally)
+        try:
+            if _RAG_OK:
+                from qdrant_client import QdrantClient
+                client = QdrantClient(url=_qdrant_url())
+                collection = client.get_collection(RAG_COLLECTION)
+                updated_count = collection.points_count
+                st.session_state["last_index_count"] = updated_count
+                
+                # Show updated status message
+                src_name = os.path.basename(manual_path)
+                if updated_count > 0:
+                    st.success(f"Loaded built-in manual: {src_name} • Pages: {st.session_state.get('raw_page_count')} • Indexed {updated_count} chunks.")
+        except Exception:
+            pass  # Keep existing cached count
         return
 
     # Always load raw pages for Exact mode and basic grounding
@@ -560,7 +575,7 @@ def _load_builtin_manual(force: bool = False):
     else:
         st.error("Manual could not be read. Install 'langchain-community' or 'pypdf' to enable PDF reading.")
 
-_HEADER = "<h1 style='margin-bottom:0; font-weight:800;'>PDBOT</h1><p style='opacity:.5;margin-top:0px;font-size:0.9em;'>v1.5.0</p><p style='opacity:.8;margin-top:4px'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</p>"
+_HEADER = "<h1 style='margin-bottom:0; font-weight:800;'>PDBOT</h1><p style='opacity:.5;margin-top:0px;font-size:0.9em;'>v1.8.0</p><p style='opacity:.8;margin-top:4px'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</p>"
 # Single, hardcoded default logo path: place your logo at this location and it will be used automatically
 # Prefer explicit light-theme logo filename for white theme
 HARDCODED_LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "branding_logo-black.png")
@@ -684,7 +699,7 @@ def render_brand_header():
     else:
         html.append("<div class='brand-logo' style='font-weight:700;opacity:.9'>Planning &amp; Development</div>")
     html.append("<div class='brand-title'>PDBOT</div>")
-    html.append("<div style='text-align:center; opacity:0.5; margin-top:4px; font-size:0.9em;'>v1.5.0</div>")
+    html.append("<div style='text-align:center; opacity:0.5; margin-top:4px; font-size:0.9em;'>v1.8.0</div>")
     html.append("</div>")  # close brand-card
     html.append("<div class='brand-sub'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</div>")
     html.append("</div>")
@@ -752,6 +767,16 @@ init_state()
 try:
     if not st.session_state.get("raw_pages"):
         _load_builtin_manual(force=False)
+    
+    # v1.8.0: Always sync chunk count from Qdrant on startup
+    if _RAG_OK and st.session_state.get("indexed_ok"):
+        try:
+            from qdrant_client import QdrantClient
+            client = QdrantClient(url=_qdrant_url())
+            collection = client.get_collection(RAG_COLLECTION)
+            st.session_state["last_index_count"] = collection.points_count
+        except Exception:
+            pass  # Keep existing cached count if Qdrant unavailable
 except Exception as _e_auto_manual:
     st.session_state["manual_load_error"] = str(_e_auto_manual)
 
@@ -2611,6 +2636,16 @@ with st.sidebar:
             src_name = st.session_state.get("source_file") or os.path.basename(os.getenv("DEFAULT_MANUAL_PATH", "manual.pdf"))
             pages_ct = st.session_state.get("raw_page_count")
             chunks_ct = int(st.session_state.get("last_index_count") or 0)
+            
+            # v1.8.0: Try to get live count from Qdrant if available
+            if q_ok and _RAG_OK:
+                try:
+                    live_count = qc.get_collection(coll).points_count
+                    chunks_ct = live_count
+                    st.session_state["last_index_count"] = live_count
+                except Exception:
+                    pass  # Use cached count if query fails
+            
             engine_label = "Local" if st.session_state.engine == "LLM (Ollama)" else "Pretrained"
             st.markdown(f"Manual: `{src_name}`")
             st.markdown(f"Pages: {pages_ct if pages_ct is not None else '?'} • Chunks: {chunks_ct}")

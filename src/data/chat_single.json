@@ -1718,5 +1718,189 @@
   {
     "role": "assistant",
     "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The Manual defines FEC (Foreign Exchange Component) on page 5 as part of project costs, and it should be calculated using the Planning Commission Guidelines on Calculating Pakistani Rupee (PKR) Equivalent of the Foreign Exchange Component (FEC) of Projects (page 7). Regarding its treatment in cost estimates, it is stated that duties are treated as transfer payments and are excluded from the capital and operating cost (page 13).\n\nSources:\n[1] Manual for Development Projects 2024, p.60\n[2] Manual for Development Projects 2024, p.60\n[3] Manual for Development Projects 2024, p.137</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the DDWP approval limit?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The DDWP approval limit is up to Rs. 1000 million, provided foreign assistance is less than 25 percent of the total cost of the project (Source: p.168). Additionally, the DDWP can approve projects each costing up to Rs.\n\n\n\nSource: Manual for Development Projects 2024, p.169, p.185, p.136</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the DDWP approval limit?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The DDWP approval limit is up to Rs. 1000 million, provided foreign assistance is less than 25 percent of the total cost of the project (Source: p.168). Additionally, the DDWP can approve projects each costing up to Rs.\n\n\n\nSource: Manual for Development Projects 2024, p.169, p.185, p.136</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the CDWP threshold?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.18, p.169, p.181</div>"
+  },
+  {
+    "role": "user",
+    "content": "Who approves projects above Rs. 10 billion?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.76, p.76, p.187</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the CDWP threshold?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The CDWP threshold is up to 7.5 billion rupees, as stated in . Projects beyond this limit will be forwarded to ECNEC.\n\n\n\nSource: Manual for Development Projects 2024, p.18, p.169, p.181</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the PDWP approval limit?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.174, p.178, p.184</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the cost escalation limit?\""
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.72, p.59, p.72</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the foreign exchange component limit?\""
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.111, p.71, p.111</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the contingency percentage?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Not found in the Manual. [p.46, p.\n\n\n\nSource: Manual for Development Projects 2024, p.47</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the maximum project duration?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.141, p.101, p.99</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the minimum cost for PC-I submission?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The minimum cost for PC-I submission is not explicitly mentioned in the provided context.\n\n\n\nSource: Manual for Development Projects 2024, p.95, p.57, p.175</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the threshold for feasibility study?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.107, p.152, p.34</div>"
+  },
+  {
+    "role": "user",
+    "content": "What does DDWP stand for?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.185, p.175, p.181</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the role of ECNEC?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.167, p.18, p.20</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the DDWP approval limit?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.169, p.185, p.136</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the CDWP threshold?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.18, p.169, p.181</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the DDWP approval limit?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.169, p.185, p.136</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the DDWP approval limit?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.111, p.79, p.18</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the DDWP approval limit?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.111, p.79, p.18</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the DDWP approval limit?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.111, p.79, p.18</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the DDWP treshold limit?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.111, p.18, p.136</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the DDWP approval limit?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.111, p.79, p.18</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the DDWP approval limit?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.111, p.101, p.66</div>"
   }
 ]

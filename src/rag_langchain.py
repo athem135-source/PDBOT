@@ -109,7 +109,7 @@ RERANKER_MODEL = os.getenv("PNDBOT_RERANKER", "cross-encoder/ms-marco-MiniLM-L-6
 
 # v1.8.0 Retrieval thresholds (RELAXED for recall, strict filtering for precision)
 MIN_RELEVANCE_SCORE = float(os.getenv("PNDBOT_MIN_SCORE", "0.12"))  # Relaxed from 0.40 to 0.12 (never block RAG)
-MAX_FINAL_CHUNKS = int(os.getenv("PNDBOT_MAX_CHUNKS", "2"))  # Hard limit: 2 chunks only
+MAX_FINAL_CHUNKS = int(os.getenv("PNDBOT_MAX_CHUNKS", "3"))  # v1.8.0: Increased to 3 for numeric queries
 WARNING_THRESHOLD = 0.30  # Show warning if all scores < 0.30
 
 
@@ -463,6 +463,8 @@ def _split_into_chunks(text: str, chunk_size: int = 50, chunk_overlap: int = 0) 
         cleaned_sentences.append(sent)
     
     # Group sentences into chunks of 40-55 words
+    # CRITICAL: Never break a sentence - always include complete sentences
+    # PRIORITY: Keep numeric values (Rs./million/billion/percentage) together
     chunks = []
     current_chunk = []
     current_word_count = 0
@@ -470,22 +472,52 @@ def _split_into_chunks(text: str, chunk_size: int = 50, chunk_overlap: int = 0) 
     for sent in cleaned_sentences:
         sent_words = len(sent.split())
         
-        # If adding this sentence exceeds target, finalize current chunk
-        if current_word_count > 0 and (current_word_count + sent_words) > 55:
+        # Detect if sentence contains critical numeric values
+        has_numeric_value = bool(re.search(r'\bRs\.?\s*\d+|USD\s*\d+|\d+\s*(million|billion|crore|lakh|percent|%)', sent, re.IGNORECASE))
+        
+        # Check if adding this sentence would exceed limit
+        would_exceed = (current_word_count + sent_words) > 55
+        
+        # If sentence has numeric value, NEVER split it even if it causes longer chunk
+        if has_numeric_value and would_exceed and current_word_count > 0:
+            # Finalize previous chunk
             chunk_text = ' '.join(current_chunk)
-            if 40 <= len(chunk_text.split()) <= 120:  # Keep chunks in range
+            if len(chunk_text.split()) >= 5:
                 chunks.append(chunk_text)
+            # Start new chunk with this COMPLETE numeric sentence
+            current_chunk = [sent]
+            current_word_count = sent_words
+        elif current_word_count > 0 and would_exceed:
+            # Normal case: finalize current chunk WITHOUT this sentence
+            chunk_text = ' '.join(current_chunk)
+            word_count = len(chunk_text.split())
+            if 5 <= word_count <= 120:  # Accept any reasonable size
+                chunks.append(chunk_text)
+            
+            # Start new chunk with current sentence
+            current_chunk = [sent]
+            current_word_count = sent_words
+        
+        if current_word_count > 0 and would_exceed:
+            # Finalize current chunk WITHOUT this sentence
+            chunk_text = ' '.join(current_chunk)
+            word_count = len(chunk_text.split())
+            if 5 <= word_count <= 120:  # Accept any reasonable size
+                chunks.append(chunk_text)
+            
+            # Start new chunk with current sentence
             current_chunk = [sent]
             current_word_count = sent_words
         else:
+            # Add sentence to current chunk
             current_chunk.append(sent)
             current_word_count += sent_words
             
-            # If we've reached good size, finalize
-            if current_word_count >= 40:
+            # If we're in target range (40-55) and next sentence might exceed,
+            # finalize now to keep chunks optimal
+            if current_word_count >= 40 and current_word_count <= 55:
                 chunk_text = ' '.join(current_chunk)
-                if 40 <= len(chunk_text.split()) <= 120:
-                    chunks.append(chunk_text)
+                chunks.append(chunk_text)
                 current_chunk = []
                 current_word_count = 0
     
@@ -493,7 +525,7 @@ def _split_into_chunks(text: str, chunk_size: int = 50, chunk_overlap: int = 0) 
     if current_chunk:
         chunk_text = ' '.join(current_chunk)
         word_count = len(chunk_text.split())
-        if word_count >= 5:  # At least 5 words
+        if word_count >= 5:  # At least 5 words minimum
             chunks.append(chunk_text)
     
     return chunks
@@ -567,6 +599,7 @@ def ingest_pdf_sentence_level(
             continue
         
         # v1.8.0: Split page into sentence-level chunks (40-55 words each, never break mid-sentence)
+        # Target: 40-55 words per chunk using NLTK sentence tokenizer
         chunks = _split_into_chunks(page_text, chunk_size=50, chunk_overlap=0)
         
         for chunk_text in chunks:
@@ -782,7 +815,7 @@ def post_filter_garbage_chunks(chunks: List[Dict[str, Any]], query: str) -> List
     CRITICAL v1.8.0 POST-FILTER: Remove garbage chunks that pollute answers.
     
     Removes:
-    - Chunks with score < 0.30 (relevance too low)
+    - Chunks with score < 0.15 (relevance too low)
     - Chunks with "Figure", "Table", "Annexure" headers
     - Notification codes (e.g., "(4(9)R-14/2008)")
     - Page formatting garbage (headers/footers)
@@ -810,10 +843,10 @@ def post_filter_garbage_chunks(chunks: List[Dict[str, Any]], query: str) -> List
         if not text:
             continue
         
-        # Rule 0: Score too low (< 0.30)
-        if score < 0.30:
+        # Rule 0: Score too low (< 0.15) - v1.8.0: Further relaxed for numeric queries
+        if score < 0.15:
             if DEBUG_MODE:
-                print(f"[DEBUG] Filter: Score too low ({score:.2f} < 0.30)")
+                print(f"[DEBUG] Filter: Score too low ({score:.2f} < 0.15)")
             continue
         
         # Rule 1: Too short (< 5 words)
@@ -922,7 +955,7 @@ def search_sentences(
     
     Changes from v1.7.0:
     - min_score RELAXED from 0.40 → 0.12 (never block RAG per requirements)
-    - Post-filter now rejects score < 0.30 (stricter)
+    - Post-filter now rejects score < 0.15 (balanced for numeric queries)
     - Chunk size changed to 40-55 words (sentence-level)
     - Max chunk length 120 words (down from 150)
     
@@ -936,8 +969,8 @@ def search_sentences(
     if SentenceTransformer is None or QdrantClient is None:
         raise RuntimeError("RAG dependencies not properly loaded. Please restart the application.")
     
-    # Step 1: Initial retrieval (get 15 candidates - v1.7.0 reduced from 20)
-    initial_k = 15  # Cast wider net initially, then filter aggressively
+    # Step 1: Initial retrieval (get 25 candidates - v1.8.0 increased for numeric queries)
+    initial_k = 25  # Cast wider net initially, then filter aggressively
     
     model = get_embedder()
     if model is None:
