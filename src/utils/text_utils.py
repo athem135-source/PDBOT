@@ -354,7 +354,7 @@ def extract_factual_items(query: str, chunks: List[str], max_items: int = 5) -> 
 
 # --- Generative helpers ---
 def render_citations(citations: List[Dict[str, Any]], manual_title: str = "Manual for Development Projects 2024") -> str:
-    \"\"\"Render a Sources block in the proper format (v1.8.0 fix).
+    """Render a Sources block in the proper format (v1.8.0 fix).
     
     Format:
     Source: Manual for Development Projects 2024, p.XX
@@ -370,30 +370,30 @@ def render_citations(citations: List[Dict[str, Any]], manual_title: str = "Manua
     
     Returns:
         Formatted citation string
-    \"\"\"
+    """
     if not citations:
-        return \"\"
+        return ""
     
     # Take only first citation (single source format)
     # Filter out invalid pages
     valid_citations = []
     for c in citations[:3]:  # Max 3 sources
-        page = c.get(\"page\")
-        if page and str(page).replace(\".\", \"\").replace(\",\", \"\").isdigit():
+        page = c.get("page")
+        if page and str(page).replace(".", "").replace(",", "").isdigit():
             valid_citations.append(c)
     
     if not valid_citations:
-        return \"\"
+        return ""
     
     # Format as: Source: Manual for Development Projects 2024, p.X
     if len(valid_citations) == 1:
-        page = valid_citations[0].get(\"page\", \"?\")
-        return f\"\\n\\nSource: {manual_title}, p.{page}\"
+        page = valid_citations[0].get("page", "?")
+        return f"\n\nSource: {manual_title}, p.{page}"
     else:
         # Multiple sources: Source: Manual for Development Projects 2024, p.X, p.Y
-        pages = [str(c.get(\"page\", \"?\")) for c in valid_citations]
-        page_list = \", p.\".join(pages)
-        return f\"\\n\\nSource: {manual_title}, p.{page_list}\"
+        pages = [str(c.get("page", "?")) for c in valid_citations]
+        page_list = ", p.".join(pages)
+        return f"\n\nSource: {manual_title}, p.{page_list}"
 
 
 def to_markdown_table(headers: List[str], rows: List[List[Any]]) -> str:
