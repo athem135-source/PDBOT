@@ -2022,5 +2022,13 @@
   {
     "role": "assistant",
     "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The ECNEC sanctions development projects in PSDP that cost more than Rs. 7.5 billion, as per the Manual for Development Projects 2024, p.\n\n\n\nSource: Manual for Development Projects 2024, p.18, p.167, p.165</div>"
+  },
+  {
+    "role": "user",
+    "content": "what is the enec budget"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.24, p.24, p.24</div>"
   }
 ]

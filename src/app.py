@@ -561,7 +561,12 @@ def _load_builtin_manual(force: bool = False):
             st.session_state["last_index_count"] = 0
             st.session_state["builtin_indexed"] = False
     except Exception as e:
-        st.error(f"Failed to index into Qdrant: {e}")
+        error_msg = str(e)
+        if "Embedding model not available" in error_msg or "sentence-transformers" in error_msg:
+            st.error(f"Failed to index into Qdrant: {error_msg}")
+            st.warning("**Troubleshooting:** Try reinstalling dependencies with: `pip install --force-reinstall sentence-transformers torch`")
+        else:
+            st.error(f"Failed to index into Qdrant: {e}")
         st.session_state["indexed_ok"] = False
         st.session_state["last_index_count"] = 0
         st.session_state["builtin_indexed"] = False

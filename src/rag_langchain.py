@@ -130,8 +130,7 @@ def get_embedder() -> Optional[SentenceTransformer]:  # type: ignore[valid-type]
     Returns cached instance to avoid expensive re-initialization.
     Typically loads once per process (~500ms), then reused for all queries.
     
-    Thread safety: Adequate for Streamlit's single-process model.
-    For multi-threaded production, consider adding threading.Lock.
+    v2.0.0: More robust retry logic for browser refresh scenarios.
     """
     global _embedder_cache
     if _embedder_cache is None:
@@ -140,9 +139,9 @@ def get_embedder() -> Optional[SentenceTransformer]:  # type: ignore[valid-type]
                 print("[DEBUG] SentenceTransformers not available")
             return None
         try:
-            if SentenceTransformer is None:  # type: ignore
-                return None
-            _embedder_cache = SentenceTransformer(EMBED_MODEL)  # type: ignore
+            # Force re-import to handle Streamlit cache clearing
+            from sentence_transformers import SentenceTransformer as ST
+            _embedder_cache = ST(EMBED_MODEL)  # type: ignore
             if DEBUG_MODE:
                 print(f"[DEBUG] Loaded embedder: {EMBED_MODEL}")
         except Exception as e:
@@ -562,11 +561,10 @@ def ingest_pdf_sentence_level(
         return 0
 
     # Check dependencies are actually loaded
-    if SentenceTransformer is None or not SENTENCE_TRANSFORMERS_AVAILABLE:
+    if not SENTENCE_TRANSFORMERS_AVAILABLE:
         error_msg = "SentenceTransformer not loaded - sentence-transformers import failed"
         if DEBUG_MODE:
             print(f"[DEBUG] {error_msg}")
-            print(f"[DEBUG] SentenceTransformer is None: {SentenceTransformer is None}")
             print(f"[DEBUG] SENTENCE_TRANSFORMERS_AVAILABLE: {SENTENCE_TRANSFORMERS_AVAILABLE}")
             print(f"[DEBUG] Try: pip install --upgrade sentence-transformers torch")
         raise RuntimeError(error_msg)
@@ -578,9 +576,10 @@ def ingest_pdf_sentence_level(
     # Initialize models (cached)
     model = get_embedder()
     if model is None:
-        error_msg = "Embedding model not available. Please ensure sentence-transformers is installed: pip install sentence-transformers"
+        error_msg = "Embedding model not available. Sentence-transformers may not be properly installed."
         if DEBUG_MODE:
-            print(f"[WARN] {error_msg}")
+            print(f"[ERROR] {error_msg}")
+            print(f"[DEBUG] Try: pip install --force-reinstall sentence-transformers")
         raise RuntimeError(error_msg)
     
     dim = int(model.get_sentence_embedding_dimension() or 384)
