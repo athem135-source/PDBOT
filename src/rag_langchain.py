@@ -100,11 +100,16 @@ except Exception:
 # CONFIGURATION
 # ============================================================================
 
-COLLECTION = os.getenv("PNDBOT_RAG_COLLECTION", "pnd_manual_sentences")
+# v1.6.0: Updated to use sentence-level chunks (2-3 sentences, OCR-cleaned)
+COLLECTION = os.getenv("PNDBOT_RAG_COLLECTION", "pnd_manual_v2")
 EMBED_MODEL = os.getenv("PNDBOT_EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
 
 # CRITICAL: Cross-encoder for semantic reranking
 RERANKER_MODEL = os.getenv("PNDBOT_RERANKER", "cross-encoder/ms-marco-MiniLM-L-6-v2")
+
+# v1.7.0 Retrieval thresholds (ULTRA-STRICT for precision)
+MIN_RELEVANCE_SCORE = float(os.getenv("PNDBOT_MIN_SCORE", "0.40"))  # Increased from 0.35 to 0.40
+MAX_FINAL_CHUNKS = int(os.getenv("PNDBOT_MAX_CHUNKS", "2"))  # Hard limit: 2 chunks only
 
 
 # ============================================================================
@@ -134,7 +139,9 @@ def get_embedder() -> Optional[SentenceTransformer]:  # type: ignore[valid-type]
                 print("[DEBUG] SentenceTransformers not available")
             return None
         try:
-            _embedder_cache = SentenceTransformer(EMBED_MODEL)
+            if SentenceTransformer is None:  # type: ignore
+                return None
+            _embedder_cache = SentenceTransformer(EMBED_MODEL)  # type: ignore
             if DEBUG_MODE:
                 print(f"[DEBUG] Loaded embedder: {EMBED_MODEL}")
         except Exception as e:
@@ -337,8 +344,13 @@ def _read_pdf_pages(pdf_path: str) -> List[str]:
         doc = fitz.open(pdf_path)
         for page_num in range(len(doc)):
             page = doc.load_page(page_num)
-            txt = page.get_text("text") or ""
-            pages.append(txt)
+            txt = page.get_text("text")
+            if isinstance(txt, str):
+                pages.append(txt)
+            elif txt:
+                pages.append(str(txt))
+            else:
+                pages.append("")
         doc.close()
         
         if DEBUG_MODE:
@@ -688,31 +700,150 @@ def rerank_with_cross_encoder(
         return sorted(chunks, key=lambda x: x.get("score", 0), reverse=True)[:top_k]
 
 
+def post_filter_garbage_chunks(chunks: List[Dict[str, Any]], query: str) -> List[Dict[str, Any]]:
+    """
+    CRITICAL v1.7.0 POST-FILTER: Remove garbage chunks that pollute answers.
+    
+    Removes:
+    - Chunks with "Figure", "Table", "Annexure" headers
+    - Notification codes (e.g., "(4(9)R-14/2008)")
+    - Page formatting garbage (headers/footers)
+    - Too short chunks (< 5 words)
+    - Too long chunks (> 150 words - likely tables)
+    - Number-only chunks (lists of figures)
+    - iPAS system descriptions
+    - Climate change tables
+    - Unrelated manual sections
+    
+    Args:
+        chunks: Retrieved chunks
+        query: User question
+        
+    Returns:
+        Filtered chunks list
+    """
+    filtered = []
+    
+    for chunk in chunks:
+        text = chunk.get("text", "").strip()
+        text_lower = text.lower()
+        
+        if not text:
+            continue
+        
+        # Rule 1: Too short (< 5 words)
+        words = text.split()
+        if len(words) < 5:
+            if DEBUG_MODE:
+                print(f"[DEBUG] Filter: Too short ({len(words)} words)")
+            continue
+        
+        # Rule 2: Too long (> 150 words - likely table/list)
+        if len(words) > 150:
+            if DEBUG_MODE:
+                print(f"[DEBUG] Filter: Too long ({len(words)} words)")
+            continue
+        
+        # Rule 3: Contains forbidden headers
+        forbidden_headers = [
+            "figure ",
+            "table ",
+            "annexure ",
+            "list of figures",
+            "list of tables",
+            "table of contents",
+            "list of annexures",
+            "list of appendices",
+        ]
+        if any(header in text_lower[:50] for header in forbidden_headers):
+            if DEBUG_MODE:
+                print(f"[DEBUG] Filter: Forbidden header detected")
+            continue
+        
+        # Rule 4: Notification codes (e.g., "(4(9)R-14/2008)")
+        if re.search(r'\(\d+\(\d+\)[A-Z]-\d+/\d{4}\)', text):
+            if DEBUG_MODE:
+                print(f"[DEBUG] Filter: Notification code detected")
+            continue
+        
+        # Rule 5: Number-only chunks (> 50% numbers)
+        number_words = sum(1 for w in words if w.replace(',', '').replace('.', '').isdigit())
+        if len(words) > 10 and number_words / len(words) > 0.5:
+            if DEBUG_MODE:
+                print(f"[DEBUG] Filter: Too many numbers ({number_words}/{len(words)})")
+            continue
+        
+        # Rule 6: iPAS system chunks (irrelevant for policy questions)
+        if "ipas" in text_lower and "system" in text_lower and "ipas" not in query.lower():
+            if DEBUG_MODE:
+                print(f"[DEBUG] Filter: iPAS system chunk (not relevant to query)")
+            continue
+        
+        # Rule 7: Climate change tables (unless query asks about climate)
+        if "climate change" in text_lower and "table" in text_lower and "climate" not in query.lower():
+            if DEBUG_MODE:
+                print(f"[DEBUG] Filter: Climate table (not relevant to query)")
+            continue
+        
+        # Rule 8: Page headers/footers patterns
+        if re.match(r'^(page \d+|manual for development projects|\d+\s*$)', text_lower.strip()):
+            if DEBUG_MODE:
+                print(f"[DEBUG] Filter: Page header/footer")
+            continue
+        
+        # Rule 9: Repetitive list patterns (e.g., "1. xxx 2. xxx 3. xxx")
+        if re.findall(r'\d+\.\s+', text):
+            list_count = len(re.findall(r'\d+\.\s+', text))
+            if list_count > 8:  # More than 8 numbered items = likely table/long list
+                if DEBUG_MODE:
+                    print(f"[DEBUG] Filter: Repetitive numbered list ({list_count} items)")
+                continue
+        
+        # Rule 10: Acronym spam (> 30% ALL CAPS words)
+        caps_words = sum(1 for w in words if len(w) > 2 and w.isupper())
+        if len(words) > 10 and caps_words / len(words) > 0.3:
+            if DEBUG_MODE:
+                print(f"[DEBUG] Filter: Acronym spam ({caps_words}/{len(words)})")
+            continue
+        
+        # Chunk passed all filters
+        filtered.append(chunk)
+    
+    return filtered
+
+
 # ============================================================================
 # MAIN SEARCH FUNCTION (FIX #5 - ORCHESTRATION)
 # ============================================================================
 
 def search_sentences(
     query: str,
-    top_k: int = 3,  # REDUCED from 60 to 3 (after reranking)
+    top_k: int = 2,  # v1.7.0: REDUCED from 3 to 2 (ultra-strict)
     qdrant_url: str = "http://localhost:6333",
     mmr: bool = False,
     lambda_mult: float = 0.7,
-    min_score: float = 0.20,  # ENTERPRISE FIX: Raised from 0.05 to 0.20 to filter noise
-    enable_reranking: bool = True,  # ENTERPRISE FIX: Always use reranking for 90% accuracy
+    min_score: float = 0.40,  # v1.7.0: Raised from 0.20 to 0.40 (ultra-strict)
+    enable_reranking: bool = True,  # v1.7.0: Always use reranking
     enable_filtering: bool = True,
 ) -> List[Dict[str, Any]]:
-    """Enterprise-grade search with filtering and reranking.
+    """Enterprise-grade search with ultra-strict filtering (v1.7.0).
     
-    CRITICAL FLOW:
-    1. Initial retrieval: Get 20 chunks from Qdrant
-    2. Filter: Remove annexure/checklist if conceptual question
-    3. Rerank: Use cross-encoder to get top 3 most relevant
-    4. Return: Final 3 chunks for LLM
+    CRITICAL FLOW (v1.7.0):
+    1. Initial retrieval: Get 15 chunks from Qdrant (reduced from 20)
+    2. Post-filter: Remove garbage (tables, headers, notifications, iPAS, climate)
+    3. Filter: Remove annexure/checklist if conceptual question
+    4. Rerank: Use cross-encoder to get top 2 most relevant
+    5. Return: Final 2 chunks ONLY for LLM
+    
+    Changes from v1.6.0:
+    - top_k reduced from 3 → 2
+    - min_score raised from 0.20 → 0.40
+    - Added post_filter_garbage_chunks (10 rules)
+    - Reduced initial_k from 20 → 15
     
     Args:
         query: User question
-        top_k: Final number of chunks to return (default 3)
+        top_k: Final number of chunks to return (default 2, MAX 2)
         enable_reranking: Use cross-encoder (recommended: True)
         enable_filtering: Apply exclusion rules (recommended: True)
     """
@@ -720,8 +851,8 @@ def search_sentences(
     if SentenceTransformer is None or QdrantClient is None:
         raise RuntimeError("RAG dependencies not properly loaded. Please restart the application.")
     
-    # Step 1: Initial retrieval (get 20 candidates)
-    initial_k = 20  # Cast wider net initially
+    # Step 1: Initial retrieval (get 15 candidates - v1.7.0 reduced from 20)
+    initial_k = 15  # Cast wider net initially, then filter aggressively
     
     model = get_embedder()
     if model is None:
@@ -781,7 +912,13 @@ def search_sentences(
     if DEBUG_MODE:
         print(f"[DEBUG] Initial retrieval: {len(chunks)} chunks")
     
-    # Step 2: Filter annexure/checklist if needed
+    # Step 2A: CRITICAL POST-FILTER - Remove garbage chunks (v1.7.0)
+    chunks = post_filter_garbage_chunks(chunks, query)
+    
+    if DEBUG_MODE:
+        print(f"[DEBUG] After garbage filter: {len(chunks)} chunks")
+    
+    # Step 2B: Filter annexure/checklist if needed
     if enable_filtering:
         chunks, excluded = filter_chunks_by_rules(chunks, query)
     

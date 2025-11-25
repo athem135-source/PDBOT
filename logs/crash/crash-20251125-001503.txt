@@ -1,0 +1,10 @@
+Exception in PDBOT
+
+Traceback (most recent call last):
+  File "D:\PLANNING WORK\Chatbot\PND BOT MINI DEMO\src\app.py", line 2831, in <module>
+    answer_html, citations = generate_answer(q)
+                             ^^^^^^^^^^^^^^^^^^
+  File "D:\PLANNING WORK\Chatbot\PND BOT MINI DEMO\src\app.py", line 2022, in generate_answer
+    if DEBUG_MODE:
+       ^^^^^^^^^^
+NameError: name 'DEBUG_MODE' is not defined

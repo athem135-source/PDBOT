@@ -1,11 +1,15 @@
 """
-Query classification and routing logic for PDBot v1.5.0
+Query classification and routing logic for PDBot v1.6.0
 
 Phase 3 & 4 Behavior Fixes:
 - Off-scope detection (medical, sports, politics, GK)
 - Abuse/profanity detection (hard vs soft)
 - Bribery/corruption detection
 - Banter detection ("stupid bot" vs real abuse)
+
+Phase 6 Safety Routing Fix:
+- Static template responses that BYPASS RAG completely
+- No context pollution from retrieval for red-line queries
 
 All classifiers return (category, confidence) tuples.
 """
@@ -14,6 +18,13 @@ from __future__ import annotations
 import re
 from typing import Tuple, Optional, List
 from dataclasses import dataclass
+
+# Import static response templates
+from .templates import (
+    get_redline_response,
+    get_offscope_response,
+    get_abuse_response,
+)
 
 
 @dataclass
@@ -61,6 +72,9 @@ class QueryClassifier:
         # Phase 5: Detect bonus/savings misuse attempts
         r"\b(savings|saved.*fund)\b.*\b(bonus|cash|incentive|reward)\b.*\b(team|staff|employee)\b",
         r"\b(use|give|distribute|allocate)\b.*\b(savings|surplus)\b.*\b(bonus|cash)\b",
+        # Phase 6: Detect "hide X as Y" pattern more broadly
+        r"\bhide\b.*\bas\b",  # "hide procurement as operational"
+        r"\b(procurement|purchase|cost)\b.*\bas\b.*\b(operational|field|monitoring)\b",
     ]
     
     ABUSE_PATTERNS = [
@@ -77,11 +91,35 @@ class QueryClassifier:
         r"\b(this|that).*\b(stupid|useless|dumb).*\b(bot|system|chatbot)\b",
     ]
     
-    # Off-scope patterns
+    # Off-scope patterns (EXPANDED v1.7.0 - prevent RAG pollution)
     MEDICAL_PATTERNS = [
         r"\b(headache|fever|cough|cold|pain|sick|disease|illness|medicine|drug|tablet|pill)\b",
         r"\b(doctor|hospital|clinic|pharmacy|medical|health|treatment|cure|symptom)\b",
         r"\b(what.*take|what.*medicine|what.*drug)\b.*\b(headache|fever|pain|sick)\b",
+    ]
+    
+    SPORTS_PATTERNS = [
+        r"\b(cricket|football|soccer|fifa|world cup|olympics|match|tournament|player|team|goal|wicket)\b",
+        r"\b(who won|who will win|winner|champion|trophy|medal)\b.*\b(cricket|football|fifa|world cup|olympics)\b",
+        r"\b(1992|2022|world cup)\b.*\b(cricket|football|fifa)\b",
+    ]
+    
+    POLITICS_PATTERNS = [
+        r"\b(election|vote|voting|poll|candidate|party|political|politician|minister)\b.*\b(who|win|winner|next|better)\b",
+        r"\b(government|ruling|opposition)\b.*\b(better|worse|best)\b",
+        r"\b(pti|pml|ppp|mqm|anp)\b",  # Pakistani political parties
+        r"\b(who will win|next election|election results?)\b",
+    ]
+    
+    RECIPE_PATTERNS = [
+        r"\b(recipe|cook|cooking|prepare|ingredients|biryani|burger|pizza|dish|meal|food)\b.*\b(how|make|prepare)\b",
+        r"\b(how.*make|how.*cook|how.*prepare)\b.*\b(biryani|burger|pizza|dish|food)\b",
+    ]
+    
+    GENERAL_KNOWLEDGE_PATTERNS = [
+        r"\b(who is|what is|where is|when did)\b.*\b(capital|president|prime minister|country|city)\b",
+        r"\b(history|geography|science|math|chemistry|physics|biology)\b.*\b(what|who|how)\b",
+        r"\b(inventor|discovery|invention|discovered|invented)\b",
     ]
     
     SPORTS_PATTERNS = [
@@ -132,12 +170,13 @@ class QueryClassifier:
         
         # Priority 1: Bribery/corruption (legal risk)
         if any(pattern.search(q) for pattern in self.bribery_re + self.misuse_re):
+            subcategory = "bribery" if any(p.search(q) for p in self.bribery_re) else "misuse"
             return QueryClassification(
                 category="bribery",
-                subcategory="corruption" if any(p.search(q) for p in self.bribery_re) else "misuse",
+                subcategory=subcategory,
                 confidence=0.95,
                 should_use_rag=False,  # Don't retrieve manual content
-                response_template="bribery_refusal"
+                response_template=get_redline_response(subcategory)
             )
         
         # Priority 2: Hard abuse (safety)
@@ -147,7 +186,7 @@ class QueryClassifier:
                 subcategory="profanity",
                 confidence=0.9,
                 should_use_rag=False,
-                response_template="abuse_boundary"
+                response_template=get_abuse_response("hard")
             )
         
         # Priority 3: Soft banter
@@ -161,7 +200,7 @@ class QueryClassifier:
                     subcategory="soft_insult",
                     confidence=0.85,
                     should_use_rag=False,
-                    response_template="banter_response"
+                    response_template=get_abuse_response("soft")
                 )
         
         # Priority 4: Off-scope queries
@@ -172,7 +211,7 @@ class QueryClassifier:
                 subcategory="medical",
                 confidence=0.9,
                 should_use_rag=False,
-                response_template="off_scope_medical"
+                response_template=get_offscope_response("medical")
             )
         
         # Sports
@@ -182,7 +221,7 @@ class QueryClassifier:
                 subcategory="sports",
                 confidence=0.9,
                 should_use_rag=False,
-                response_template="off_scope_sports"
+                response_template=get_offscope_response("sports")
             )
         
         # Politics
@@ -192,7 +231,7 @@ class QueryClassifier:
                 subcategory="politics",
                 confidence=0.85,
                 should_use_rag=False,
-                response_template="off_scope_politics"
+                response_template=get_offscope_response("politics")
             )
         
         # General knowledge
@@ -202,7 +241,7 @@ class QueryClassifier:
                 subcategory="general_knowledge",
                 confidence=0.8,
                 should_use_rag=False,
-                response_template="off_scope_general"
+                response_template=get_offscope_response("general")
             )
         
         # Priority 5: In-scope (normal manual query)
