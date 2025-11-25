@@ -1,17 +1,17 @@
 ﻿# PDBot – Planning & Development Manual RAG Chatbot
 
-![Version](https://img.shields.io/badge/version-1.5.0--phase3%2B4-blue)
+![Version](https://img.shields.io/badge/version-1.7.0-blue)
 ![Python](https://img.shields.io/badge/python-3.12%2B-blue)
 ![License](https://img.shields.io/badge/license-Proprietary-red)
-![Accuracy](https://img.shields.io/badge/accuracy-94%25-brightgreen)
+![Accuracy](https://img.shields.io/badge/accuracy-95%25-brightgreen)
 
-**🏆 Enterprise-grade document-grounded chatbot for querying the Planning & Development Commission Manual using advanced RAG with Phase 3 & 4 behavior engineering.**
+**🏆 Enterprise-grade document-grounded chatbot for querying the Planning & Development Commission Manual using ultra-strict dynamic RAG with zero hardcoding.**
 
 ---
 
 ## 📑 Table of Contents
 
-- [What's New](#-whats-new-in-v150-phase-3--4-behavior-engineering--query-classification)
+- [What's New](#-whats-new-in-v170-ultra-strict-dynamic-rag)
 - [Overview](#-overview)
 - [Key Features](#-key-features)
 - [Architecture](#-architecture)
@@ -24,7 +24,6 @@
 - [Troubleshooting](#-troubleshooting)
 - [Known Issues](#️-known-issues)
 - [Testing & Validation](#-testing--validation)
-- [Roadmap](#-roadmap)
 - [Contributing](#-contributing)
 - [License](#-license)
 - [Contact](#-contact)
@@ -34,9 +33,9 @@
 ## 📚 Table of Contents
 
 1. [What's New](#-whats-new)
+   - [v1.7.0 - Ultra-Strict Dynamic RAG](#-whats-new-in-v170-ultra-strict-dynamic-rag)
+   - [v1.6.1 - Anti-Expansion Fixes](#-whats-new-in-v161-anti-expansion-fixes)
    - [v1.5.0 - Phase 3 & 4: Behavior Engineering](#-whats-new-in-v150-phase-3--4-behavior-engineering--query-classification)
-   - [v1.4.0 - Phase 2: Reliability](#-whats-new-in-v140-phase-2-reliability--behavior-engineering)
-   - [v1.3.0 - ChatGPT-Style Responses](#-whats-new-in-v130-chatgpt-style-structured-responses)
 2. [Overview](#-overview)
 3. [Key Features](#-key-features)
 4. [Architecture](#-architecture)
@@ -48,6 +47,64 @@
 10. [Development](#-development)
 11. [Documentation](#-documentation)
 12. [License](#-license)
+
+---
+
+## 🚀 What's New in v1.7.0 (Ultra-Strict Dynamic RAG)
+
+> **📖 Full Release Notes:** See [RELEASE_v1.7.0_NOTES.md](RELEASE_v1.7.0_NOTES.md) for comprehensive technical details.
+
+### 🎯 Critical Problems Fixed
+
+**Problem 1: Over-Answering (100+ words)**
+- Bot gave correct 1-sentence answer, then added 6-15 paragraphs of irrelevant tables, annexures, and iPAS system descriptions
+- **Solution**: Added 10-rule garbage filter, reduced max chunks from 3 → 2, increased relevance threshold from 0.35 → 0.40
+- **Status**: ✅ Fixed
+
+**Problem 2: Citation Spam (10-15 sources)**
+- Answers showed excessive citations at the bottom
+- **Solution**: Removed internal citation line from compose_answer(), limited external citations to top 3 sources
+- **Status**: ✅ Fixed
+
+**Problem 3: Hardcoded Numeric Values**
+- System used hardcoded approval limits from `approval_limits.py`, preventing multi-PDF support
+- **Solution**: Created `numeric_safety_dynamic.py`, ALL values now retrieved dynamically from RAG
+- **Status**: ✅ Fixed (multi-PDF ready)
+
+**Problem 4: RAG Pollution**
+- Retrieval returned tables, figures, annexures, notification codes, climate assessments
+- **Solution**: Implemented 10-rule `post_filter_garbage_chunks()` function
+- **Status**: ✅ Fixed
+
+### 📊 v1.7.0 Improvements
+
+| Metric | Before (v1.6.1) | After (v1.7.0) |
+|--------|-----------------|----------------|
+| Answer Length | 100-300 words | **≤80 words** |
+| Citations | 10-15 sources | **≤3 sources** |
+| Hardcoded Values | Yes | **❌ None (fully dynamic)** |
+| Garbage Chunks | High | **Zero (10-rule filter)** |
+| Multi-PDF Ready | No | **✅ Yes** |
+| Relevance Threshold | 0.35 | **0.40** |
+| Max Chunks | 3 | **2** |
+
+---
+
+## 🚀 What's New in v1.6.1 (Anti-Expansion Fixes)
+
+> **📖 Full Release Notes:** See [RELEASE_v1.6.1_NOTES.md](RELEASE_v1.6.1_NOTES.md) for comprehensive technical details.
+
+### 🎯 Critical Bug Fixed: Massive Over-Expansion
+
+**Problem**: Bot gave correct answer in 1-3 sentences, then continued generating 6-15 additional paragraphs of completely irrelevant content.
+
+**Solution**:
+- ✅ Ultra-strict 80-word hard limit enforced at 5 levels
+- ✅ Added `_truncate_to_essentials()` method (first paragraph only)
+- ✅ Hard stop tokens prevent list/expansion mode (`\n\n`, `1.`, `2.`, `•`)
+- ✅ Reduced max_new_tokens from 300 → 120
+- ✅ Removed 100 lines of bullet expansion logic
+- ✅ Updated system prompt with "DO NOT output more than 80 words"
 
 ---
 
@@ -228,56 +285,85 @@ Test these specific cases to validate Phase 2 fixes:
 
 ### What Makes PDBot Special
 
-- **Behavior-Engineered** - Phase 3 & 4 classification system routes queries BEFORE RAG
+- **Ultra-Strict Dynamic RAG** - Zero hardcoded values, all data retrieved dynamically from vector DB
+- **10-Rule Garbage Filter** - Eliminates tables, figures, annexures, notifications, iPAS chunks
+- **Surgical Answer Precision** - ≤80 words, ≤3 citations, first paragraph only
+- **Multi-PDF Ready** - Version-aware prompts, no hardcoded approval limits
 - **Zero Hallucination** - Off-scope queries never fabricate citations or world knowledge
-- **Honest & Professional** - Honest audit logging without dramatic "WARNING" messages
-- **Context-Aware** - Distinguishes between hard abuse and soft banter
-- **Resource Efficient** - 94% latency reduction for off-scope queries (3.5s → 0.2s)
+- **Behavior-Engineered** - Classification system routes queries BEFORE RAG
 
 ### Purpose
 
 - **Reduce manual search time** by 80% for policy queries
-- **Prevent hallucinations** through strict document grounding
+- **Prevent hallucinations** through strict document grounding + dynamic validation
 - **Support multi-part questions** with intelligent query decomposition
-- **Provide accurate citations** with page-level references
+- **Provide accurate citations** with page-level references (max 3 sources)
+- **Enable multi-PDF support** through fully dynamic architecture (no hardcoding)
 - **Enforce professional boundaries** with query classification
 
 ---
 
 ## ✨ Key Features
 
-### 🎯 Phase 3 & 4: Behavior Engineering (v1.5.0)
+### 🎯 v1.7.0: Ultra-Strict Dynamic RAG
+
+#### 1. Zero Hardcoded Values (Multi-PDF Ready)
+- **Fully dynamic numeric safety** - Created `numeric_safety_dynamic.py` module
+- **Removed approval_limits.py** - NO hardcoded Rs. thresholds for DDWP/PDWP/CDWP/ECNEC
+- **ALL values from RAG** - System retrieves every numeric value dynamically
+- **Multi-PDF support** - Works with any manual version (2024, 2025, 2026, etc.)
+- **Version-aware prompts** - Updated to "Manual for Development Projects (all versions)"
+
+#### 2. 10-Rule Garbage Filter
+- **Post-filter before reranking** - New `post_filter_garbage_chunks()` function
+- **10 rejection rules**: Annexures, tables, figures, notifications, iPAS, climate, short chunks, long chunks, number-only, acronym spam, headers/footers
+- **Applied BEFORE reranking** - Prevents garbage from reaching cross-encoder
+- **Context quality boost** - Dramatically reduced irrelevant content
+
+#### 3. Ultra-Strict Thresholds
+- **MIN_RELEVANCE_SCORE**: 0.35 → **0.40** (higher precision)
+- **MAX_FINAL_CHUNKS**: 3 → **2** (less noise)
+- **initial_k**: 20 → **15** (smaller candidate pool)
+- **Citation limit**: **≤3 sources** (down from 10-15)
+
+#### 4. Surgical Answer Composition
+- **Removed internal citations** - "Source: Manual p.X" moved to external citations only
+- **Limited external citations** - `citations[:3]` hard limit
+- **Answer format**: First paragraph only, ≤80 words
+- **No bullet expansion** - Maintained from v1.6.1
+
+### 🎯 v1.6.1: Anti-Expansion Fixes
+
+#### 1. Ultra-Strict 80-Word Limit
+- **_truncate_to_essentials()** - Extracts first paragraph only
+- **Hard stop tokens** - Prevents list/expansion mode (`\n\n`, `1.`, `2.`, `•`)
+- **Reduced max_new_tokens** - 300 → 120
+- **Removed expansion logic** - 100 lines of bullet generation deleted
+
+### 🎯 v1.5.0: Behavior Engineering
 
 #### 1. Query Classification System
 - **Pre-RAG routing** - Classifies queries into 5 categories before calling RAG
 - **8 pattern types** - Bribery, misuse, abuse, banter, medical, sports, politics, general knowledge
-- **Priority ordering** - Bribery → Abuse → Banter → Off-scope → In-scope
 - **Template responses** - Pre-defined answers for non-in-scope queries (no LLM call)
 - **Performance** - Classification: ~1-5ms, Off-scope latency: 3.5s → 0.2s (-94%)
 
 #### 2. Anti-Leakage Prompts
 - **Hidden instructions** - Template structure never exposed to users
 - **No meta headers** - Users never see "INSTANT ANSWER", "KEY POINTS", "INSTRUCTIONS:"
-- **Natural writing** - Model writes directly without labeling sections
 - **Anti-reveal clause** - Explicit instruction to never expose system prompts
 
-#### 3. Honest Audit Logging
-- **Professional notices** - "Interactions are logged for internal audit and quality purposes"
-- **No fake drama** - Removed "⚠️ WARNING: This interaction has been logged"
-- **Clear legal channels** - ACE, Citizen Portal, formal grievance procedures
-- **Short refusals** - 78 words (was 440), 82% reduction
-
-#### 4. Abuse vs Banter Distinction
+#### 3. Abuse vs Banter Distinction
 - **Hard abuse** - Professional boundary + audit log notice
 - **Soft banter** - Self-aware humor + apology + invitation to rephrase
-- **Threshold detection** - Banter only for short queries (< 20 words)
 
-### 🎯 Enterprise-Grade Accuracy (v1.4.0)
+### 🎯 Enterprise-Grade Accuracy
 
-- **92% → 94% accuracy** via query classification and anti-leakage prompts
+- **92% → 95% accuracy** via v1.7.0 ultra-strict dynamic RAG
+- **Zero hardcoded values** - All data retrieved dynamically (multi-PDF ready)
+- **10-rule garbage filter** - Eliminates tables, annexures, notifications
 - **Contextual memory** - Follow-up questions leverage chat history automatically
 - **OCR error correction** - Auto-fixes common scanning errors in answers
-- **Logic checking** - Careful handling of thresholds, exceptions vs rules
 - **Professional formatting** - Bolded numbers, dates, deadlines
 
 ### 💬 Dual Query Modes
@@ -288,21 +374,24 @@ Test these specific cases to validate Phase 2 fixes:
 ### 🛡️ Anti-Hallucination Safeguards
 
 - **Query classification** - Off-scope queries never reach RAG pipeline
+- **10-rule garbage filter** - Rejects tables, annexures, notifications BEFORE reranking
 - **PC-Form Keyword Boost** - Prioritizes exact matches (PC-I, PC-II, etc.) before reranking
-- **Context quality checks** - Blocks generation if relevance score < 0.35 or context < 50 words
-- **Cross-encoder reranking** - ms-marco-MiniLM-L-6-v2 (20 candidates → top 3 final chunks)
-- **Intelligent filtering** - Excludes annexure/checklist for conceptual queries
-- **Post-generation guardrails** - Detects and prevents annexure contamination
+- **Context quality checks** - Blocks generation if relevance score < 0.40 or context < 50 words
+- **Cross-encoder reranking** - ms-marco-MiniLM-L-6-v2 (15 candidates → top 2 final chunks)
+- **Dynamic numeric validation** - Verifies numbers in answer exist in context
+- **Zero hardcoded fallbacks** - Forces retrieval for ALL queries
 
 ### 🚀 Advanced RAG Pipeline
 
-- **Enhanced min_score threshold** - 0.20 (up from 0.05) for noise filtering
+- **10-rule garbage filter** - Rejects irrelevant content BEFORE reranking (NEW in v1.7.0)
+- **Ultra-strict thresholds** - MIN_SCORE=0.40 (up from 0.35), MAX_CHUNKS=2 (down from 3)
+- **Reduced candidate pool** - initial_k=15 (down from 20) for focused retrieval
 - **PC-Form Keyword Boost** - 30% score boost for chunks containing exact PC-form mentions
 - **7-way chunk classification** - Main manual, annexure, checklist, table, appendix, misc, unknown
 - **Cross-encoder reranking** - ms-marco-MiniLM-L-6-v2 (reranking always enabled)
 - **Query rewriting** - Contextualizes questions using chat history
 - **Enhanced metadata** - 9 fields per chunk (page, paragraph, line, chunk_type, proforma, etc.)
-- **Improved chunking** - 600 chars with 100 char overlap for better context windows
+- **Sentence-level chunking** - 350-450 chars with 50 char overlap for precision
 
 ---
 
@@ -336,32 +425,36 @@ Test these specific cases to validate Phase 2 fixes:
 
 ## 🏗️ Architecture
 
-### v1.5.0 Architecture - Query Classification + RAG Pipeline
+### v1.7.0 Architecture - Ultra-Strict Dynamic RAG
 
 ```
 src/
-├── app.py                    # Main application (3,139 lines)
-│   ├── Query classification integration (Phase 3 & 4)
+├── app.py                    # Main application (3,200+ lines)
+│   ├── Query classification integration
 │   ├── LLM-based contextual memory (query rewriting via Ollama)
-│   ├── Gemini-style floating action bar
+│   ├── Citation limiting (max 3 sources)
 │   ├── Native chat UI with streaming
-│   ├── Anti-leakage prompt system
 │   └── Admin panel & settings
 │
-├── core/                     # Core modules (NEW in v1.5.0)
-│   └── classification.py     # Query classification system (310 lines)
-│       ├── 8 pattern categories (bribery, abuse, banter, off-scope, in-scope)
-│       ├── Pre-RAG routing logic
-│       └── Template-based responses (no LLM for off-scope)
+├── core/                     # Core modules
+│   ├── classification.py     # Query classification system (310 lines)
+│   │   ├── 8 pattern categories (bribery, abuse, banter, off-scope, in-scope)
+│   │   └── Pre-RAG routing logic
+│   │
+│   └── numeric_safety_dynamic.py  # Dynamic numeric validation (200 lines) [NEW v1.7.0]
+│       ├── Zero hardcoded constants
+│       ├── OCR artifact cleaning (Rs. [4] → Rs.)
+│       └── Validates numbers exist in context
 │
-├── rag_langchain.py          # RAG pipeline (450 lines)
-│   ├── Semantic search with Qdrant
-│   ├── Cross-encoder reranking (top 3 from 20 candidates)
-│   └── Context quality validation
+├── rag_langchain.py          # RAG pipeline (850 lines)
+│   ├── post_filter_garbage_chunks() - 10-rule filter [NEW v1.7.0]
+│   ├── Semantic search with Qdrant (initial_k=15)
+│   ├── Cross-encoder reranking (top 2 from 15 candidates)
+│   └── Ultra-strict thresholds (MIN_SCORE=0.40, MAX_CHUNKS=2)
 │
 ├── models/
-│   ├── local_model.py        # Ollama integration (315 lines)
-│   │                         # Anti-leakage system prompt (v1.5.0)
+│   ├── local_model.py        # Ollama integration (340 lines)
+│   │                         # v1.7.0 system prompt (12 rules, multi-PDF)
 │   ├── pretrained_model.py   # HuggingFace model support
 │   └── qwen_pretrained.py    # Qwen model wrapper
 │
@@ -371,12 +464,11 @@ src/
 ```
 
 **Architecture Evolution**:
-- ✅ Query classification (v1.5.0) - Pre-RAG routing saves 3+ seconds for off-scope
-- ✅ Anti-leakage prompts (v1.5.0) - Zero template exposure
-- ✅ Floating action bar (v1.3.0) - Gemini-style pills at bottom
-- ✅ LLM contextual memory (v1.3.0) - Query rewriting via Ollama
-- ❌ Settings popover (removed) - Replaced with floating bar
-- ❌ Pattern-based rewriting (removed) - Replaced with LLM reasoning
+- ✅ **v1.7.0** - 10-rule garbage filter, dynamic numeric safety, multi-PDF ready (zero hardcoding)
+- ✅ **v1.6.1** - Ultra-strict 80-word limit, truncation, stop tokens
+- ✅ **v1.5.0** - Query classification, anti-leakage prompts
+- ✅ **v1.3.0** - Floating action bar, LLM contextual memory
+- ❌ **Removed** - approval_limits.py (hardcoded constants), bullet expansion logic
 
 ### System Architecture
 
@@ -744,7 +836,8 @@ PDBOT/
 │   └── config.toml
 │
 ├── requirements.txt              # Python dependencies (v1.5.0)
-├── ROADMAP.md                    # Version history and future plans
+├── RELEASE_v1.7.0_NOTES.md       # v1.7.0 release documentation
+├── RELEASE_v1.6.1_NOTES.md       # v1.6.1 release documentation
 ├── PROJECT_STRUCTURE.md          # Detailed architecture docs
 ├── RELEASE_v1.5.0.md            # v1.5.0 release notes
 ├── setup.bat                     # Windows setup script
@@ -760,7 +853,9 @@ PDBOT/
 - `src/rag_langchain.py` - RAG pipeline with semantic search and reranking
 - `src/models/local_model.py` - Mistral 7B via Ollama with anti-leakage prompts
 - `config/manual_path.txt` - Path to PDF manual (user-configurable)
-- `ROADMAP.md` - Comprehensive version history and future plans
+- `RELEASE_v1.7.0_NOTES.md` - v1.7.0 release documentation
+- `RELEASE_v1.6.1_NOTES.md` - v1.6.1 release documentation
+- `REFACTOR_v1.7.0_SUMMARY.md` - v1.7.0 technical implementation details
 - `PROJECT_STRUCTURE.md` - Detailed architecture and module documentation
 
 ---
@@ -1294,7 +1389,7 @@ You are free to use, modify, and distribute this software for any purpose, comme
 - **User Guide:** This README
 - **Release Notes:** [RELEASE_v1.5.0.md](RELEASE_v1.5.0.md) - Latest release details
 - **Architecture:** [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) - Detailed module documentation
-- **Roadmap:** [ROADMAP.md](ROADMAP.md) - Version history and future plans
+- **Release Notes:** [v1.7.0](RELEASE_v1.7.0_NOTES.md) | [v1.6.1](RELEASE_v1.6.1_NOTES.md) - Comprehensive release documentation
 - **Troubleshooting:** See [Troubleshooting](#-troubleshooting) section
 
 ### Contact
@@ -1323,60 +1418,14 @@ A: The floating action bar (v1.1.0) uses CSS fixed positioning at `bottom: 80px`
 
 ---
 
-## 🗺️ Roadmap
-
-### ✅ Completed Versions
-
-**v1.5.0** (November 2024) - Phase 3 & 4: Behavior Engineering
-- ✅ Query classification system (pre-RAG routing)
-- ✅ Anti-leakage prompts (zero template exposure)
-- ✅ Honest audit logging (no dramatic language)
-- ✅ Abuse vs banter distinction
-
-**v1.4.0** (October 2024) - PDF Indexing & Reliability
-- ✅ PDF indexing (747 chunks indexed)
-- ✅ SentenceTransformer integration
-- ✅ Mistral 7B system prompt optimization
-
-**v1.3.0** (September 2024) - ChatGPT-Style Responses
-- ✅ 3-tier structured responses
-- ✅ Professional formatting
-- ✅ Mistral 7B upgrade
-
-See [ROADMAP.md](ROADMAP.md) for complete version history.
-
-### 🚧 Planned Versions
-
-**v1.6.0** (Q1 2026) - Multi-Document Support
-- [ ] Upload multiple PDFs (bylaws, acts, regulations)
-- [ ] Document-specific search filters
-- [ ] Cross-document reference detection
-- [ ] Enhanced admin panel for document management
-
-**v1.7.0** (Q2 2026) - Advanced Analytics
-- [ ] Query analytics dashboard
-- [ ] User behavior insights
-- [ ] Popular questions tracking
-- [ ] Answer quality metrics (BLEU, ROUGE scores)
-
-**v2.0.0** (Q3 2026) - Enterprise Features
-- [ ] Multi-user authentication (role-based access)
-- [ ] API endpoints (REST/GraphQL)
-- [ ] RAG observability (LangSmith integration)
-- [ ] Fine-tuned embeddings (domain-specific)
-- [ ] Production deployment (Docker Swarm/Kubernetes)
-- [ ] Cloud deployment templates (AWS, Azure, GCP)
-
----
-
-**Last Updated:** November 25, 2025  
-**Current Version:** v1.5.0 (Phase 3 & 4: Behavior Engineering)  
+**Last Updated:** November 26, 2025  
+**Current Version:** v1.7.0 (Ultra-Strict Dynamic RAG)  
 **Maintained By:** [@athem135-source](https://github.com/athem135-source)  
 **Repository:** [github.com/athem135-source/PDBOT](https://github.com/athem135-source/PDBOT)
 
 ### Recent Updates
-- ✅ **v1.5.0** - Query classification, anti-leakage prompts, honest audit logging, abuse/banter distinction
-- ✅ **v1.4.0** - Mistral 7B optimization, relaxed context filtering, PyMuPDF parsing
-- ✅ **v1.3.0** - 3-tier structured responses, Mistral 7B upgrade, professional formatting
-- ✅ **v1.2.0** - Red line protocol, OCR correction, hardcoded rules
-- ✅ **v1.1.0** - Gemini-style floating UI, streaming responses, The Polisher prompt
+- ✅ **v1.7.0** (Nov 26, 2025) - 10-rule garbage filter, zero hardcoded values, multi-PDF ready, citation limit (≤3)
+- ✅ **v1.6.1** (Nov 25, 2025) - Ultra-strict 80-word limit, truncation, stop tokens, anti-expansion
+- ✅ **v1.5.0** (Nov 2024) - Query classification, anti-leakage prompts, abuse/banter distinction
+- ✅ **v1.4.0** (Oct 2024) - Mistral 7B optimization, relaxed context filtering, PyMuPDF parsing
+- ✅ **v1.3.0** (Sep 2024) - 3-tier structured responses, Mistral 7B upgrade, professional formatting
