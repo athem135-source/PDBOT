@@ -3,7 +3,7 @@
 ![Version](https://img.shields.io/badge/version-1.7.0-blue)
 ![Python](https://img.shields.io/badge/python-3.12%2B-blue)
 ![License](https://img.shields.io/badge/license-Proprietary-red)
-![Accuracy](https://img.shields.io/badge/accuracy-95%25-brightgreen)
+![Accuracy](https://img.shields.io/badge/accuracy-87%25-brightgreen)
 
 **🏆 Enterprise-grade document-grounded chatbot for querying the Planning & Development Commission Manual using ultra-strict dynamic RAG with zero hardcoding.**
 

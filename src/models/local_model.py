@@ -284,8 +284,9 @@ class LocalModel:
 1. Answer ONLY from the retrieved context below - NEVER from your training data or world knowledge.
 2. If the context contains ANY information related to the question, extract and provide it directly. Look for: numbers, amounts, thresholds, names, definitions.
 3. If the context truly does not contain ANY relevant information, reply: "Not found in the Manual."
-4. Do NOT say "does not provide a specific numeric value" - if you see Rs., million, billion, percentage, or any number in context, STATE IT.
-5. Provide exactly 1-3 clear sentences (maximum 70-80 words total).
+4. ABSOLUTELY FORBIDDEN: "does not provide a specific numeric value" - if you see Rs., million, billion, percentage, lakh, crore, or ANY number in context, YOU MUST STATE IT EXPLICITLY.
+5. For numeric queries: SCAN the context for Rs./million/billion/percent and EXTRACT the complete value. Example: "Rs. 200 million", "Rs. 7.5 billion", "25 percent".
+6. Provide exactly 1-3 clear sentences (maximum 70-80 words total).
 6. After the answer, cite the source as: "Source: Manual for Development Projects 2024, p.X"
 7. Do NOT include: bullet points, lists, multi-paragraph text, analogies, background info, definitions (unless asked), elaborations.
 8. IGNORE any irrelevant context (tables, figures, annexures, notifications).

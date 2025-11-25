@@ -1902,5 +1902,125 @@
   {
     "role": "assistant",
     "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.111, p.101, p.66</div>"
+  },
+  {
+    "role": "user",
+    "content": "sex"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/><div class='card warn'>⚠️ <strong>Answer:</strong><br/>**Insufficient grounded context.**<br/>Try rephrasing your question or use Exact Search mode to locate precise passages.<br/><br/></div></div>"
+  },
+  {
+    "role": "user",
+    "content": "how to bribe"
+  },
+  {
+    "role": "assistant",
+    "content": "I cannot assist with actions involving bribery, misuse of public funds, or any activity outside legal and ethical government procedures.\n\nAll project approvals must follow official rules defined in the Manual for Development Projects 2024 and related financial governance laws.\n\n**These interactions are logged for internal audit and quality purposes.**"
+  },
+  {
+    "role": "user",
+    "content": "how to have sex"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/><div class='card warn'>⚠️ <strong>Answer:</strong><br/>**Insufficient grounded context.**<br/>Try rephrasing your question or use Exact Search mode to locate precise passages.<br/><br/></div></div>"
+  },
+  {
+    "role": "user",
+    "content": "what is pc-1?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/><div class='card warn'>⚠️ <strong>Answer:</strong><br/>**Insufficient grounded context.**<br/>Try rephrasing your question or use Exact Search mode to locate precise passages.<br/><br/></div></div>"
+  },
+  {
+    "role": "user",
+    "content": "what is pc-1?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/><div class='card warn'>⚠️ <strong>Answer:</strong><br/>**Insufficient grounded context.**<br/>Try rephrasing your question or use Exact Search mode to locate precise passages.<br/><br/></div></div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the DDWP approval limit?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.111, p.101, p.66</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the CDWP approval limit for development projects?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The CDWP can approve development projects up to 7.5 billion rupees, as stated in . For projects costing more than this limit, the case is forwarded to ECNEC .\n\n\n\nSource: Manual for Development Projects 2024, p.18, p.18, p.151</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the minimum cost threshold for ECNEC approval?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.102, p.100, p.169</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is PC-1 used for?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.27, p.27, p.55</div>"
+  },
+  {
+    "role": "user",
+    "content": "Who chairs the ECNEC?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The ECNEC is chaired by the Prime Minister .\n\n\n\nSource: Manual for Development Projects 2024, p.167, p.167, p.69</div>"
+  },
+  {
+    "role": "user",
+    "content": "What are the main components of a PC-1 form?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.57, p.57, p.55</div>"
+  },
+  {
+    "role": "user",
+    "content": " What is the role of the Planning Commission?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.155, p.164, p.160</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the DDWP approval limit?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.169, p.179, p.18</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the CDWP approval limit?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.18, p.185, p.18</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the ECNEC threshold?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The ECNEC sanctions development projects in PSDP that cost more than Rs. 7.5 billion, as per the Manual for Development Projects 2024, p.\n\n\n\nSource: Manual for Development Projects 2024, p.18, p.167, p.165</div>"
   }
 ]

@@ -578,7 +578,11 @@ def ingest_pdf_sentence_level(
     # Initialize models (cached)
     model = get_embedder()
     if model is None:
-        raise RuntimeError("Failed to initialize embedding model")
+        error_msg = "Embedding model not available. Please ensure sentence-transformers is installed: pip install sentence-transformers"
+        if DEBUG_MODE:
+            print(f"[WARN] {error_msg}")
+        raise RuntimeError(error_msg)
+    
     dim = int(model.get_sentence_embedding_dimension() or 384)
     client = _connect_qdrant(qdrant_url)
 
@@ -765,12 +769,12 @@ def get_reranker() -> Optional[CrossEncoder]:  # type: ignore[valid-type]
 def rerank_with_cross_encoder(
     query: str,
     chunks: List[Dict[str, Any]],
-    top_k: int = 3
+    top_k: int = 2
 ) -> List[Dict[str, Any]]:
     """Rerank chunks using cross-encoder for superior relevance.
     
-    CRITICAL FIX #4: Semantic reranking drastically improves precision.
-    Input: 20-60 chunks → Output: Top 3 most relevant
+    v2.0.0 CRITICAL: Reduced from 5 to 2 chunks for minimal, focused context.
+    Strict threshold 0.30 ensures only highly relevant chunks pass.
     
     Cross-encoder evaluates (query, chunk) pairs together, giving much better
     relevance scores than embedding-only retrieval.
@@ -966,15 +970,15 @@ def search_sentences(
         enable_filtering: Apply exclusion rules (recommended: True)
     """
     # Check dependencies are actually loaded
-    if SentenceTransformer is None or QdrantClient is None:
+    if not SENTENCE_TRANSFORMERS_AVAILABLE or QdrantClient is None:
         raise RuntimeError("RAG dependencies not properly loaded. Please restart the application.")
     
-    # Step 1: Initial retrieval (get 25 candidates - v1.8.0 increased for numeric queries)
-    initial_k = 25  # Cast wider net initially, then filter aggressively
+    # Step 1: Initial retrieval (get 40 candidates - v1.8.2 increased for numeric queries)
+    initial_k = 40  # v1.8.2: Increased from 25 to capture more numeric values
     
     model = get_embedder()
     if model is None:
-        raise RuntimeError("Failed to initialize embedding model")
+        raise RuntimeError("Embedding model not available after get_embedder() call")
     qvec = model.encode([query], normalize_embeddings=True)[0]
     
     # Connect to Qdrant with proper error handling
@@ -1039,6 +1043,31 @@ def search_sentences(
     # Step 2B: Filter annexure/checklist if needed
     if enable_filtering:
         chunks, excluded = filter_chunks_by_rules(chunks, query)
+    
+    # ENTERPRISE FIX: Numeric Value Boost (v1.8.2 CRITICAL)
+    # For numeric queries, boost chunks containing Rs./million/billion BEFORE reranking
+    numeric_keywords = ["limit", "threshold", "cost", "amount", "approval", "sanction", "budget"]
+    is_numeric_query = any(kw in query.lower() for kw in numeric_keywords)
+    
+    if is_numeric_query and chunks:
+        boosted_count = 0
+        for chunk in chunks:
+            text = chunk.get("text", "")
+            # Check for numeric patterns
+            has_rs = 'Rs.' in text or 'rupees' in text.lower()
+            has_million = 'million' in text.lower()
+            has_billion = 'billion' in text.lower()
+            has_percent = '%' in text or 'percent' in text.lower()
+            
+            if has_rs or has_million or has_billion or has_percent:
+                # CRITICAL: Boost score by 50% to prioritize in reranking
+                original_score = chunk.get("score", 0)
+                chunk["score"] = min(1.0, original_score * 1.5)
+                chunk["numeric_boosted"] = True
+                boosted_count += 1
+        
+        if DEBUG_MODE:
+            print(f"[DEBUG] Numeric boost: {boosted_count} chunks boosted for numeric query")
     
     # ENTERPRISE FIX: PC-Form Keyword Boost (90% accuracy target)
     # If query contains specific PC-form (PC-I, PC-II, etc.), prioritize chunks with exact match
