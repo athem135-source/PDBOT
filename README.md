@@ -2,7 +2,7 @@
 
 ![Version](https://img.shields.io/badge/version-2.0.0-blue)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+![License](https://img.shields.io/badge/license-Proprietary-red)
 ![Accuracy](https://img.shields.io/badge/accuracy-80--85%25-brightgreen)
 
 **🏆 Enterprise-grade document-grounded chatbot for querying the Planning & Development Commission Manual using ultra-strict dynamic RAG with zero hardcoding.**
@@ -988,9 +988,15 @@ We welcome contributions! Please follow these guidelines:
 
 ## 📄 License
 
-**MIT License** – See [LICENSE](LICENSE) file for details.
+**Proprietary License** – See [LICENSE](LICENSE) file for full details.
 
-You are not free to use, modify, and distribute this software for any purpose, commercial or non-commercial.
+**© 2024-2025 Hassan Arif Afridi. All Rights Reserved.**
+
+This software is proprietary and developed for use by the Planning & Development Commission, Government of Pakistan. Unauthorized use, distribution, or modification is strictly prohibited without explicit written permission from the copyright holder.
+
+For licensing inquiries or authorized use requests, contact:
+- **Hassan Arif Afridi (Copyright Holder)**
+- **Email:** hassanarifafridi@gmail.com
 
 ---
 
