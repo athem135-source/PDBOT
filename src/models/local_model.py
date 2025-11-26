@@ -310,6 +310,35 @@ Your job is to give the most direct, concise answer supported by the retrieved t
             )
             raw_out = self._ollama_generate(prompt, max_new_tokens, temperature=temperature, system=system_msg)
             
+            # v2.0.0: CRITICAL POST-PROCESSING - Detect forbidden default responses
+            forbidden_phrases = [
+                "does not provide a specific numeric value",
+                "does not provide specific information",
+                "does not contain a specific",
+                "manual does not provide",
+                "context does not provide",
+            ]
+            
+            # Check if response contains forbidden phrases (case-insensitive)
+            raw_lower = raw_out.lower()
+            has_forbidden = any(phrase in raw_lower for phrase in forbidden_phrases)
+            
+            if has_forbidden:
+                # Check if context actually has numeric values
+                has_numbers = any(pattern in filtered_context for pattern in 
+                    ['Rs.', 'million', 'billion', 'percent', '%', 'lakh', 'crore'])
+                
+                if has_numbers:
+                    # Force regeneration with stricter prompt
+                    stricter_prompt = (
+                        f"===CONTEXT FROM MANUAL===\n{filtered_context}\n===END CONTEXT===\n\n"
+                        f"QUESTION: {question}\n\n"
+                        "CRITICAL: The context above CONTAINS numbers/values. Extract them directly. "
+                        "Do NOT say 'does not provide'. State the exact values you see.\n\n"
+                        "ANSWER:"
+                    )
+                    raw_out = self._ollama_generate(stricter_prompt, max_new_tokens, temperature=0.1, system=system_msg)
+            
             # v1.8.0: ULTRA-HARD TRUNCATION - First sentence only if > 80 words, remove ALL formatting
             out = self._truncate_to_essentials(raw_out)
             

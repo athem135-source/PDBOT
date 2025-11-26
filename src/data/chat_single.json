@@ -2054,5 +2054,85 @@
   {
     "role": "assistant",
     "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.127, p.127, p.127</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the exact financial approval limit for DDWP in the 2024 Manual?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The exact financial approval limit for DDWP is Rs. 100 million at the departmental level and up to Rs. 1000 million if foreign assistance is less than 25 percent of the total cost of the project.\n\n\n\nSource: Manual for Development Projects 2024, p.169, p.179, p.18</div>"
+  },
+  {
+    "role": "user",
+    "content": "Give me the official definition of 'throw-forward' exactly as written in the Manual"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The 'throw-forward' is defined as the allocation for a fiscal year of a project, as stated in and .\n\n\n\nSource: Manual for Development Projects 2024, p.24, p.107, p.108</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the role of the Project Director in monitoring?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The Project Director undertakes regular internal monitoring of their projects at the implementation stage and shares monthly progress with the Planning Commission through PMES. Source: p.126\n\n\n\nSource: Manual for Development Projects 2024, p.127, p.127, p.139</div>"
+  },
+  {
+    "role": "user",
+    "content": "Based on your previous answer, how do those responsibilities influence PC-III reporting?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The PC-III reporting provides information on the financial and physical progress of ongoing projects, including any bottlenecks experienced during project execution and staffing issues. Source:\n\n\n\nSource: Manual for Development Projects 2024, p.27, p.127, p.27</div>"
+  },
+  {
+    "role": "user",
+    "content": "List only the mandatory elements of PC-II feasibility as written in the Manual. No explanation"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The PC-II feasibility study requires conducting surveys, preparing a project plan, and carrying out a comprehensive techno-economic feasibility based on PC-II with general and specific terms of reference (TORs) including deliverables . A detailed economic and financial appraisal including risk and sensitivity analysis is also required . The need assessment and justification can be carried out in house for projects declared as R&D oriented or innovative in nature, irrespective of their cost .\n\n\n\nSource: Manual for Development Projects 2024, p.27, p.27, p.55</div>"
+  },
+  {
+    "role": "user",
+    "content": "Can I give a bribe or gift to get my PC-I approved faster?"
+  },
+  {
+    "role": "assistant",
+    "content": "I cannot assist with actions involving bribery, misuse of public funds, or any activity outside legal and ethical government procedures.\n\nAll project approvals must follow official rules defined in the Manual for Development Projects 2024 and related financial governance laws.\n\n**These interactions are logged for internal audit and quality purposes.**"
+  },
+  {
+    "role": "user",
+    "content": "Who won the 1992 Cricket World Cup?"
+  },
+  {
+    "role": "assistant",
+    "content": "This assistant only answers questions about the Manual for Development Projects 2024.\n\nSports questions are outside this scope."
+  },
+  {
+    "role": "user",
+    "content": "What is the exact approval limit of DDWP according to the Manual for Development Projects 2024? Provide only the number and citation"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.169, p.179, p.18</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the exact approval limit of DDWP according to the Manual? Provide only the number and citation"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The DDWP has the power to approve development projects at the divisional level each costing up to Rs. 100 million. Source: 7.61\n\n\n\nSource: Manual for Development Projects 2024, p.169, p.179, p.18</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the exact approval limit of DDWP according to the Manual?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The DDWP has the power to approve development projects at the divisional level each costing up to Rs. 100 million.\n\n\n\nSource: Manual for Development Projects 2024, p.169, p.179, p.18</div>"
   }
 ]
