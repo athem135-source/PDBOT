@@ -939,20 +939,22 @@ def post_filter_garbage_chunks(chunks: List[Dict[str, Any]], query: str) -> List
 
 def search_sentences(
     query: str,
-    top_k: int = 2,  # v1.8.0: Keep at 2 (ultra-strict output)
-    qdrant_url: str = "http://localhost:6333",
+    top_k: int = 3,  # v2.0.0: Increased to 3 for better coverage
+    qdrant_url: str = "http://localhost:6338",  # Fixed: correct port
     mmr: bool = False,
     lambda_mult: float = 0.7,
-    min_score: float = 0.12,  # v1.8.0: RELAXED from 0.40 to 0.12 (never block RAG)
+    min_score: float = 0.18,  # v2.0.0: Balanced threshold (was 0.12, too loose)
     enable_reranking: bool = True,  # v1.8.0: Always use reranking
     enable_filtering: bool = True,
 ) -> List[Dict[str, Any]]:
-    """Enterprise-grade search with relaxed retrieval + strict filtering (v1.8.0).
+    """Enterprise-grade search with balanced retrieval + strict filtering (v2.0.0).
     
-    CRITICAL FLOW (v1.8.0):
-    1. Initial retrieval: Get 15 chunks from Qdrant (min_score=0.12 - NEVER block RAG)
-    2. Post-filter: Remove garbage (score<0.30, tables, headers, notifications, iPAS, climate)
-    3. Filter: Remove annexure/checklist if conceptual question
+    CRITICAL FLOW (v2.0.0):
+    1. Initial retrieval: Get 40 chunks from Qdrant (min_score=0.18 - balanced)
+    2. Numeric boost: +50% score for chunks with Rs./million/billion
+    3. Post-filter: Remove garbage (score<0.18, tables, headers, notifications)
+    4. Reranker: Keep top 3 most relevant chunks
+    5. Return to LLM with polished extraction prompt
     4. Rerank: Use cross-encoder to get top 1-2 most relevant
     5. Return: Final 1-2 chunks ONLY for LLM (with warning if confidence low)
     

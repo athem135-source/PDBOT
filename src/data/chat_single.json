@@ -2030,5 +2030,29 @@
   {
     "role": "assistant",
     "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.24, p.24, p.24</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the exact financial approval limit for DDWP in the 2024 Manual? Please give only the number and citation"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.169, p.179, p.18</div>"
+  },
+  {
+    "role": "user",
+    "content": "Give me the official definition of ‘throw-forward’ exactly as written in the Manual, without explanation"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.24, p.107, p.108</div>"
+  },
+  {
+    "role": "user",
+    "content": "What are the specific monitoring responsibilities of the Project Director according to the 2024 Manual?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.127, p.127, p.127</div>"
   }
 ]
