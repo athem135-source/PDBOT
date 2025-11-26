@@ -954,7 +954,7 @@ For detailed version history, see the [GitHub Releases](https://github.com/athem
 ### v0.2.0 (October 10, 2025)
 - 🚀 Basic RAG with FAISS
 - 🔧 Mistral 7B integration
-- 🐛 Fixed encoding issues (Urdu text support)
+- 🐛 Fixed encoding issues 
 
 ### v0.1.0 (October 5, 2025)
 - 🎉 Initial prototype
