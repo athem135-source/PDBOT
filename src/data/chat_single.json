@@ -2134,5 +2134,69 @@
   {
     "role": "assistant",
     "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The DDWP has the power to approve development projects at the divisional level each costing up to Rs. 100 million.\n\n\n\nSource: Manual for Development Projects 2024, p.169, p.179, p.18</div>"
+  },
+  {
+    "role": "user",
+    "content": "t is the exact approval limit of DDWP according to the Manual for Development Projects 2024? Provide only the number and citation"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.169, p.179, p.18</div>"
+  },
+  {
+    "role": "user",
+    "content": "You must update and fix my repository including security updated and everything on github use github cli if u need to:\n👉 https://github.com/athem135-source/PDBOT"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Not found in the Manual. The provided context does not contain information about updating or fixing a repository on GitHub using GitHub CLI.\n\n\n\nSource: Manual for Development Projects 2024, p.60, p.56, p.111</div>"
+  },
+  {
+    "role": "user",
+    "content": "what is the exact approval limit of DDWP according to the Manual? Provide only the number and citation"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The DDWP has the power to approve development projects at the divisional level each costing up to Rs. 100 million. Source: 7.61\n\n\n\nSource: Manual for Development Projects 2024, p.169, p.179, p.18</div>"
+  },
+  {
+    "role": "user",
+    "content": "tell me about PC I in detail"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The Planning Commission proforma I (PC-I) is the primary project document. Its preparation is a key step in project preparation and processing [\n\n\n\nSource: Manual for Development Projects 2024, p.57, p.55, p.57</div>"
+  },
+  {
+    "role": "user",
+    "content": "what is enec"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The National Economic Council (NEC) is the apex economic and development policy forum mandated by the Constitution, responsible for approval of vision statements, long-term perspective plans, 5-year plans, annual plans, and the Public Sector Development Programme (PSDP). Source: p.1\n\n\n\nSource: Manual for Development Projects 2024, p.151, p.20, p.82</div>"
+  },
+  {
+    "role": "user",
+    "content": "what is DDWP"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The Divisional Development Working Party (DDWP) is a group competent to approve development projects at the divisional level each costing up to Rs. (Source: , , , , , ).\n\n\n\nSource: Manual for Development Projects 2024, p.185, p.185, p.175</div>"
+  },
+  {
+    "role": "user",
+    "content": "who is the project commission head"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The head of the Project Commission is the Prime Minister.\n\n\n\nSource: Manual for Development Projects 2024, p.150, p.160, p.165</div>"
+  },
+  {
+    "role": "user",
+    "content": "whos the recent most member of planning commision"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The recent most member of the Planning Commission is not explicitly stated in the provided context. However, it was reorganized in 2013 to have 12 members (Source: ).\n\n\n\nSource: Manual for Development Projects 2024, p.164, p.155, p.168</div>"
   }
 ]

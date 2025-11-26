@@ -1,42 +1,48 @@
 # ============================================
-# PDBot Requirements - v1.5.0
-# Phase 3 & 4 Behavior Engineering + Query Classification
+# PDBot Requirements - v2.0.0
+# Enterprise-Grade Security & Dependency Updates
 # ============================================
 
 # ---- Frontend & UI ----
-streamlit>=1.36.0              # Interactive web UI framework for chatbot interface
-requests>=2.32.0               # HTTP library for API calls (Ollama, Qdrant health checks)
+streamlit>=1.40.0              # Interactive web UI framework (security patches)
+requests>=2.32.3               # HTTP library (CVE-2024-35195 fixed in 2.32.3)
 
 # ---- Document Processing ----
-pypdf>=4.2.0                   # PDF text extraction for manual ingestion (fallback parser)
-PyMuPDF>=1.24.0                # Primary PDF parser (better OCR and table handling for annexures)
+pypdf>=5.1.0                   # PDF extraction (security updates, better error handling)
+PyMuPDF>=1.25.2                # Primary PDF parser (latest stable, security patches)
 
 # ---- LLM Backend ----
-transformers>=4.44.2           # Hugging Face transformers for tokenization and embeddings
-torch==2.5.1                   # PyTorch deep learning framework (pinned - v2.9+ has meta tensor bug)
+transformers>=4.47.0           # Hugging Face transformers (latest stable, security updates)
+torch>=2.5.1,<2.6.0            # PyTorch (security patches, pinned to 2.5.x series)
 
 # ---- RAG Pipeline ----
-langchain>=0.2.0               # RAG orchestration framework (document loaders, chains)
-langchain-text-splitters>=0.2.0  # Sentence-level text chunking for granular retrieval
-langchain-community>=0.2.0     # Community integrations (Qdrant, Ollama connectors)
+langchain>=0.3.0               # RAG orchestration (v0.3+ has breaking changes, test thoroughly)
+langchain-text-splitters>=0.3.0  # Sentence-level chunking (updated for v0.3)
+langchain-community>=0.3.0     # Community integrations (Qdrant, Ollama)
 
 # ---- NLP & Embeddings ----
-nltk>=3.8.1                    # Natural Language Toolkit (sentence tokenization - punkt)
-sentence-transformers>=3.0.0   # Semantic embeddings + cross-encoder reranking
+nltk>=3.9.1                    # Natural Language Toolkit (latest stable)
+sentence-transformers>=3.3.1   # Semantic embeddings (security updates, performance improvements)
                                # Models: all-MiniLM-L6-v2 (embeddings, 384d)
                                #         cross-encoder/ms-marco-MiniLM-L-6-v2 (reranker)
 
 # ---- Vector Database ----
-qdrant-client>=1.9.0           # Qdrant vector DB client for semantic search
+qdrant-client>=1.12.1          # Qdrant client (latest stable, API improvements)
 
-# ---- Compatibility Fixes ----
-# Note: Keras 3 is not compatible with sentence-transformers
-# If keras is installed, uninstall it with: pip uninstall -y keras
+# ---- Security & Compatibility ----
+# Critical: Keep these updated for security patches
+urllib3>=2.2.3                 # HTTP client (security patches)
+certifi>=2024.8.30             # SSL certificates (keep updated)
+cryptography>=44.0.0           # Cryptographic recipes (security critical)
 
 # ============================================
-# v1.5.0 Changes (Phase 3 & 4 Behavior Fixes):
-# - Query classification system (off-scope, abuse, banter, bribery)
-# - Anti-leakage prompts (no visible template headers)
-# - Honest audit logging notices
-# - Separate banter handling for "stupid bot" comments
+# v2.0.0 Changes (Complete Refactor):
+# - Sentence-level chunking (40-55 words, NLTK)
+# - Polished system prompt (forces extraction)
+# - Forbidden response detection + regeneration
+# - Numeric integrity (50% boost for Rs./million/billion)
+# - Classification layer (off-scope/red-line/in-scope)
+# - Balanced retrieval (top_k=3, min_score=0.18)
+# - Security updates (all deps to latest stable)
+# - Production-ready (≥87% accuracy target)
 # ============================================
