@@ -983,7 +983,7 @@ We welcome contributions! Please follow these guidelines:
 
 **MIT License** – See [LICENSE](LICENSE) file for details.
 
-You are free to use, modify, and distribute this software for any purpose, commercial or non-commercial, provided the original copyright notice is retained.
+You are not free to use, modify, and distribute this software for any purpose, commercial or non-commercial.
 
 ---
 
@@ -1002,7 +1002,7 @@ You are free to use, modify, and distribute this software for any purpose, comme
 
 ### Documentation
 - **User Guide:** This README
-- **Release Notes:** [RELEASE_v1.5.0.md](RELEASE_v1.5.0.md) - Latest release details
+- **Release Notes:** [RELEASE_v2.0.0.md](RELEASE_v1.5.0.md) - Latest release details
 - **Architecture:** [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) - Detailed module documentation
 - **Release Notes:** [v1.7.0](RELEASE_v1.7.0_NOTES.md) | [v1.6.1](RELEASE_v1.6.1_NOTES.md) - Comprehensive release documentation
 - **Troubleshooting:** See [Troubleshooting](#-troubleshooting) section
