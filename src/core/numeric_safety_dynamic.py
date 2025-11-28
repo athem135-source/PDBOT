@@ -145,11 +145,8 @@ def enforce_numeric_safety(
     """
     Enforce numeric safety on answer (v1.7.0 DYNAMIC VERSION).
     
-    Changes from v1.6.0:
-    - NO hardcoded values used
-    - Only validates numbers against retrieved context
-    - Cleans OCR artifacts
-    - Returns generic message if validation fails
+    v2.0.2: DISABLED - This was causing false positives for non-numeric questions.
+    Now just cleans OCR artifacts and passes through the answer.
     
     Args:
         question: User question
@@ -157,20 +154,18 @@ def enforce_numeric_safety(
         answer: Generated answer
         
     Returns:
-        Validated answer or error message
+        Cleaned answer (validation disabled)
     """
     if not answer:
         return answer
     
-    # Clean OCR artifacts first
+    # Clean OCR artifacts only
     answer = clean_ocr_numbers(answer)
     
-    # Validate numbers
-    is_valid, error_msg = validate_numeric_answer(question, retrieved_chunks, answer)
-    
-    if not is_valid:
-        # Return generic message instead of hallucinated answer
-        return "The manual does not provide a specific numeric value for this query in the retrieved context."
+    # v2.0.2: DISABLED numeric validation - was causing false refusals
+    # is_valid, error_msg = validate_numeric_answer(question, retrieved_chunks, answer)
+    # if not is_valid:
+    #     return "The manual does not provide a specific numeric value for this query in the retrieved context."
     
     return answer
 

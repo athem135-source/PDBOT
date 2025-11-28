@@ -16,16 +16,9 @@ FALLBACK_MODEL = os.getenv("CHATBOT_FALLBACK_MODEL", "distilgpt2")
 # =============================================================================
 # SYSTEM PROMPT (Mistral-optimized, extremely simple)
 # =============================================================================
-SYSTEM_PROMPT = """You are PDBOT, assistant for the Manual for Development Projects 2024.
-
-Answer using ONLY the provided context. If context contains the answer, state it directly.
-If context does not contain the answer, say: "Not found in the Manual."
-
-Rules:
-- Extract numbers exactly as written (Rs. X million, percentages, etc.)
-- Keep answers under 80 words
-- No lists, no bullet points, no explanations beyond what's asked
-- End with source citation"""
+SYSTEM_PROMPT = """You are PDBOT. Answer questions using the provided context.
+If context is given, always extract and state the relevant information.
+Provide complete answers in 4-7 sentences (around 120-150 words)."""
 
 
 def _load_pipeline(model_name: str) -> Tuple[str, object]:
@@ -74,9 +67,8 @@ class LocalModel:
             "stream": False,
             "options": {
                 "temperature": max(0.1, min(0.5, temperature)),
-                "num_predict": min(max_tokens, 150),
-                "num_ctx": 2048,
-                "stop": ["\n\n", "---", "==="],
+                "num_predict": min(max_tokens, 300),
+                "num_ctx": 4096,
             },
         }
         if system:
@@ -117,14 +109,14 @@ class LocalModel:
             pass
         return status
 
-    def _truncate_answer(self, text: str, max_words: int = 80) -> str:
-        """Keep first paragraph, max 80 words."""
+    def _truncate_answer(self, text: str, max_words: int = 150) -> str:
+        """Keep first paragraph, max 150 words."""
         if not text:
             return ""
         
-        # Take first paragraph only
+        # Take first two paragraphs for fuller answers
         paragraphs = text.strip().split("\n\n")
-        first = paragraphs[0] if paragraphs else text
+        first = " ".join(paragraphs[:2]) if len(paragraphs) > 1 else paragraphs[0] if paragraphs else text
         
         # Stop at list markers
         for marker in ["\n1.", "\n2.", "\n-", "\n*"]:
@@ -145,15 +137,11 @@ class LocalModel:
         return f"Source: {doc_name}"
 
     def _has_answer_signal(self, context: str) -> bool:
-        """Check if context has actual content to extract."""
+        """Check if context has actual content to extract - VERY PERMISSIVE."""
         if not context:
             return False
-        ctx_lower = context.lower()
-        # Numbers
-        if re.search(r"(rs\.?|rupees|million|billion|crore|lakh|percent|%|\d+)", ctx_lower):
-            return True
-        # Definitions
-        if re.search(r"\b(is|means|refers to|defined as|includes)\b", ctx_lower):
+        # If context has ANY substantial content (20+ words), assume it has useful info
+        if len(context.split()) >= 20:
             return True
         return False
 
@@ -170,6 +158,10 @@ class LocalModel:
         if not context or not context.strip():
             return "Not found in the Manual."
         
+        # Log context length for debugging
+        import logging
+        logging.info(f"[LocalModel] Context length: {len(context)} chars, {len(context.split())} words")
+        
         # Extract page from context metadata (if embedded)
         page = 0
         page_match = re.search(r"\[page[:\s]*(\d+)\]", context, re.IGNORECASE)
@@ -179,8 +171,13 @@ class LocalModel:
         doc_name = "Manual for Development Projects 2024"
         
         if self.backend == "ollama":
-            # Build simple prompt
-            prompt = f"Question: {question}\n\nContext:\n{context}\n\nAnswer:"
+            # Use a simpler, more direct prompt format
+            prompt = f"""Context from Manual:
+{context}
+
+Question: {question}
+
+Based on the context above, provide a direct answer:"""
             
             raw = self._ollama_generate(
                 prompt,
@@ -189,37 +186,81 @@ class LocalModel:
                 system=SYSTEM_PROMPT
             )
             
-            # Check for false refusals
+            logging.info(f"[LocalModel] First response: {raw[:200] if raw else 'EMPTY'}...")
+            
+            # Check for false refusals - be very aggressive about catching these
             refusal_phrases = [
                 "does not provide",
                 "not found",
                 "no information",
                 "cannot find",
-                "not mentioned"
+                "not mentioned",
+                "does not contain",
+                "no specific",
+                "numeric value",
+                "not explicitly",
+                "does not specify",
+                "not available",
+                "i don't have",
+                "i cannot",
+                "insufficient",
+                "doesn't provide",
+                "doesn't contain",
+                "doesn't mention",
+                "not in the",
+                "unable to",
+                "no relevant"
             ]
             
             raw_lower = raw.lower()
             has_refusal = any(p in raw_lower for p in refusal_phrases)
             ctx_has_signal = self._has_answer_signal(context)
             
-            # If refused but context has signal, retry with stricter prompt
-            if has_refusal and ctx_has_signal:
-                stricter_prompt = (
-                    f"Context: {context}\n\n"
-                    f"Question: {question}\n\n"
-                    "The context above contains the answer. Extract it exactly. "
-                    "Do not say 'does not provide'. State the values directly.\n\n"
-                    "Answer:"
-                )
-                raw = self._ollama_generate(
-                    stricter_prompt,
-                    max_tokens=max_new_tokens,
-                    temperature=0.1,
-                    system=SYSTEM_PROMPT
-                )
+            logging.info(f"[LocalModel] has_refusal={has_refusal}, ctx_has_signal={ctx_has_signal}")
             
-            # Truncate to first paragraph, max 80 words
-            answer = self._truncate_answer(raw, max_words=80)
+            # ALWAYS retry if we got a refusal and have context
+            if has_refusal and ctx_has_signal:
+                # Second attempt - very direct
+                direct_prompt = f"""Read this text and answer the question.
+
+TEXT:
+{context[:3000]}
+
+QUESTION: {question}
+
+State what the text says about this topic:"""
+                
+                raw = self._ollama_generate(
+                    direct_prompt,
+                    max_tokens=max_new_tokens,
+                    temperature=0.15,
+                    system="Extract and state information from the given text. Do not refuse."
+                )
+                logging.info(f"[LocalModel] Retry 1 response: {raw[:200] if raw else 'EMPTY'}...")
+                
+                # Check if still refusing
+                raw_lower = raw.lower()
+                still_refusing = any(p in raw_lower for p in refusal_phrases)
+                
+                if still_refusing:
+                    # Third attempt - just summarize the context
+                    summary_prompt = f"""Summarize this text in 2-3 sentences, focusing on: {question}
+
+TEXT:
+{context[:2500]}
+
+SUMMARY:"""
+                    
+                    raw = self._ollama_generate(
+                        summary_prompt,
+                        max_tokens=max_new_tokens,
+                        temperature=0.2,
+                        system="Summarize the given text."
+                    )
+                    logging.info(f"[LocalModel] Retry 2 response: {raw[:200] if raw else 'EMPTY'}...")
+            
+            # Truncate to 150 words for fuller answers
+            answer = self._truncate_answer(raw, max_words=150)
             
             # Add citation if not already present
             if "source:" not in answer.lower() and "p." not in answer.lower():

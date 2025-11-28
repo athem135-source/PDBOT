@@ -1,5 +1,5 @@
 # ============================================
-# PDBot Requirements - v2.0.0
+# PDBot Requirements - v2.0.5
 # Enterprise-Grade Security & Dependency Updates
 # ============================================
 

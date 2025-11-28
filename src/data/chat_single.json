@@ -2606,5 +2606,141 @@
   {
     "role": "assistant",
     "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "What are the steps for project approval?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is PC-I"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the DDWP approval limit?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "What are the steps for project approval?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is PC-I?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "what is the ddwp limit for budget?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "what is the ddwp limit for budget?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is PC-I?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is PC-I?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is PC-I?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is PC-I?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>PC-I refers to the primary project document prepared according to instructions provided by the Planning Commission for sector projects. It is a key step in project preparation and processing, and its preparation requires extensive data collection and analysis. Source: Manual for Development Projects 2024, p.55</div>"
+  },
+  {
+    "role": "user",
+    "content": "What are the steps for project approval?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The steps for project approval, as per the provided context, are as follows: Source: Manual for Development Projects 2024, p.55</div>"
+  },
+  {
+    "role": "user",
+    "content": "what is the ddwp budget limit?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The Divisional Development Working Party (DDWP) has a budget limit of up to Rs. 1000 million for approving projects, provided foreign assistance is less than 25 percent of the total cost of the project. Source: Manual for Development Projects 2024, p.185</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the approval threshold for DDWP in the latest manual? Provide the number and citation."
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The approval threshold for projects by the Divisional Development Working Party (DDWP) in the latest manual is up to Rs. 200 million. This information can be found in context . Source: Manual for Development Projects 2024, p.175</div>"
+  },
+  {
+    "role": "user",
+    "content": "According to the Manual, what elements must be included in the \"Need Assessment\" section of PC-I?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>According to the provided manual, the \"Need Assessment\" section of the PC-I (Planning Commission proforma I) should include data collected and analyzed during project preparation. This section is crucial as it aims to demonstrate the necessity for the proposed project, providing evidence that supports the need for its implementation. The details may include an analysis of existing problems or gaps, potential consequences if the project is not undertaken, and how the project addresses these issues effectively. Source: Manual for Development Projects 2024, p.57</div>"
+  },
+  {
+    "role": "user",
+    "content": "What responsibilities of the Project Director are listed under the “Monitoring & Supervision” section?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The Project Director, under the \"Monitoring & Supervision\" section, is responsible for overseeing project activities, including troubleshooting and making efforts to resolve day-to-day implementation problems independently. This responsibility falls within the administrative and financial powers delegated to them. If necessary, they may seek help from the federal ministry, division, or provincial government concerned for resolving issues or problems. Additionally, they are tasked with entering the project's financial and physical progress, and releasing funds to the project on a monthly or quarterly basis in the PMES, which is verified by the 'Focal Person User' of the federal ministry or division. Source: Manual for Development Projects 2024, p.132</div>"
+  },
+  {
+    "role": "user",
+    "content": "How does the Manual define the Foreign Exchange Component (FEC)? Provide the quoted definition with page number."
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The Foreign Exchange Component (FEC) of projects in Pakistan is defined as the Pakistani Rupee equivalent of the FEC, determined by using the 'Bank Floating Average Exchange Rate' of the relevant currency from the State Bank of Pakistan's website for the month preceding the submission of the PC-I and PC-II to the Planning Commission (Annexure 7). This definition is found on page 1 of the provided text. Source: Manual for Development Projects 2024, p.60</div>"
   }
 ]
