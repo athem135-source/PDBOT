@@ -9,6 +9,13 @@ import logging
 from typing import Optional, Dict, Any, Tuple, cast
 import requests
 
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # python-dotenv not installed, rely on system env vars
+
 _CACHE: Dict[str, Tuple[str, object]] = {}
 
 DEFAULT_MODEL = os.getenv("CHATBOT_MODEL", "google/flan-t5-small")

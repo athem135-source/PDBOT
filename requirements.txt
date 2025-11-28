@@ -1,11 +1,12 @@
 # ============================================
-# PDBot Requirements - v2.0.6
+# PDBot Requirements - v2.0.7
 # Enterprise-Grade Security & Dependency Updates
 # ============================================
 
 # ---- Frontend & UI ----
 streamlit>=1.40.0              # Interactive web UI framework (security patches)
 requests>=2.32.3               # HTTP library (CVE-2024-35195 fixed in 2.32.3)
+python-dotenv>=1.0.0           # Load environment variables from .env file
 
 # ---- Document Processing ----
 pypdf>=5.1.0                   # PDF extraction (security updates, better error handling)
