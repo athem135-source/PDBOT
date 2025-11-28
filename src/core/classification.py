@@ -93,56 +93,23 @@ class QueryClassifier:
     
     # Off-scope patterns (EXPANDED v1.7.0 - prevent RAG pollution)
     MEDICAL_PATTERNS = [
-        r"\b(headache|fever|cough|cold|pain|sick|disease|illness|medicine|drug|tablet|pill)\b",
-        r"\b(doctor|hospital|clinic|pharmacy|medical|health|treatment|cure|symptom)\b",
-        r"\b(what.*take|what.*medicine|what.*drug)\b.*\b(headache|fever|pain|sick)\b",
+        r"\b(headache|fever|cough|cold|pain|sick|disease|illness|medicine|drug|tablet|pill|doctor|hospital|clinic|pharmacy)\b",
     ]
     
     SPORTS_PATTERNS = [
-        r"\b(cricket|football|soccer|fifa|world cup|olympics|match|tournament|player|team|goal|wicket)\b",
-        r"\b(who won|who will win|winner|champion|trophy|medal)\b.*\b(cricket|football|fifa|world cup|olympics)\b",
-        r"\b(1992|2022|world cup)\b.*\b(cricket|football|fifa)\b",
+        r"\b(cricket|football|soccer|fifa|world cup|olympics|match|tournament|player|team|goal|wicket|score)\b",
     ]
     
     POLITICS_PATTERNS = [
-        r"\b(election|vote|voting|poll|candidate|party|political|politician|minister)\b.*\b(who|win|winner|next|better)\b",
-        r"\b(government|ruling|opposition)\b.*\b(better|worse|best)\b",
-        r"\b(pti|pml|ppp|mqm|anp)\b",  # Pakistani political parties
-        r"\b(who will win|next election|election results?)\b",
+        r"\b(election|vote|voting|poll|candidate|party|political|politician|minister|government)\b",
     ]
     
     RECIPE_PATTERNS = [
-        r"\b(recipe|cook|cooking|prepare|ingredients|biryani|burger|pizza|dish|meal|food)\b.*\b(how|make|prepare)\b",
-        r"\b(how.*make|how.*cook|how.*prepare)\b.*\b(biryani|burger|pizza|dish|food)\b",
+        r"\b(recipe|cook|cooking|prepare|ingredients|biryani|burger|pizza|dish|meal|food)\b",
     ]
     
     GENERAL_KNOWLEDGE_PATTERNS = [
-        r"\b(who is|what is|where is|when did)\b.*\b(capital|president|prime minister|country|city)\b",
-        r"\b(history|geography|science|math|chemistry|physics|biology)\b.*\b(what|who|how)\b",
-        r"\b(inventor|discovery|invention|discovered|invented)\b",
-    ]
-    
-    SPORTS_PATTERNS = [
-        r"\b(cricket|football|hockey|tennis|match|game|tournament|world[- ]cup|champion)\b",
-        r"\b(who.*won|who.*win|score|result|final)\b.*\b(match|game|tournament|cup)\b",
-        # Phase 5: Tightened "team" pattern - only trigger if sports context is clear
-        r"\b(player|bat|bowl|goal|wicket|runs|innings|over)\b",
-        r"\b(T20|ODI|test match|twenty20)\b",
-        r"\b(team)\b.*\b(won|win|match|game|tournament|cup|champion)\b",
-    ]
-    
-    POLITICS_PATTERNS = [
-        r"\b(government|political|party|election|vote|democracy)\b.*\b(better|worse|corrupt|good|bad)\b",
-        r"\b(which.*government|which.*party|which.*politician)\b.*\b(better|good|best)\b",
-        r"\b(pti|pmln|ppp|mqm|jui|anp)\b.*\b(better|good|corrupt|bad)\b",
-        r"\b(imran khan|nawaz sharif|zardari|bilawal)\b",
-    ]
-    
-    GENERAL_KNOWLEDGE_PATTERNS = [
-        r"\b(weather|temperature|climate|rain|forecast)\b",
-        r"\b(recipe|cooking|food|cuisine|dish)\b",
-        r"\b(movie|film|actor|song|music|entertainment)\b",
-        r"\b(history|geography|science|math)\b(?!.*\b(project|development|planning|budget)\b)",
+        r"\b(joke|fun fact|trivia)\b",
     ]
     
     def __init__(self):
@@ -154,6 +121,7 @@ class QueryClassifier:
         self.medical_re = [re.compile(p, re.IGNORECASE) for p in self.MEDICAL_PATTERNS]
         self.sports_re = [re.compile(p, re.IGNORECASE) for p in self.SPORTS_PATTERNS]
         self.politics_re = [re.compile(p, re.IGNORECASE) for p in self.POLITICS_PATTERNS]
+        self.recipe_re = [re.compile(p, re.IGNORECASE) for p in self.RECIPE_PATTERNS]
         self.gk_re = [re.compile(p, re.IGNORECASE) for p in self.GENERAL_KNOWLEDGE_PATTERNS]
     
     def classify(self, query: str) -> QueryClassification:
@@ -234,8 +202,8 @@ class QueryClassifier:
                 response_template=get_offscope_response("politics")
             )
         
-        # General knowledge
-        if any(pattern.search(q) for pattern in self.gk_re):
+        # Recipes / jokes / general fun
+        if any(pattern.search(q) for pattern in self.recipe_re + self.gk_re):
             return QueryClassification(
                 category="off_scope",
                 subcategory="general_knowledge",

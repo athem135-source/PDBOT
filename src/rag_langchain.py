@@ -443,3 +443,51 @@ def mmr_rerank(
     
     return [items[i] for i in selected]
 
+
+# =============================================================================
+# Error Classes (for app.py compatibility)
+# =============================================================================
+class RetrievalBackendError(Exception):
+    """Raised when vector DB or retrieval backend is unavailable."""
+    pass
+
+
+class EmbeddingModelError(Exception):
+    """Raised when embedding model fails to load."""
+    pass
+
+
+# =============================================================================
+# Context Building (for app.py compatibility)
+# =============================================================================
+def build_context(
+    hits: List[Dict[str, Any]],
+    token_budget: int = 2400
+) -> Dict[str, Any]:
+    """
+    Build context string from search hits.
+    Returns {"context": str, "citations": list}.
+    """
+    if not hits:
+        return {"context": "", "citations": []}
+    
+    items = []
+    cits = []
+    char_budget = token_budget * 4  # rough chars estimate
+    total_chars = 0
+    
+    for i, h in enumerate(hits):
+        text = (h.get("text") or "").strip()
+        page = h.get("page", 0)
+        
+        if not text:
+            continue
+        
+        if total_chars + len(text) > char_budget:
+            break
+        
+        items.append(f"[{i+1}] {text}")
+        total_chars += len(text)
+        cits.append({"n": i + 1, "page": page})
+    
+    return {"context": "\n\n".join(items).strip(), "citations": cits}

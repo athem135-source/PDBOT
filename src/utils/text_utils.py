@@ -374,26 +374,19 @@ def render_citations(citations: List[Dict[str, Any]], manual_title: str = "Manua
     if not citations:
         return ""
     
-    # Take only first citation (single source format)
-    # Filter out invalid pages
-    valid_citations = []
-    for c in citations[:3]:  # Max 3 sources
+    # Take only first valid citation (single source format)
+    first_valid = None
+    for c in citations:
         page = c.get("page")
         if page and str(page).replace(".", "").replace(",", "").isdigit():
-            valid_citations.append(c)
-    
-    if not valid_citations:
+            first_valid = c
+            break
+
+    if not first_valid:
         return ""
-    
-    # Format as: Source: Manual for Development Projects 2024, p.X
-    if len(valid_citations) == 1:
-        page = valid_citations[0].get("page", "?")
-        return f"\n\nSource: {manual_title}, p.{page}"
-    else:
-        # Multiple sources: Source: Manual for Development Projects 2024, p.X, p.Y
-        pages = [str(c.get("page", "?")) for c in valid_citations]
-        page_list = ", p.".join(pages)
-        return f"\n\nSource: {manual_title}, p.{page_list}"
+
+    page = first_valid.get("page", "?")
+    return f"\n\nSource: {manual_title}, p.{page}"
 
 
 def to_markdown_table(headers: List[str], rows: List[List[Any]]) -> str:

@@ -2,14 +2,24 @@
 setlocal EnableDelayedExpansion
 
 REM ============================================
-REM PDBot Setup Script - v1.5.0
-REM Phase 3 & 4: Behavior Engineering + Query Classification
+REM PDBot Setup Script - v2.0.0
 REM Creates venv, installs dependencies, validates services
+REM Default Qdrant port: 6338 (falls back to .env QDRANT_PORT if set)
 REM ============================================
+
+set "SCRIPT_DIR=%~dp0"
+pushd "%SCRIPT_DIR%\.." >NUL
+
+REM Resolve Qdrant port from .env if provided
+set "QDRANT_PORT=6338"
+if exist ".env" (
+  for /f "tokens=2 delims==" %%i in ('findstr /r "^QDRANT_PORT=" ".env"') do set "QDRANT_PORT=%%i"
+)
+set "QDRANT_URL=http://localhost:%QDRANT_PORT%"
 
 echo.
 echo ========================================
-echo    PDBot Setup - Complete Installation
+echo    PDBot Setup - v2.0.0
 echo ========================================
 echo.
 
@@ -20,7 +30,7 @@ IF %ERRORLEVEL% NEQ 0 (
   echo [ERROR] Python not found. Install Python 3.10+ from https://www.python.org/
   goto :end
 )
-for /f "tokens=2" %%i in ('py --version 2^>^&1') do set PYVER=%%i
+for /f "tokens=2" %%i in ('py --version 2^>^&1') do set "PYVER=%%i"
 echo [OK] Python !PYVER! detected
 echo.
 
@@ -39,17 +49,17 @@ IF NOT EXIST ".venv\Scripts\activate.bat" (
 )
 echo.
 
-REM Activate and upgrade pip
+REM Activate and upgrade pip/setuptools/wheel
 echo [3/6] Activating environment and upgrading pip...
 call ".venv\Scripts\activate"
-python -m pip install --upgrade pip --quiet
-echo [OK] Pip upgraded
+python -m pip install --upgrade pip setuptools wheel --quiet
+echo [OK] Pip toolchain upgraded
 echo.
 
 REM Install dependencies
 echo [4/6] Installing Python dependencies...
 IF EXIST requirements.txt (
-  echo This may take 2-5 minutes on first run...
+  echo This may take a few minutes on first run...
   pip install -r requirements.txt --quiet
   IF %ERRORLEVEL% NEQ 0 (
     echo [ERROR] Dependency installation failed. Check your internet connection.
@@ -62,10 +72,20 @@ IF EXIST requirements.txt (
 )
 echo.
 
-REM Fix Keras 3 compatibility issue
-echo [5/6] Fixing Keras compatibility for sentence-transformers...
-pip uninstall -y keras >NUL 2>&1
-echo [OK] Keras compatibility fixed
+REM Optional: ensure NLTK punkt for sentence tokenization (silent if already present)
+echo [5/6] Ensuring NLTK punkt tokenizer...
+python - <<PY
+try:
+    import nltk
+    nltk.data.find("tokenizers/punkt")
+    print("[OK] NLTK punkt already available")
+except LookupError:
+    import nltk
+    nltk.download("punkt", quiet=True)
+    print("[OK] NLTK punkt downloaded")
+except Exception as e:
+    print(f"[WARN] Could not verify/download NLTK punkt: {e}")
+PY
 echo.
 
 REM Validate services
@@ -76,38 +96,19 @@ ollama --version >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
   echo   [WARN] Ollama not detected.
   echo   Install from: https://ollama.com/
-  echo   After installation, this script will auto-install TinyLlama
-  echo.
-  echo   Manual installation:
-  echo     1. Download Ollama: https://ollama.com/download
-  echo     2. Run: ollama pull tinyllama
-  echo     3. Verify: ollama list
 ) ELSE (
-  for /f "tokens=*" %%i in ('ollama --version 2^>^&1') do set OLLAMA_VER=%%i
+  for /f "tokens=*" %%i in ('ollama --version 2^>^&1') do set "OLLAMA_VER=%%i"
   echo   [OK] Ollama detected: !OLLAMA_VER!
-  echo   Checking TinyLlama model...
-  ollama list 2^>^&1 | findstr /i "tinyllama" >NUL
-  IF %ERRORLEVEL% NEQ 0 (
-    echo   [INFO] TinyLlama model not found. Installing now...
-    echo   This will download ~637MB - may take 2-5 minutes...
-    ollama pull tinyllama
-    IF %ERRORLEVEL% EQU 0 (
-      echo   [OK] TinyLlama installed successfully
-    ) ELSE (
-      echo   [ERROR] Failed to install TinyLlama
-      echo   Try manually: ollama pull tinyllama
-    )
-  ) ELSE (
-    echo   [OK] TinyLlama model ready
-  )
+  echo   Tip: set OLLAMA_MODEL in .env (default: mistral:latest)
 )
 echo.
-echo   Checking Qdrant (Vector DB)...
-curl --silent --max-time 2 http://localhost:6333/health >NUL 2>&1
+echo   Checking Qdrant (Vector DB) at %QDRANT_URL%...
+curl --silent --max-time 2 "%QDRANT_URL%/health" >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
-  echo   [WARN] Qdrant not responding on port 6333
+  echo   [WARN] Qdrant not responding at %QDRANT_URL%
   echo   Install: https://qdrant.tech/documentation/quick-start/
-  echo   Or run: docker run -p 6333:6333 qdrant/qdrant
+  echo   Or run (with persistent storage):
+  echo     docker run -d -p %QDRANT_PORT%:6333 -v %%cd%%\qdrant_storage:/qdrant/storage --name qdrant qdrant/qdrant
 ) ELSE (
   echo   [OK] Qdrant service is running
 )
@@ -117,16 +118,13 @@ echo ========================================
 echo    Setup Complete!
 echo ========================================
 echo.
-echo [NOTE] First run will auto-download models (~100MB):
-echo   - all-MiniLM-L6-v2 (embedding model)
-echo   - cross-encoder/ms-marco-MiniLM-L-6-v2 (reranker)
-echo.
-echo To run the chatbot:
-echo   run.bat          (Windows CMD)
-echo   .\run.ps1        (PowerShell)
+echo Next steps:
+echo   1) run.bat          (Windows CMD)
+echo   2) .\run.ps1        (PowerShell)
 echo.
 echo The app will open at http://localhost:8501
 echo.
 
 :end
+popd >NUL
 endlocal

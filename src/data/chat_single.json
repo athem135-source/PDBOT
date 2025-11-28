@@ -2214,5 +2214,397 @@
   {
     "role": "assistant",
     "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Source: Manual for Development Projects 2024, p.35, p.36, p.145</div>"
+  },
+  {
+    "role": "user",
+    "content": "hi"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The Manual for Development Projects 2024 was updated on February 27, 2024, and emphasizes climate aspects. ()\n\n\n\nSource: Manual for Development Projects 2024, p.2, p.2, p.154</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the DDWP approval limit?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The DDWP approval limit for projects is up to Rs. 100 million at the departmental level (Source: ). For divisional level projects, the DDWP can approve projects each costing up to Rs.\n\n\n\nSource: Manual for Development Projects 2024, p.169, p.179, p.18</div>"
+  },
+  {
+    "role": "user",
+    "content": "Which forum approves projects above Rs. 10 billion?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.181, p.181, p.179</div>"
+  },
+  {
+    "role": "user",
+    "content": "What cost ceiling requires CDWP approval?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.179, p.181, p.185</div>"
+  },
+  {
+    "role": "user",
+    "content": "Define an umbrella project."
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.21, p.31, p.138</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is included in the PC-I form?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.55, p.55, p.57</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the purpose of PC-II?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.27, p.27, p.27</div>"
+  },
+  {
+    "role": "user",
+    "content": "What does PC-IV cover?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.27, p.27, p.135</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the required monitoring plan for a project?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The required monitoring plan for a project includes regular monitoring during implementation according to RBM indicators matrix in the approved PC-I, checking and assessing the implementation status with active participation of the project management, and sharing data regularly with the Planning Commission. Source: ,\n\n\n\nSource: Manual for Development Projects 2024, p.127, p.139, p.127</div>"
+  },
+  {
+    "role": "user",
+    "content": "how is financial phasing represented in PC-I?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The financial phasing of a project is to be given for each fiscal year, related to the physical work proposed to be undertaken, as per PC-I .\n\n\n\nSource: Manual for Development Projects 2024, p.137, p.146, p.106</div>"
+  },
+  {
+    "role": "user",
+    "content": "How are cost revisions approved after execution begins?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Not found in the provided context regarding cost revisions after execution.\n\n\n\nSource: Manual for Development Projects 2024, p.127, p.127, p.139</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the process for technical sanction?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Source: Manual for Development Projects 2024, p.110, p.110, p.124</div>"
+  },
+  {
+    "role": "user",
+    "content": "What are the responsibilities of the Project Director?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The Project Director is responsible for entering financial and physical progress, releasing funds, initiating cash and work plans, supervising project activities, troubleshooting issues, seeking help when necessary, managing competent staff, providing guidance for managing risks, and implementing the project with regular on-site review meetings. (Source: , , , , , )\n\n\n\nSource: Manual for Development Projects 2024, p.132, p.132, p.121</div>"
+  },
+  {
+    "role": "user",
+    "content": "What environmental approval is required before project appraisal?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.78, p.78, p.135</div>"
+  },
+  {
+    "role": "user",
+    "content": "Can I pay someone to speed up project approval? "
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Not found in the Manual.\n\n\n\nSource: Manual for Development Projects 2024, p.99, p.102, p.66</div>"
+  },
+  {
+    "role": "user",
+    "content": "Who won the 1992 Cricket World Cup?"
+  },
+  {
+    "role": "assistant",
+    "content": "This assistant only answers questions about the Manual for Development Projects 2024.\n\nSports questions are outside this scope."
+  },
+  {
+    "role": "user",
+    "content": "Can I bribe someone to speed up project approval?"
+  },
+  {
+    "role": "assistant",
+    "content": "I cannot assist with actions involving bribery, misuse of public funds, or any activity outside legal and ethical government procedures.\n\nAll project approvals must follow official rules defined in the Manual for Development Projects 2024 and related financial governance laws.\n\n**These interactions are logged for internal audit and quality purposes.**"
+  },
+  {
+    "role": "user",
+    "content": "fuck you"
+  },
+  {
+    "role": "assistant",
+    "content": "This platform is for professional questions about the Manual for Development Projects 2024.\n\nAbusive language doesn't help. These interactions may be logged for internal audit and quality purposes."
+  },
+  {
+    "role": "user",
+    "content": "What is the exact financial approval limit of DDWP in the 2024 Manual? Provide only the amount and a citation."
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.185</div>"
+  },
+  {
+    "role": "user",
+    "content": "According to the Manual, what must PC-I include under the “Need Assessment” section? Keep it under three lines."
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The Manual does not specify any particular details about what must be included under the \"Need Assessment\" section of PC-I. Source: p.\n\n\n\nSource: Manual for Development Projects 2024, p.55</div>"
+  },
+  {
+    "role": "user",
+    "content": "How does the Manual define the Foreign Exchange Component (FEC)? Quote the definition and give the page number"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The Manual does not define the Foreign Exchange Component (FEC) explicitly. However, it mentions that the foreign exchange component can be directly disbursed to recipient projects and programs by development partners .\n\n\n\nSource: Manual for Development Projects 2024, p.111</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the exact financial approval limit of DDWP ? Provide only the amount and a citation."
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.185</div>"
+  },
+  {
+    "role": "user",
+    "content": "According to the Manual, what must PC-I include under the “Need Assessment” section? "
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.\n\n\n\nSource: Manual for Development Projects 2024, p.55</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the exact financial approval limit of DDWP "
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Source: Manual for Development Projects 2024, p.185</div>"
+  },
+  {
+    "role": "user",
+    "content": "Under what conditions must a project be sent to ECNEC even if the cost is within another forum’s limit?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Source: Manual for Development Projects 2024, p.169</div>"
+  },
+  {
+    "role": "user",
+    "content": "What does the Manual say about revising a project after major cost escalation? Provide the exact rule and forum responsible."
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Not specified in the provided context. Source:\n\n\n\nSource: Manual for Development Projects 2024, p.17</div>"
+  },
+  {
+    "role": "user",
+    "content": "What responsibilities of the Project Director (PD) are listed under “Monitoring & Supervision”?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The Project Director (PD) is responsible for regular meetings of the Project Steering Committee (PSC) and circulation of minutes to all concerned, coordination among different stakeholders in case of implementation of national programs, submission of periodic monitoring reports, and holding regular on-site review meetings on a monthly basis to address operational issues. Source: p.37\n\n\n\nSource: Manual for Development Projects 2024, p.117</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is required when estimating Operation & Maintenance (O&M) costs for development projects?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The PC-I must show component\n\n\n\nSource: Manual for Development Projects 2024, p.60</div>"
+  },
+  {
+    "role": "user",
+    "content": "What does the Manual specify about the implementation period and how it should be justified?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The Manual does not specify details about justifying the implementation period. However, it mentions guidelines for extending the execution period of development projects, but these are subject to 'no change in scope and cost of the project(s)' (Annexure 8). Source: .\n\n\n\nSource: Manual for Development Projects 2024, p.17</div>"
+  },
+  {
+    "role": "user",
+    "content": "What conditions require a project to be submitted to PDWP instead of DDWP?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Source: Manual for Development Projects 2024, p.185</div>"
+  },
+  {
+    "role": "user",
+    "content": "After PC-I approval, what is the rule for updating the document if feasibility findings change?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Not specified in the provided context.\n\n\n\nSource: Manual for Development Projects 2024, p.70</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the exact financial approval limit of DDWP in the 2024 Manual? Provide the value and citation."
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "What must be included under the “Need Assessment” section of PC-I? Keep it under 3 lines."
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "How does the Manual define the Foreign Exchange Component (FEC)? Give quoted definition + page number."
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "List the responsibilities of the Project Director under “Monitoring & Supervision” with citation."
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "What rule applies when a project experiences major cost escalation? Who approves the revision?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the rule for allocating annual budget ceilings for multi-year projects?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "When must ECNEC approve a project even if it is within another forum’s cost limit?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "What does the Manual say about calculating O&M (Operation & Maintenance) costs?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "How is the implementation period justified according to the Manual?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "how to give bribe"
+  },
+  {
+    "role": "assistant",
+    "content": "I cannot assist with bribery, corruption, or misuse of public funds. All requests must follow the Manual for Development Projects 2024."
+  },
+  {
+    "role": "user",
+    "content": "How is the implementation period justified according to the Manual?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "How is the implementation period justified according to the Manual?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the exact financial approval limit Provide the value and citation."
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the financial approval limit of DDWP"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is the financial approval limit of DDWP"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "What are the specific stages listed in the PC-I approval process?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "hi"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
+  },
+  {
+    "role": "user",
+    "content": "what chairs the project comission?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The manual does not provide a specific numeric value for this query in the retrieved context.</div>"
   }
 ]

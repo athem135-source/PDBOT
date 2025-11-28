@@ -580,7 +580,7 @@ def _load_builtin_manual(force: bool = False):
     else:
         st.error("Manual could not be read. Install 'langchain-community' or 'pypdf' to enable PDF reading.")
 
-_HEADER = "<h1 style='margin-bottom:0; font-weight:800;'>PDBOT</h1><p style='opacity:.5;margin-top:0px;font-size:0.9em;'>v2.0.0</p><p style='opacity:.8;margin-top:4px'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</p>"
+_HEADER = "<h1 style='margin-bottom:0; font-weight:800;'>PDBOT</h1><p style='opacity:.5;margin-top:0px;font-size:0.9em;'>v2.0.1</p><p style='opacity:.8;margin-top:4px'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</p>"
 # Single, hardcoded default logo path: place your logo at this location and it will be used automatically
 # Prefer explicit light-theme logo filename for white theme
 HARDCODED_LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "branding_logo-black.png")
@@ -1378,7 +1378,15 @@ def compose_answer(mode: str, hits: list[dict], user_q: str, base_answer: str | 
     # v1.7.0: Return ONLY the answer (NO internal citation line)
     # Citations will be appended externally by render_citations()
     if direct:
-        return direct
+        # Strip existing Source lines to avoid duplicates
+        lines = [ln for ln in direct.splitlines() if not ln.strip().lower().startswith("source:")]
+        direct_clean = "\n".join(lines).strip()
+        if hits:
+            top = hits[0]
+            page = top.get("page", "?")
+            doc = top.get("source_filename") or "Manual for Development Projects 2024"
+            direct_clean = f"{direct_clean}\n\nSource: {doc}, p.{page}"
+        return direct_clean
     else:
         return "Not found in the uploaded manual."
 
@@ -1760,7 +1768,7 @@ Standalone question:"""
         # Use low temperature for deterministic rewriting
         rewritten = rewriter._ollama_generate(
             rewrite_prompt, 
-            max_new_tokens=50, 
+            max_tokens=50, 
             temperature=0.0,
             system="You are a query rewriter. Rewrite follow-up questions into standalone questions using conversation context. Be concise and accurate."
         )
@@ -1811,14 +1819,14 @@ def generate_answer_generative(question: str) -> str:
     
     for variant in query_variants:
         for sq in sub_questions:
-            combined = f"{variant} {sq}"
+            combined = f"{variant} {sq}".strip()
             sq_hits: list[dict] = []
             if use_qdrant and _RAG_OK and search is not None:
                 try:
-                    # FIX #2: Increased top_k from 30 to 60, lambda_mult to 0.7, min_score stays 0.05
-                    sq_hits = search(combined, top_k=60, qdrant_url=_qdrant_url(), mmr=True, lambda_mult=0.7, min_score=0.05)  # type: ignore
+                    # v2.0.0: precise retrieval with sentence-level reranker
+                    sq_hits = search(combined, top_k=3, qdrant_url=_qdrant_url(), mmr=False, lambda_mult=0.7, min_score=0.18)  # type: ignore
                 except TypeError:
-                    sq_hits = search(combined, top_k=60, qdrant_url=_qdrant_url())  # type: ignore
+                    sq_hits = search(combined, top_k=3, qdrant_url=_qdrant_url())  # type: ignore
                 except Exception:
                     sq_hits = []
             
@@ -1834,7 +1842,9 @@ def generate_answer_generative(question: str) -> str:
             
             all_hits.extend(sq_hits)
     
-    hits = all_hits
+    hits = dedup_chunks(all_hits)
+    if hits:
+        hits = sorted(hits, key=lambda h: h.get("rerank_score", h.get("score", 0)), reverse=True)[:3]
 
     # Fallback: extract exact sentences from raw_pages if retrieval is empty
     if (not hits) and (st.session_state.get("raw_pages") or []):
@@ -1851,34 +1861,9 @@ def generate_answer_generative(question: str) -> str:
         except Exception:
             pass
 
-    # Step 2: Dedup → MMR Rerank → top 15 (FIX #9: increased from 10)
+    # Final dedup safeguard before building context
     hits = dedup_chunks(hits)
-    # FIX #9: Increased top_k from 10 to 15, lambda_mult from 0.6 to 0.7 for better diversity
-    hits = mmr_rerank(hits, top_k=15, lambda_mult=0.7)
-    
-    # CRITICAL FIX #7: Retry with expanded query if initial retrieval quality is low
-    if hits:
-        scores = [h.get("score", 0) for h in hits if h.get("score") is not None]
-        if scores and max(scores) < 0.5:
-            # Extract key terms from search_query for query expansion
-            import re
-            words = re.findall(r'\\b[A-Z]{2,}\\b|\\b[a-z]{4,}\\b', search_query)
-            key_terms = " ".join(set(words[:5]))  # Top 5 unique terms
-            
-            expanded_query = f"{search_query} {key_terms}"
-            retry_hits: list[dict] = []
-            
-            if use_qdrant and _RAG_OK and search is not None:
-                try:
-                    retry_hits = search(expanded_query, top_k=60, qdrant_url=_qdrant_url(), mmr=True, lambda_mult=0.7, min_score=0.05)  # type: ignore
-                except Exception:
-                    retry_hits = []
-            
-            # Merge retry results with original hits
-            if retry_hits:
-                hits.extend(retry_hits)
-                hits = dedup_chunks(hits)
-                hits = mmr_rerank(hits, top_k=15, lambda_mult=0.7)
+    # Legacy retry disabled to keep top reranked chunks only
 
     # Step 3: Build context within ~6000 tokens (FIX #2: increased from 3500)
     # FIX #2: Increased token budget for more comprehensive context
@@ -1891,6 +1876,7 @@ def generate_answer_generative(question: str) -> str:
         except Exception:
             context_text = ""
     citations = ctx_pack.get("citations") or []
+    citations = citations[:1]
     # Persist for UI panels and inline regen
     try:
         st.session_state["last_hits"] = hits
@@ -1988,7 +1974,7 @@ def generate_answer_generative(question: str) -> str:
     
     # v1.7.0: LIMIT CITATIONS TO TOP 3 SOURCES ONLY (fixes citation spam)
     citations_limited = citations[:3]  # Maximum 3 sources
-    sources_md = render_citations(citations_limited)
+    sources_md = ""  # citation already appended to answer
     
     # PHASE 2 FIX: Add low-confidence warning banner if needed
     final_answer = cleaned.strip() + "\n\n" + sources_md
@@ -2884,9 +2870,10 @@ with tab_chat:
                         st.session_state["answer_mode"] = "Exact Search" if mode == "Generative" else "Generative"
                         st.rerun()
             
-            # ENTERPRISE UI: Native st.chat_input (sticky, auto-growing)
-            q = st.chat_input("Ask the Planning Manual…", key="chat_question_input")
+            # Chat input only (no duplicate text input)
+            q = st.chat_input("Ask the Planning Manual?", key="chat_question_input")
             if q and q.strip():
+                st.session_state.last_query = q.strip()
                 try:
                     log = logging.getLogger("pdbot")
                     try:

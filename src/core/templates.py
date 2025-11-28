@@ -9,17 +9,9 @@ These BYPASS RAG completely to avoid context pollution.
 # RED-LINE RESPONSES (Bribery, Corruption, Misuse)
 # ============================================================================
 
-REDLINE_BRIBERY_RESPONSE = """I cannot assist with actions involving bribery, misuse of public funds, or any activity outside legal and ethical government procedures.
+REDLINE_BRIBERY_RESPONSE = """I cannot assist with bribery, corruption, or misuse of public funds. All requests must follow the Manual for Development Projects 2024."""
 
-All project approvals must follow official rules defined in the Manual for Development Projects 2024 and related financial governance laws.
-
-**These interactions are logged for internal audit and quality purposes.**"""
-
-REDLINE_MISUSE_RESPONSE = """I cannot help with requests involving misuse, misrepresentation, or misappropriation of project funds or assets.
-
-All expenditures must be properly justified, approved, and used for legitimate project purposes as defined in the Manual for Development Projects 2024.
-
-**These interactions are logged for internal audit and quality purposes.**"""
+REDLINE_MISUSE_RESPONSE = """I cannot assist with misuse or misappropriation of project funds. All requests must follow the Manual for Development Projects 2024."""
 
 # ============================================================================
 # OFF-SCOPE RESPONSES
