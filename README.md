@@ -1,6 +1,6 @@
 ﻿# PDBot – Planning & Development Manual RAG Chatbot
 
-![Version](https://img.shields.io/badge/version-2.0.5-blue)
+![Version](https://img.shields.io/badge/version-2.0.6-blue)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-Proprietary-red)
 ![Accuracy](https://img.shields.io/badge/accuracy-80--85%25-brightgreen)
@@ -225,7 +225,7 @@ src/
 │   ├── local_model.py        # Ollama integration (350+ lines)
 │   │                         # v2.0.0 polished prompt + forbidden response detection
 │   ├── pretrained_model.py   # HuggingFace model support
-│   └── qwen_pretrained.py    # Qwen model wrapper
+│   └── local_model.py        # Ollama LLM wrapper
 │
 └── utils/
     ├── text_utils.py         # NLTK sentence tokenization, numeric preservation
@@ -576,8 +576,7 @@ PDBOT/
 │   ├── models/                   # LLM backends
 │   │   ├── __init__.py
 │   │   ├── local_model.py        # Ollama integration (315 lines)
-│   │   ├── pretrained_model.py   # HuggingFace models
-│   │   └── qwen_pretrained.py    # Qwen wrapper
+│   │   └── pretrained_model.py   # HuggingFace models (legacy)
 │   ├── utils/                    # Utilities
 │   │   ├── __init__.py
 │   │   ├── persist.py            # Chat history save/load

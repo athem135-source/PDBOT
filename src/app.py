@@ -388,14 +388,9 @@ def _qdrant_url() -> str:
 
 from src.models.local_model import LocalModel
 from typing import Any as _Any
-try:
-    from src.models.pretrained_model import PretrainedModel as _ImportedPretrainedModel
-    PretrainedModel: _Any = _ImportedPretrainedModel  # type: ignore[assignment]
-except Exception:
-    class _FallbackPretrainedModel:
-        def __init__(self, *args, **kwargs):
-            raise RuntimeError("Pretrained model backend not available.")
-    PretrainedModel: _Any = _FallbackPretrainedModel
+
+# v2.0.5: Removed pretrained model support (Qwen) - using Ollama only
+
 try:
     # Suppress TensorFlow/Keras warnings during import
     import warnings
@@ -580,7 +575,7 @@ def _load_builtin_manual(force: bool = False):
     else:
         st.error("Manual could not be read. Install 'langchain-community' or 'pypdf' to enable PDF reading.")
 
-_HEADER = "<h1 style='margin-bottom:0; font-weight:800;'>PDBOT</h1><p style='opacity:.5;margin-top:0px;font-size:0.9em;'>v2.0.5</p><p style='opacity:.8;margin-top:4px'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</p>"
+_HEADER = "<h1 style='margin-bottom:0; font-weight:800;'>PDBOT</h1><p style='opacity:.5;margin-top:0px;font-size:0.9em;'>v2.0.6</p><p style='opacity:.8;margin-top:4px'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</p>"
 # Single, hardcoded default logo path: place your logo at this location and it will be used automatically
 # Prefer explicit light-theme logo filename for white theme
 HARDCODED_LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "branding_logo-black.png")
@@ -704,7 +699,7 @@ def render_brand_header():
     else:
         html.append("<div class='brand-logo' style='font-weight:700;opacity:.9'>Planning &amp; Development</div>")
     html.append("<div class='brand-title'>PDBOT</div>")
-    html.append("<div style='text-align:center; opacity:0.5; margin-top:4px; font-size:0.9em;'>v2.0.5</div>")
+    html.append("<div style='text-align:center; opacity:0.5; margin-top:4px; font-size:0.9em;'>v2.0.6</div>")
     html.append("</div>")  # close brand-card
     html.append("<div class='brand-sub'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</div>")
     html.append("</div>")
@@ -1909,8 +1904,26 @@ def generate_answer_generative(question: str) -> str:
     warning_reason = quality_check.get("reason", "")
 
     # Legacy-style Generative answering: simple prompt -> compose -> sanitize
-    engine = st.session_state.engine if "engine" in st.session_state else "LLM (Ollama)"
+    # v2.0.5: Ollama only (removed pretrained mode)
     base_answer = ""
+    try:
+        gen = LocalModel(model_name=globals().get("model_name", os.getenv("OLLAMA_MODEL", "mistral:latest")), backend="ollama")
+        try:
+            probe = gen.ollama_status()
+            if not probe.get("alive"):
+                raise RuntimeError("Ollama is not reachable. Start Ollama or pull the model.")
+        except Exception:
+            # Proceed with an empty base answer and rely on compose_answer
+            pass
+        # FIX #8: Increased max_new_tokens from 1200 to 1800 for fuller answers
+        base_answer = gen.generate_response(
+            question=question,
+            context=context_text,
+            max_new_tokens=1800,
+            temperature=0.15,
+        ) or ""
+    except Exception:
+        base_answer = ""
     try:
         if engine == "LLM (Ollama)":
             gen = LocalModel(model_name=globals().get("model_name", os.getenv("OLLAMA_MODEL", "mistral:latest")), backend="ollama")
@@ -1928,21 +1941,6 @@ def generate_answer_generative(question: str) -> str:
                 max_new_tokens=1800,
                 temperature=0.15,
             ) or ""
-        else:
-            # Pretrained (local) route
-            try:
-                gen = PretrainedModel(
-                    entrypoint=st.session_state.get("pretrained_entry") or "",
-                    model_path=st.session_state.get("pretrained_path") or "",
-                )
-                base_answer = gen.predict(
-                    question=question,
-                    context=context_text,
-                    chunks=[h.get("text", "") for h in (st.session_state.get("last_hits") or [])],
-                    raw_pages=st.session_state.get("raw_pages") or [],
-                ) or ""
-            except Exception:
-                base_answer = ""
     except Exception:
         base_answer = ""
 
@@ -2241,14 +2239,12 @@ The vector database (Qdrant) is not responding. This prevents searching the manu
         # Minimal metadata used by inline regen (fallbacks exist if missing)
         _engine = st.session_state.engine if "engine" in st.session_state else "LLM (Ollama)"
         st.session_state["last_meta"] = {
-            "backend": ("ollama" if _engine == "LLM (Ollama)" else "pretrained"),
+            "backend": "ollama",
             "model": getattr(locals().get("generator", None), "model_name", os.getenv("OLLAMA_MODEL", "mistral:latest")),
             "max_new_tokens": int(globals().get("max_tokens", 768)),
             "top_k": int(globals().get("top_k", 6)),
             "exact_mode": str(st.session_state.get("answer_mode", "Generative")).lower().startswith("exact"),
             "temperature": float(globals().get("temperature", 0.2)),
-            "pretrained_entry": st.session_state.get("pretrained_entry") or "",
-            "pretrained_path": st.session_state.get("pretrained_path") or "",
         }
     except Exception:
         pass
@@ -2389,29 +2385,15 @@ with st.sidebar:
     # Initialize engine/predictor state defaults
     if "engine" not in st.session_state:
         st.session_state.engine = "LLM (Ollama)"
-    if "pretrained_entry" not in st.session_state:
-        st.session_state.pretrained_entry = ""
-    if "pretrained_path" not in st.session_state:
-        st.session_state.pretrained_path = ""
+    # v2.0.5: Removed pretrained mode - Ollama only
 
     if st.session_state.get("is_admin", False):
         with st.expander("Options", expanded=True):
-            # Simple on/off for Pretrained mode (customer-friendly)
-            use_pretrained_sidebar = st.toggle(
-                "Pretrained mode",
-                value=(st.session_state.engine == "Pretrained (local)"),
-                help="Turn ON to use a small built-in model (Qwen). Turn OFF to use Ollama.")
-            # Sync engine with toggle
-            st.session_state.engine = "Pretrained (local)" if use_pretrained_sidebar else "LLM (Ollama)"
-            # If enabling pretrained and no entrypoint set, apply built-in default
-            if use_pretrained_sidebar and not st.session_state.get("pretrained_entry"):
-                st.session_state.pretrained_entry = "src.models.qwen_pretrained:predict"
-
-            engine = st.session_state.engine
-            if engine == "LLM (Ollama)":
-                model_name = st.text_input("Ollama model", value=os.getenv("OLLAMA_MODEL", "mistral:latest"))
-            else:
-                model_name = st.text_input("Ollama model (for reference)", value=os.getenv("OLLAMA_MODEL", "mistral:latest"), help="Not used in Pretrained mode")
+            # v2.0.5: Removed pretrained toggle - Ollama only
+            engine = "LLM (Ollama)"
+            st.session_state.engine = engine
+            
+            model_name = st.text_input("Ollama model", value=os.getenv("OLLAMA_MODEL", "mistral:latest"))
             # Answer mode control is available in the Chat input bar.
             # FIX #10: Increased defaults and ranges for better retrieval
             top_k = st.slider("Top-K context chunks", 1, 20, 10)
@@ -2490,79 +2472,21 @@ with st.sidebar:
         st.info("Settings reset.")
         st.session_state["manual_action"] = None
 
-    # Pretrained options (advanced)
-    if st.session_state.get("is_admin", False) and st.session_state.engine == "Pretrained (local)":
-        with st.expander("Pretrained settings", expanded=False):
-            st.text_input("Entrypoint (module:function or path.py:function)", key="pretrained_entry", value=st.session_state.get("pretrained_entry") or os.getenv("PRETRAINED_ENTRYPOINT", ""))
-            st.text_input("Model artifact path (optional)", key="pretrained_path", value=st.session_state.get("pretrained_path") or os.getenv("PRETRAINED_MODEL_PATH", ""))
-            # FIX-Preload: one-click preload/caching of the built-in model
-            c1, c2 = st.columns([1,2])
-            with c1:
-                do_preload = st.button("Preload model", help="Download/initialize the pretrained model now so first answer is instant.")
-            with c2:
-                st.caption("First run takes a few minutes; cached under .hf_cache for reuse")
-            if do_preload:
-                try:
-                    import importlib
-                    import threading, time
-                    ep = st.session_state.get("pretrained_entry") or "src.models.qwen_pretrained:predict"
-                    mod_path = ep.split(":")[0]
-                    mod = importlib.import_module(mod_path)
-                    # Loading bar that advances while the model downloads/loads
-                    prog = st.progress(0)
-                    status_holder = st.empty()
-                    result: dict = {}
-                    error_holder: dict[str, Exception | None] = {"err": None}
+    # v2.0.5: Removed pretrained options - Ollama only
 
-                    def _run_preload():
-                        try:
-                            res = getattr(mod, "preload")(st.session_state.get("pretrained_path") or None)
-                            result.update(res or {})
-                        except Exception as _e:
-                            error_holder["err"] = _e
-
-                    t = threading.Thread(target=_run_preload, daemon=True)
-                    t.start()
-                    pct = 0
-                    phase_msgs = [
-                        "Checking local cache…",
-                        "Downloading tokenizer…",
-                        "Downloading model weights…",
-                        "Initializing model…",
-                    ]
-                    mi = 0
-                    while t.is_alive():
-                        pct = (pct + 2) % 100
-                        prog.progress(max(1, pct))
-                        status_holder.info(phase_msgs[mi % len(phase_msgs)])
-                        mi += 1
-                        time.sleep(0.3)
-                    t.join()
-                    prog.progress(100)
-                    if error_holder["err"] is not None:
-                        raise error_holder["err"]
-                    st.success(f"Pretrained ready: {result.get('model_id')} on {result.get('device')} (cache: {result.get('cache')})")
-                except Exception as e:
-                    st.error(f"Preload failed: {e}")
-
-    # Engine status
-    if st.session_state.get("is_admin", False) and st.session_state.engine == "LLM (Ollama)":
+    # Engine status (Ollama only)
+    if st.session_state.get("is_admin", False):
         _lm_probe = LocalModel(model_name=model_name, backend="ollama")
         _status = _lm_probe.ollama_status()
         icon = "✅" if _status.get("alive") else "❌"
         model_icon = "✅" if _status.get("has_model") else "❌"
         st.markdown(f"Ollama: {icon} &nbsp;&nbsp; Model '{model_name}': {model_icon}")
         with st.sidebar.expander("Backend status", expanded=False):
-            st.write("Selected engine: LLM (Ollama)")
+            st.write("Engine: LLM (Ollama)")
             if _status.get("alive"):
                 st.success("Ollama reachable")
             else:
                 st.error("Ollama not reachable. Start Ollama and pull the model.")
-    elif st.session_state.get("is_admin", False):
-        with st.sidebar.expander("Backend status", expanded=False):
-            st.write("Selected engine: Pretrained (local)")
-            st.info("Simple mode uses the built-in Qwen 0.5B predictor (CPU-friendly). Advanced users can set a custom entrypoint.")
-    # Removed future roadmap notes from the sidebar for a cleaner UI
 
     # Retrieval / LangChain / Qdrant status (compact: Online/Offline)
     if st.session_state.get("is_admin", False):
@@ -3104,42 +3028,28 @@ with tab_chat:
                                 words_target = max(words_target, 380)
                             # Pass only raw context to the model; LocalModel injects its own system prompt
                             base = ""
-                            if engine == "LLM (Ollama)":
-                                generator = LocalModel(model_name=model_name, backend="ollama")
-                                try:
-                                    probe = generator.ollama_status()
-                                    if not probe.get("alive"):
-                                        st.error("Ollama is not reachable. Please start Ollama and ensure the model is pulled.")
-                                        raise RuntimeError("ollama_not_available")
-                                except Exception:
-                                    st.error("Ollama not available.")
-                                    raise
-                                base = call_with_timeout(
-                                    generator.generate_response,
-                                    30,
-                                    question=question,
-                                    context=context,
-                                    max_new_tokens=int(max_tokens),
-                                    temperature=0.15,
-                                ) or ""
-                            else:
-                                generator = PretrainedModel(entrypoint=st.session_state.get("pretrained_entry") or "", model_path=st.session_state.get("pretrained_path") or "")
-                                try:
-                                    base = call_with_timeout(
-                                        generator.predict,
-                                        30,
-                                        question=question,
-                                        context=context,
-                                        chunks=[h.get("text", "") for h in (st.session_state.get("last_hits") or [])],
-                                        raw_pages=st.session_state.get("raw_pages") or [],
-                                    ) or ""
-                                except Exception as _e_pred:
-                                    logging.exception("Pretrained prediction failed")
-                                    base = ""
+                            # v2.0.5: Ollama only (removed pretrained mode)
+                            generator = LocalModel(model_name=model_name, backend="ollama")
+                            try:
+                                probe = generator.ollama_status()
+                                if not probe.get("alive"):
+                                    st.error("Ollama is not reachable. Please start Ollama and ensure the model is pulled.")
+                                    raise RuntimeError("ollama_not_available")
+                            except Exception:
+                                st.error("Ollama not available.")
+                                raise
+                            base = call_with_timeout(
+                                generator.generate_response,
+                                30,
+                                question=question,
+                                context=context,
+                                max_new_tokens=int(max_tokens),
+                                temperature=0.15,
+                            ) or ""
 
                             # First-answer shortness guard: retry once with more tokens if answer too short and we have evidence
                             try:
-                                if len((base or "").strip()) < 220 and len(hits) >= 3 and engine == "LLM (Ollama)":
+                                if len((base or "").strip()) < 220 and len(hits) >= 3:
                                     base = call_with_timeout(
                                         generator.generate_response,
                                         30,
@@ -3231,8 +3141,6 @@ with tab_chat:
                     "top_k": top_k,
                     "exact_mode": bool(is_exact),
                     "temperature": temperature,
-                    "pretrained_entry": st.session_state.get("pretrained_entry") or "",
-                    "pretrained_path": st.session_state.get("pretrained_path") or "",
                 }
 
                 # Keep suggestions disabled

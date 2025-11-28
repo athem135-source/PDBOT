@@ -2742,5 +2742,21 @@
   {
     "role": "assistant",
     "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The Foreign Exchange Component (FEC) of projects in Pakistan is defined as the Pakistani Rupee equivalent of the FEC, determined by using the 'Bank Floating Average Exchange Rate' of the relevant currency from the State Bank of Pakistan's website for the month preceding the submission of the PC-I and PC-II to the Planning Commission (Annexure 7). This definition is found on page 1 of the provided text. Source: Manual for Development Projects 2024, p.60</div>"
+  },
+  {
+    "role": "user",
+    "content": "State the exact financial ceiling after which ECNEC must approve a project, regardless of forum. Provide the numeric value."
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The text states that in cases where foreign exchange or foreign assistance is more than 25 percent of the total cost of the project, the approving forum will be CDWP/ECNEC, and there is no specified numerical value for the financial ceiling mentioned. Source: Manual for Development Projects 2024, p.169</div>"
+  },
+  {
+    "role": "user",
+    "content": "State the exact financial ceiling after which ECNEC must approve a project, regardless of forum. Provide the numeric value."
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>The financial ceiling for projects that require approval from ECNEC is when foreign exchange or foreign assistance constitutes more than 25% of the total project cost, regardless of the project's overall cost. This percentage threshold indicates a significant involvement of foreign resources in the project. Source: Manual for Development Projects 2024, p.169</div>"
   }
 ]

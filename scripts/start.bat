@@ -1,6 +1,6 @@
 @echo off
 REM ============================================
-REM PDBot Quick Start - v2.0.5
+REM PDBot Quick Start - v2.0.6
 REM One-click setup and launch
 REM ============================================
 
@@ -9,7 +9,7 @@ pushd "%SCRIPT_DIR%\.." >NUL
 
 echo.
 echo ========================================
-echo    PDBot Quick Start v2.0.5
+echo    PDBot Quick Start v2.0.6
 echo ========================================
 echo.
 

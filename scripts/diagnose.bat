@@ -2,7 +2,7 @@
 setlocal EnableDelayedExpansion
 
 REM ============================================
-REM PDBot Troubleshooting & Diagnostics - v2.0.5
+REM PDBot Troubleshooting & Diagnostics - v2.0.6
 REM Checks Python, venv, key packages, Ollama, Qdrant, ports, disk
 REM Default Qdrant port: 6333 (override via .env QDRANT_PORT or PNDBOT_QDRANT_URL)
 REM ============================================
@@ -25,7 +25,7 @@ if defined PNDBOT_QDRANT_URL (
 
 echo.
 echo ========================================
-echo    PDBot System Diagnostics (v2.0.5)
+echo    PDBot System Diagnostics (v2.0.6)
 echo ========================================
 echo.
 

@@ -53,8 +53,7 @@ PND BOT MINI DEMO/
 │   │   ├── __init__.py
 │   │   ├── custom_predictor_template.py  # Custom model template
 │   │   ├── local_model.py       # Mistral 7B via Ollama (315 lines)
-│   │   ├── pretrained_model.py  # Generic pretrained model
-│   │   └── qwen_pretrained.py   # Qwen model support
+│   │   └── pretrained_model.py  # Generic pretrained model (legacy)
 │   │
 │   └── utils/                   # Utility modules
 │       ├── __init__.py
