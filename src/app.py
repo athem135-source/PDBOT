@@ -575,7 +575,7 @@ def _load_builtin_manual(force: bool = False):
     else:
         st.error("Manual could not be read. Install 'langchain-community' or 'pypdf' to enable PDF reading.")
 
-_HEADER = "<h1 style='margin-bottom:0; font-weight:800;'>PDBOT</h1><p style='opacity:.5;margin-top:0px;font-size:0.9em;'>v2.0.6</p><p style='opacity:.8;margin-top:4px'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</p>"
+_HEADER = "<h1 style='margin-bottom:0; font-weight:800;'>PDBOT</h1><p style='opacity:.5;margin-top:0px;font-size:0.9em;'>v2.0.7</p><p style='opacity:.8;margin-top:4px'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</p>"
 # Single, hardcoded default logo path: place your logo at this location and it will be used automatically
 # Prefer explicit light-theme logo filename for white theme
 HARDCODED_LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "branding_logo-black.png")
@@ -699,7 +699,7 @@ def render_brand_header():
     else:
         html.append("<div class='brand-logo' style='font-weight:700;opacity:.9'>Planning &amp; Development</div>")
     html.append("<div class='brand-title'>PDBOT</div>")
-    html.append("<div style='text-align:center; opacity:0.5; margin-top:4px; font-size:0.9em;'>v2.0.6</div>")
+    html.append("<div style='text-align:center; opacity:0.5; margin-top:4px; font-size:0.9em;'>v2.0.7</div>")
     html.append("</div>")  # close brand-card
     html.append("<div class='brand-sub'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</div>")
     html.append("</div>")
@@ -1905,7 +1905,9 @@ def generate_answer_generative(question: str) -> str:
 
     # Legacy-style Generative answering: simple prompt -> compose -> sanitize
     # v2.0.5: Ollama only (removed pretrained mode)
+    # v2.0.7: Added Groq fallback and force_groq toggle for admin testing
     base_answer = ""
+    _force_groq = st.session_state.get("force_groq_fallback", False)
     try:
         gen = LocalModel(model_name=globals().get("model_name", os.getenv("OLLAMA_MODEL", "mistral:latest")), backend="ollama")
         try:
@@ -1921,6 +1923,7 @@ def generate_answer_generative(question: str) -> str:
             context=context_text,
             max_new_tokens=1800,
             temperature=0.15,
+            force_groq=_force_groq,
         ) or ""
     except Exception:
         base_answer = ""
@@ -1940,6 +1943,7 @@ def generate_answer_generative(question: str) -> str:
                 context=context_text,
                 max_new_tokens=1800,
                 temperature=0.15,
+                force_groq=_force_groq,
             ) or ""
     except Exception:
         base_answer = ""
@@ -2474,19 +2478,42 @@ with st.sidebar:
 
     # v2.0.5: Removed pretrained options - Ollama only
 
-    # Engine status (Ollama only)
+    # Engine status (Ollama + Groq fallback)
     if st.session_state.get("is_admin", False):
         _lm_probe = LocalModel(model_name=model_name, backend="ollama")
         _status = _lm_probe.ollama_status()
+        _groq_ok = _lm_probe.groq_available()
         icon = "✅" if _status.get("alive") else "❌"
         model_icon = "✅" if _status.get("has_model") else "❌"
-        st.markdown(f"Ollama: {icon} &nbsp;&nbsp; Model '{model_name}': {model_icon}")
+        groq_icon = "✅" if _groq_ok else "❌"
+        st.markdown(f"Ollama: {icon} &nbsp;&nbsp; Model '{model_name}': {model_icon} &nbsp;&nbsp; Groq fallback: {groq_icon}")
         with st.sidebar.expander("Backend status", expanded=False):
-            st.write("Engine: LLM (Ollama)")
+            st.write("Engine: LLM (Ollama + Groq fallback)")
             if _status.get("alive"):
                 st.success("Ollama reachable")
             else:
-                st.error("Ollama not reachable. Start Ollama and pull the model.")
+                st.warning("Ollama not reachable. Will use Groq fallback if available.")
+            if _groq_ok:
+                st.success("Groq API available (fallback)")
+            else:
+                st.info("Groq API not available")
+            
+            # v2.0.7: Test Groq fallback button
+            st.divider()
+            st.caption("🧪 Test Groq Fallback")
+            if "force_groq_fallback" not in st.session_state:
+                st.session_state.force_groq_fallback = False
+            force_groq = st.toggle(
+                "Force Groq (bypass Ollama)",
+                value=st.session_state.force_groq_fallback,
+                key="groq_toggle",
+                help="Enable to test Groq API directly, bypassing Ollama"
+            )
+            st.session_state.force_groq_fallback = force_groq
+            if force_groq:
+                st.info("🚀 Next query will use Groq API directly")
+            else:
+                st.caption("Normal mode: Ollama first, Groq as fallback")
 
     # Retrieval / LangChain / Qdrant status (compact: Online/Offline)
     if st.session_state.get("is_admin", False):

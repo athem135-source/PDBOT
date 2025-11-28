@@ -1,10 +1,11 @@
 """
-PDBot Local Model v3.0.0
+PDBot Local Model v3.1.0
 Mistral-optimized with simple system prompt.
-Short answers, no hallucination, no false refusals.
+Groq fallback when Ollama fails.
 """
 import os
 import re
+import logging
 from typing import Optional, Dict, Any, Tuple, cast
 import requests
 
@@ -12,6 +13,11 @@ _CACHE: Dict[str, Tuple[str, object]] = {}
 
 DEFAULT_MODEL = os.getenv("CHATBOT_MODEL", "google/flan-t5-small")
 FALLBACK_MODEL = os.getenv("CHATBOT_FALLBACK_MODEL", "distilgpt2")
+
+# Groq API configuration (set GROQ_API_KEY environment variable)
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")  # Fast and capable
 
 # =============================================================================
 # SYSTEM PROMPT (Mistral-optimized, extremely simple)
@@ -109,6 +115,53 @@ class LocalModel:
             pass
         return status
 
+    def _groq_generate(self, prompt: str, max_tokens: int, temperature: float = 0.2, system: Optional[str] = None) -> str:
+        """Generate response from Groq API (fallback when Ollama fails)."""
+        if not GROQ_API_KEY:
+            return "(Groq API key not configured)"
+        
+        headers = {
+            "Authorization": f"Bearer {GROQ_API_KEY}",
+            "Content-Type": "application/json"
+        }
+        
+        messages = []
+        if system:
+            messages.append({"role": "system", "content": system})
+        messages.append({"role": "user", "content": prompt})
+        
+        payload = {
+            "model": GROQ_MODEL,
+            "messages": messages,
+            "temperature": max(0.1, min(0.7, temperature)),
+            "max_tokens": min(max_tokens, 500),
+        }
+        
+        try:
+            r = requests.post(GROQ_API_URL, headers=headers, json=payload, timeout=30)
+            r.raise_for_status()
+            data = r.json()
+            return str(data.get("choices", [{}])[0].get("message", {}).get("content", "")).strip()
+        except requests.exceptions.RequestException as e:
+            logging.error(f"[Groq] API error: {e}")
+            return f"(Groq error: {e})"
+        except Exception as e:
+            logging.error(f"[Groq] Error: {e}")
+            return f"(Error: {e})"
+
+    def groq_available(self) -> bool:
+        """Check if Groq API is available."""
+        if not GROQ_API_KEY:
+            return False
+        try:
+            # Quick test with minimal request
+            headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
+            payload = {"model": GROQ_MODEL, "messages": [{"role": "user", "content": "hi"}], "max_tokens": 5}
+            r = requests.post(GROQ_API_URL, headers=headers, json=payload, timeout=10)
+            return r.status_code == 200
+        except Exception:
+            return False
+
     def _truncate_answer(self, text: str, max_words: int = 150) -> str:
         """Keep first paragraph, max 150 words."""
         if not text:
@@ -150,9 +203,14 @@ class LocalModel:
         question: str,
         context: str = "",
         max_new_tokens: int = 150,
-        temperature: float = 0.2
+        temperature: float = 0.2,
+        force_groq: bool = False
     ) -> str:
-        """Generate answer from question and context."""
+        """Generate answer from question and context.
+        
+        Args:
+            force_groq: If True, bypass Ollama and use Groq directly (for testing)
+        """
         
         # No context = not found
         if not context or not context.strip():
@@ -170,6 +228,34 @@ class LocalModel:
         
         doc_name = "Manual for Development Projects 2024"
         
+        # v2.0.7: Force Groq mode for testing
+        if force_groq:
+            logging.info("[LocalModel] Force Groq mode enabled - bypassing Ollama")
+            groq_prompt = f"""You are PDBOT, an assistant for the Manual for Development Projects.
+
+Based on the following context, answer the question in 4-7 sentences.
+
+Context:
+{context[:3000]}
+
+Question: {question}
+
+Provide a direct, informative answer:"""
+            
+            raw = self._groq_generate(
+                groq_prompt,
+                max_tokens=max_new_tokens,
+                temperature=0.3,
+                system=SYSTEM_PROMPT
+            )
+            logging.info(f"[LocalModel] Groq (forced) response: {raw[:200] if raw else 'EMPTY'}...")
+            
+            answer = self._truncate_answer(raw, max_words=150)
+            if "source:" not in answer.lower() and "p." not in answer.lower():
+                citation = self._format_citation(doc_name, page)
+                answer = f"{answer}\n\n{citation}"
+            return answer
+        
         if self.backend == "ollama":
             # Use a simpler, more direct prompt format
             prompt = f"""Context from Manual:
@@ -179,12 +265,19 @@ Question: {question}
 
 Based on the context above, provide a direct answer:"""
             
+            # Try Ollama first
+            ollama_failed = False
             raw = self._ollama_generate(
                 prompt,
                 max_tokens=max_new_tokens,
                 temperature=temperature,
                 system=SYSTEM_PROMPT
             )
+            
+            # Check if Ollama returned an error
+            if raw.startswith("(Ollama error:") or raw.startswith("(Error:"):
+                logging.warning(f"[LocalModel] Ollama failed: {raw}, falling back to Groq...")
+                ollama_failed = True
             
             logging.info(f"[LocalModel] First response: {raw[:200] if raw else 'EMPTY'}...")
             
@@ -258,6 +351,31 @@ SUMMARY:"""
                         system="Summarize the given text."
                     )
                     logging.info(f"[LocalModel] Retry 2 response: {raw[:200] if raw else 'EMPTY'}...")
+            
+            # v2.0.7: GROQ FALLBACK - If Ollama failed or still refusing, try Groq
+            raw_lower = raw.lower() if raw else ""
+            final_refusal = any(p in raw_lower for p in refusal_phrases) or ollama_failed or raw.startswith("(")
+            
+            if final_refusal and ctx_has_signal:
+                logging.info("[LocalModel] All Ollama attempts failed, trying Groq fallback...")
+                groq_prompt = f"""You are PDBOT, an assistant for the Manual for Development Projects.
+
+Based on the following context, answer the question in 4-7 sentences.
+
+Context:
+{context[:3000]}
+
+Question: {question}
+
+Provide a direct, informative answer:"""
+                
+                raw = self._groq_generate(
+                    groq_prompt,
+                    max_tokens=max_new_tokens,
+                    temperature=0.3,
+                    system=SYSTEM_PROMPT
+                )
+                logging.info(f"[LocalModel] Groq response: {raw[:200] if raw else 'EMPTY'}...")
             
             # Truncate to 150 words for fuller answers
             answer = self._truncate_answer(raw, max_words=150)

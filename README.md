@@ -1,6 +1,6 @@
 ﻿# PDBot – Planning & Development Manual RAG Chatbot
 
-![Version](https://img.shields.io/badge/version-2.0.6-blue)
+![Version](https://img.shields.io/badge/version-2.0.7-blue)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-Proprietary-red)
 ![Accuracy](https://img.shields.io/badge/accuracy-80--85%25-brightgreen)
@@ -26,6 +26,25 @@
 - [Contributing](#-contributing)
 - [License](#-license)
 - [Contact](#-contact)
+
+---
+
+## 🚀 What's New in v2.0.7
+
+### 🔌 Groq API Fallback
+- **Automatic Fallback** - When Ollama is unavailable or returns errors, PDBot automatically falls back to Groq API (`llama-3.1-8b-instant`)
+- **Admin Toggle** - New "Force Groq" toggle in Backend status expander for testing Groq directly
+- **Status Indicators** - Admin panel now shows both Ollama and Groq availability status
+
+### ✅ Admin Panel Enhancements
+- Groq fallback status indicator (✅/❌)
+- "Force Groq (bypass Ollama)" toggle for testing
+- Improved backend status display
+
+### 🛠️ v2.0.6 Changes (Previous)
+- Removed unused Qwen pretrained model (~200 lines removed)
+- Simplified to Ollama-only architecture
+- Faster startup time
 
 ---
 
@@ -92,6 +111,26 @@ All 9 critical dependencies updated to latest secure versions:
 ### ⚠️ Breaking Changes
 
 **langchain 0.2 → 0.3**: If you have custom code using langchain, review the [migration guide](https://python.langchain.com/docs/versions/migrating_chains/migration_guides).
+
+---
+
+## 🔮 Future Updates
+
+We are planning exciting enhancements for upcoming releases:
+
+### 🎨 React Chatbot Widget UI (Coming Soon)
+- **Embeddable Widget** - Drop-in React component for any website
+- **Modern Chat Interface** - Clean, responsive design with dark/light mode
+- **Streaming Responses** - Real-time text streaming for better UX
+- **Mobile-First** - Fully responsive for mobile devices
+- **Customizable Themes** - Match your organization's branding
+
+### 📋 Planned Features
+- Multi-document support with document selector
+- Voice input/output capabilities
+- Export chat history to PDF
+- Advanced analytics dashboard
+- API rate limiting and usage tracking
 
 ---
 
