@@ -207,6 +207,10 @@ class LocalModel:
         
         doc_name = "Manual for Development Projects 2024"
         
+        # Step 0: Remove any existing ✅ Answer: prefix (will be added by app.py)
+        text = re.sub(r"^[\s\n]*✅\s*Answer:?\s*", "", text, flags=re.IGNORECASE)
+        text = re.sub(r"^[\s\n]*Answer:?\s*", "", text, flags=re.IGNORECASE)
+        
         # Step 1: Remove any existing citations (we'll add clean one at end)
         text = re.sub(r"\n*Source:.*$", "", text, flags=re.IGNORECASE | re.MULTILINE)
         text = re.sub(r"\(Source:.*?\)", "", text, flags=re.IGNORECASE)

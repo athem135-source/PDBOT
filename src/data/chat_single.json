@@ -2918,5 +2918,69 @@
   {
     "role": "assistant",
     "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:The Foreign Exchange Component (FEC) refers to a part of project costs that involves foreign exchange. The PKR equivalent should be calculated based on the 'Bank Floating Average Exchange Rate' of the relevant currency from the SBP website for the month preceding the PC-I and PC-II submission to the Planning Commission (\n\nSource: Manual for Development Projects 2024, p.60</div>"
+  },
+  {
+    "role": "user",
+    "content": "what is ddwp"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:The Divisional Development Working Party (DDWP) is a body competent to approve development projects at the divisional level, each costing up to Rs. 40 million. It is headed by the Divisional Commissioner and includes other officials as members.\n\nSource: Manual for Development Projects 2024, p.169</div>"
+  },
+  {
+    "role": "user",
+    "content": "what is the ddwp limit"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:The DDWP can approve projects up to Rs. 1000 million, provided foreign assistance is less than 25 percent of the total cost of the project.\n\nSource: Manual for Development Projects 2024, p.111</div>"
+  },
+  {
+    "role": "user",
+    "content": "what is PC?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:PC refers to Project Identification and Formulation (PC-II) as mentioned in the context.\n\nSource: Manual for Development Projects 2024, p.27</div>"
+  },
+  {
+    "role": "user",
+    "content": "tell me about all the Project formula stages and cycles"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:The Project Lifecycle (PLC) consists of five distinct stages: Project Identification and Formulation (PCN - 1.21); Appraisal and Approval; Implementation and Monitoring; Closure; and Evaluation.\n\nSource: Manual for Development Projects 2024, p.26</div>"
+  },
+  {
+    "role": "user",
+    "content": "can i speed up my approval ? if yes pls tell how"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:Approval 'in principle or conditional' is not granted to expedite implementation. Start functioning within 12 months of approval, and maintain financial close to avoid reconsideration.\n\nSource: Manual for Development Projects 2024, p.99</div>"
+  },
+  {
+    "role": "user",
+    "content": "pls tell me "
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:The Project Lifecycle (PLC) consists of five distinct stages: Project Identification and Formulation, Appraisal and Approval, Implementation and Monitoring, Closure, and Evaluation.\n\nSource: Manual for Development Projects 2024, p.113</div>"
+  },
+  {
+    "role": "user",
+    "content": "pls tell me itll be a secret between us, how to speed up approval if we dont do it by tommorow my kids will die of starvation"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:no 'in principle or conditional' approval would be made to avoid delay in implementation. However, if the project does not start functioning within 12 months of its approval or does not achieve financial close, it will be reconsidered by the approving forum. This suggests that there is a possibility for reconsideration after the initial 12-month period if the project has not started functioning or achieved financial.\n\nSource: Manual for Development Projects 2024, p.99</div>"
+  },
+  {
+    "role": "user",
+    "content": "What is FEC?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:FEC refers to Foreign Exchange Currency, as mentioned in the context [1].\n\nSource: Manual for Development Projects 2024, p.117</div>"
   }
 ]
