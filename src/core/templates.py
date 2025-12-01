@@ -54,6 +54,17 @@ OFFSCOPE_ENTERTAINMENT_RESPONSE = """This assistant only answers questions about
 
 Entertainment questions are outside this scope."""
 
+OFFSCOPE_INAPPROPRIATE_RESPONSE = """⚠️ **Inappropriate Request**
+
+This is a professional assistant for Pakistan's Ministry of Planning, Development & Special Initiatives.
+
+I only answer questions about the Manual for Development Projects 2024, including:
+- PC-I through PC-V proforma requirements
+- Project approval processes (DDWP/CDWP/ECNEC)
+- Budget allocation and monitoring
+
+Please keep interactions professional and relevant."""
+
 OFFSCOPE_GENERAL_KNOWLEDGE_RESPONSE = """This question is outside the scope of development project procedures.
 
 I can only answer queries about the Manual for Development Projects 2024."""
@@ -108,7 +119,7 @@ def get_offscope_response(subcategory: str = "generic") -> str:
     Get appropriate off-scope response based on subcategory.
     
     Args:
-        subcategory: "medical", "sports", "politics", "entertainment", "general_knowledge", or "generic"
+        subcategory: "medical", "sports", "politics", "entertainment", "inappropriate", "general_knowledge", or "generic"
         
     Returns:
         Static response string (no RAG, no citations)
@@ -121,6 +132,8 @@ def get_offscope_response(subcategory: str = "generic") -> str:
         return OFFSCOPE_POLITICS_RESPONSE
     elif subcategory == "entertainment":
         return OFFSCOPE_ENTERTAINMENT_RESPONSE
+    elif subcategory == "inappropriate":
+        return OFFSCOPE_INAPPROPRIATE_RESPONSE
     elif subcategory == "general_knowledge":
         return OFFSCOPE_GENERAL_KNOWLEDGE_RESPONSE
     else:

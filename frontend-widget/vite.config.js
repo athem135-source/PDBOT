@@ -42,7 +42,10 @@ export default defineConfig({
   // Development server configuration
   server: {
     port: 3000,
+    host: true, // Expose to network
     open: true,
+    // Allow tunnel hosts (Cloudflare, localtunnel, etc.)
+    allowedHosts: 'all',
     // Proxy API requests to backend during development
     proxy: {
       '/chat': {

@@ -158,6 +158,25 @@ OFFSCOPE_POLITICS = [
     r"\b(?:protest|rally|march)\b.*\b(?:political|party)\b",
 ]
 
+# Sexual/inappropriate content patterns
+OFFSCOPE_SEXUAL = [
+    r"\b(?:sex|sexy|sexual|sexually)\b",
+    r"\b(?:have\s+sex|having\s+sex)\b",
+    r"\b(?:talk\s+sexy|talk\s+dirty|dirty\s+talk)\b",
+    r"\b(?:sexbot|sex\s*bot|porn|pornography|nude|naked)\b",
+    r"\b(?:hot\s+girl|hot\s+guy|hookup|hook\s*up|one\s+night\s+stand)\b",
+    r"\b(?:flirt|flirting|seduction|seduce)\b",
+    r"\b(?:kiss|kissing|make\s+out|making\s+out)\b.*\b(?:you|me|with)\b",
+    r"\b(?:dirty\s+stuff|naughty|intimate)\b.*\b(?:talk|tell|say)\b",
+    r"\b(?:erotic|sensual|foreplay)\b",
+    r"\b(?:dating|date\s+me|go\s+out\s+with\s+me)\b",
+    r"\b(?:be\s+my\s+(?:boyfriend|girlfriend|lover))\b",
+    r"\b(?:become\s+my\s+(?:boyfriend|girlfriend|lover))\b",
+    r"\b(?:love\s+me|marry\s+me|i\s+love\s+you)\b",
+    r"\b(?:you'?re?\s+(?:hot|cute|beautiful|handsome|attractive))\b",
+    r"\b(?:send\s+(?:nudes|pics|photos))\b",
+]
+
 # Red-line patterns (legal/ethical violations)
 REDLINE_BRIBERY = [
     r"\b(?:bribe|bribery|bribing|bribed)\b",
@@ -231,6 +250,7 @@ class MultiClassifier:
         self.offscope_recipe_re = [re.compile(p, re.IGNORECASE) for p in OFFSCOPE_RECIPE]
         self.offscope_entertainment_re = [re.compile(p, re.IGNORECASE) for p in OFFSCOPE_ENTERTAINMENT]
         self.offscope_politics_re = [re.compile(p, re.IGNORECASE) for p in OFFSCOPE_POLITICS]
+        self.offscope_sexual_re = [re.compile(p, re.IGNORECASE) for p in OFFSCOPE_SEXUAL]
         
         self.redline_bribery_re = [re.compile(p, re.IGNORECASE) for p in REDLINE_BRIBERY]
         self.redline_corruption_re = [re.compile(p, re.IGNORECASE) for p in REDLINE_CORRUPTION]
@@ -352,6 +372,16 @@ class MultiClassifier:
                 confidence=0.85,
                 should_use_rag=False,
                 response_template="offscope_politics"
+            )
+        
+        # Sexual/inappropriate content - highest confidence block
+        if self._match_any(q, self.offscope_sexual_re):
+            return ClassificationResult(
+                query_class=QueryClass.OFF_SCOPE.value,
+                subcategory="inappropriate",
+                confidence=0.95,
+                should_use_rag=False,
+                response_template="offscope_inappropriate"
             )
         
         # =====================================================================
