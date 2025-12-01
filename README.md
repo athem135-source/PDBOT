@@ -1,4 +1,3 @@
-
 <div align="center">
 
 
@@ -13,11 +12,39 @@ Ministry of Planning, Development & Special Initiatives
 
 An AI-powered document intelligence system for the Manual for Development Projects 2024, serving the planning and development community of Pakistan with accurate, contextual, and traceable responses.
 
-🚀 Quick Start￼ • 📖 Documentation￼ • 🏗️ Architecture￼ • 📊 Performance￼
+🚀 Quick Start￼ • 📖 Documentation￼ • 🏗️ System-architecture￼ • 📊 Performance￼
+
+⸻
+
+🌟 At a Glance
+
+PDBOT is a production-ready, Retrieval-Augmented Generation (RAG) assistant for the Manual for Development Projects 2024, built for real-world workloads inside government environments:
+	•	⚙️ 12-class query classifier (numeric, procedural, compliance, timelines, off-scope, red-line, etc.)
+	•	📄 Sentence-level retrieval with page citations and passage transparency
+	•	🧠 Session memory for contextual follow-ups and pronoun resolution
+	•	🛡️ Security-first design – input sanitization, CORS, and rate-limiting ready
+	•	🖥️ Embeddable React widget + Streamlit admin dashboard
 
 </div>
 
 
+
+⸻
+
+🔗 Table of Contents
+	1.	📋 Executive Summary￼
+	2.	🆕 What’s New in Version 2.2.0￼
+	3.	🎯 Core Capabilities￼
+	4.	🏗️ System Architecture￼
+	5.	🚀 Quick Start￼
+	6.	🌐 Website Integration￼
+	7.	📊 Performance Metrics￼
+	8.	🔒 Security Considerations￼
+	9.	📁 Project Structure￼
+	10.	📖 Documentation￼
+	11.	🤝 Contributing￼
+	12.	📞 Support & Contact￼
+	13.	📜 License￼
 
 ⸻
 
@@ -31,9 +58,10 @@ Metric	Achievement	Target
 In-Scope Accuracy	87.5%	≥ 85%
 Numeric Accuracy	92.3%	≥ 90%
 Off-Scope Detection	100%	100%
-Response Time	< 3 seconds	< 5 seconds
+Response Time	< 3 seconds	< 5 s
 Zero Hallucination	✅ Verified	Required
 
+Design Goal: Provide short, precise, source-backed answers while minimizing hallucination and maintaining strict procedural correctness for the Manual for Development Projects 2024.
 
 ⸻
 
@@ -57,8 +85,8 @@ Zero Hallucination	✅ Verified	Required
 
 🛡️ Enhanced Security
 	•	Input sanitization – Protection against injection attacks
-	•	Rate limiting ready – Infrastructure for production deployment
-	•	CORS configuration – Secure cross-origin requests
+	•	Rate limiting ready – Infrastructure hooks for production deployment
+	•	CORS configuration – Secure cross-origin requests for government domains
 
 ⸻
 
@@ -71,9 +99,13 @@ Zero Hallucination	✅ Verified	Required
 ├─────────────────────────────────────────────────────────────────┤
 │  User Query → Classifier → RAG Retrieval → LLM Generation →    │
 │               ↓              ↓               ↓                  │
-│           12-Class       Semantic +       Strict 45-70          │
+│           12-Class       Semantic +       Strict 45–70          │
 │           Detection      Reranking        Word Answers          │
 └─────────────────────────────────────────────────────────────────┘
+
+	•	Classifier-first design – Queries are assigned to one of 12 semantic classes.
+	•	RAG-centric – Answers are generated strictly from retrieved passages.
+	•	Length control – Responses are constrained to ~45–70 words by default for readability.
 
 2. Multi-Class Query Classification
 
@@ -83,14 +115,16 @@ definition_query	Terminology explanation	“What is PC-I?”
 procedure_query	Process workflows	“How does project revision work?”
 compliance_query	Regulatory requirements	“What are M&E requirements?”
 timeline_query	Duration/deadlines	“How long for ECNEC approval?”
-off_scope	Non-manual topics	Handled gracefully
-red_line	Inappropriate content	Blocked with warning
+off_scope	Non-manual topics	Non-MDP topics are handled gracefully
+red_line	Inappropriate content	Blocked with warning / safe response
+
+Additional internal classes handle reference queries, meta-questions, and navigation-style prompts.
 
 3. Retrieval-Augmented Generation
-	•	Sentence-level chunking – 1-3 sentence segments for precision
+	•	Sentence-level chunking – 1–3 sentence segments for precise grounding
 	•	Dual-phase retrieval – Vector search + cross-encoder reranking
-	•	Numeric boosting – +25% score for financial content
-	•	Page-level citations – Every response includes source page
+	•	Numeric boosting – +25% score boost for numeric/financial passages
+	•	Page-level citations – Every response includes source page information
 
 ⸻
 
@@ -100,26 +134,26 @@ red_line	Inappropriate content	Blocked with warning
 │                         PDBOT v2.2.0                                │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
-│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐          │
-│  │   React     │────▶│  Flask API  │────▶│    RAG      │          │
-│  │   Widget    │     │  (REST)     │     │  Pipeline   │          │
-│  └─────────────┘     └─────────────┘     └─────────────┘          │
+│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐           │
+│  │   React     │────▶│  Flask API  │────▶│    RAG      │           │
+│  │   Widget    │     │  (REST)     │     │  Pipeline   │           │
+│  └─────────────┘     └─────────────┘     └─────────────┘           │
 │        │                   │                   │                   │
 │        │                   │                   ▼                   │
-│        │                   │           ┌─────────────┐            │
-│        │                   │           │   Qdrant    │            │
-│        │                   │           │  (Vectors)  │            │
-│        │                   │           └─────────────┘            │
+│        │                   │           ┌─────────────┐             │
+│        │                   │           │   Qdrant    │             │
+│        │                   │           │  (Vectors)  │             │
+│        │                   │           └─────────────┘             │
 │        │                   │                   │                   │
 │        │                   ▼                   ▼                   │
-│        │           ┌─────────────┐     ┌─────────────┐            │
-│        │           │   Ollama    │ ←── │ Classifier  │            │
-│        │           │  (Mistral)  │     │ (12-Class)  │            │
-│        │           └─────────────┘     └─────────────┘            │
+│        │           ┌─────────────┐     ┌─────────────┐             │
+│        │           │   Ollama    │ ←── │ Classifier  │             │
+│        │           │  (Mistral)  │     │ (12-Class)  │             │
+│        │           └─────────────┘     └─────────────┘             │
 │        │                   │                                       │
 │        │                   ▼                                       │
 │        │           ┌─────────────┐                                 │
-│        └──────────▶│    Groq     │ (Fallback)                     │
+│        └──────────▶│    Groq     │  (Fallback – LLaMA 3)           │
 │                    │  (LLaMA 3)  │                                 │
 │                    └─────────────┘                                 │
 │                                                                     │
@@ -130,11 +164,11 @@ Technology Stack
 Layer	Technology	Purpose
 Frontend	React 18, Vite 5	Modern widget interface
 API	Flask, Flask-CORS	REST API bridge
-RAG	LangChain, Qdrant	Vector retrieval
+RAG	LangChain, Qdrant	Vector retrieval pipeline
 Embeddings	all-MiniLM-L6-v2	Semantic encoding
 Reranking	ms-marco-MiniLM-L-6-v2	Relevance scoring
-LLM	Ollama (Mistral)	Response generation
-Fallback	Groq (LLaMA 3.1)	Cloud failover
+LLM	Ollama (Mistral)	Local response generation
+Fallback	Groq (LLaMA 3.1)	Cloud failover LLM
 
 
 ⸻
@@ -145,16 +179,16 @@ Prerequisites
 	•	Python 3.10+
 	•	Node.js 18+ (for widget)
 	•	Docker Desktop (for Qdrant)
-	•	8GB RAM minimum
+	•	8GB RAM minimum recommended
 
 Option 1: Unified Launcher (Windows)
 
-# Double-click or run:
+:: Double-click or run:
 start_pdbot.bat
 
-# Select:
-# [1] React Widget (Modern UI)
-# [2] Streamlit App (Admin Dashboard)
+:: Then select:
+:: [1] React Widget (Modern UI)
+:: [2] Streamlit App (Admin Dashboard)
 
 Option 2: Manual Setup
 
@@ -172,11 +206,14 @@ docker run -d -p 6338:6333 --name pndbot-qdrant qdrant/qdrant
 ollama run mistral
 
 # 5a. For Widget (React)
-cd frontend-widget && npm install && npm run dev
-# In another terminal:
+cd frontend-widget
+npm install
+npm run dev
+
+# In another terminal (Flask widget API):
 python widget_api.py
 
-# 5b. For Streamlit App
+# 5b. For Streamlit App (Admin / Testing)
 streamlit run src/app.py
 
 
@@ -185,6 +222,8 @@ streamlit run src/app.py
 🌐 Website Integration
 
 Embedding the Widget
+
+Add the PDBOT widget to any government portal with a single script tag:
 
 <!-- PDBOT Widget Integration -->
 <script src="https://your-domain.gov.pk/pdbot/widget.js"></script>
@@ -203,7 +242,7 @@ cd frontend-widget
 npm run build
 
 # Output in dist/ folder
-# Deploy to your web server
+# Deploy dist/ to your web server (Nginx/Apache/etc.)
 
 Docker Deployment
 
@@ -242,10 +281,10 @@ System Performance
 
 Metric	Value
 Average response time	2.4 seconds
-Vector search latency	< 100ms
-Reranking latency	< 200ms
+Vector search latency	< 100 ms
+Reranking latency	< 200 ms
 LLM generation	1.5–2.0 seconds
-Memory per session	< 1MB
+Memory per session	< 1 MB
 
 
 ⸻
@@ -260,107 +299,7 @@ Data Protection
 Input Validation
 	•	Query length limits enforced
 	•	Special character sanitization
-	•	Injection attack prevention
+	•	Injection attack prevention (prompt & input level)
 
 Network Security
 	•	CORS restrictions configurable
-	•	HTTPS recommended for production
-	•	API rate limiting ready
-
-Access Control
-	•	Session-based isolation
-	•	No cross-session data leakage
-	•	Configurable authentication hooks
-
-⸻
-
-📁 Project Structure
-
-PDBOT/
-├── 📄 README.md                 # This document
-├── 📄 SECURITY.md               # Security policy
-├── 📄 CONTRIBUTING.md           # Contribution guidelines
-├── 📄 LICENSE                   # License information
-├── 📄 requirements.txt          # Python dependencies
-├── 📄 widget_api.py             # Flask API server
-├── 📄 start_pdbot.bat           # Unified launcher
-│
-├── 📂 src/                      # Core Python modules
-│   ├── 📄 app.py                # Streamlit application
-│   ├── 📄 rag_langchain.py      # RAG pipeline
-│   └── 📂 models/               # LLM wrappers
-│       ├── 📄 local_model.py    # Ollama/Groq integration
-│       └── 📄 multi_classifier.py # 12-class classifier
-│
-├── 📂 frontend-widget/          # React widget
-│   ├── 📂 src/
-│   │   ├── 📂 components/       # React components
-│   │   ├── 📂 utils/            # API & storage utilities
-│   │   └── 📂 styles/           # CSS styling
-│   └── 📄 package.json
-│
-├── 📂 config/                   # Configuration files
-├── 📂 feedback/                 # User feedback storage
-└── 📂 data/                     # Data files
-
-
-⸻
-
-🤝 Contributing
-
-We welcome contributions from government IT teams and authorized contractors.
-
-Reporting Issues
-
-Please submit issues through the official channels or create a GitHub issue with:
-	•	Clear description of the problem
-	•	Steps to reproduce
-	•	Expected vs actual behavior
-	•	System information
-
-Development Guidelines
-	1.	Follow PEP 8 for Python code
-	2.	Use ESLint configuration for JavaScript
-	3.	Write tests for new features
-	4.	Document all API changes
-
-⸻
-
-📞 Support & Contact
-
-Technical Support
-	•	Email: pdbot-support@planning.gov.pk
-	•	Documentation: docs/￼
-
-Project Information
-	•	Developed by: Ministry of Planning, Development & Special Initiatives
-	•	Version: 2.2.0
-	•	Release Date: December 2024
-
-⸻
-
-📜 License
-
-This software is developed for and owned by the Government of Pakistan, Ministry of Planning, Development & Special Initiatives. Usage is restricted to authorized government entities and approved contractors.
-
-⸻
-
-
-<div align="center">
-
-
-🇵🇰 Government of Pakistan
-
-Ministry of Planning, Development & Special Initiatives
-
-“Towards a Progressive and Prosperous Pakistan”
-
-⸻
-
-
-PDBOT v2.2.0 • Built with 🤖 AI for 🏛️ Government
-
-</div>
-
-
-
