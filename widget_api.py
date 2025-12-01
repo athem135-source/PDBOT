@@ -22,7 +22,7 @@ Endpoints:
   GET  /admin/status - Backend status for admin panel
 
 @author M. Hassan Arif Afridi
-@version 2.3.0
+@version 2.3.1
 """
 
 import os
@@ -40,12 +40,47 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 # Import PDBOT modules
 from rag_langchain import search_sentences
 from models.local_model import LocalModel
+from utils.text_utils import find_exact_locations
+
+# Groq API support (optional)
+try:
+    from groq import Groq
+    GROQ_AVAILABLE = True
+except ImportError:
+    GROQ_AVAILABLE = False
+    print("[Widget API] Groq not installed - Groq mode disabled")
+
+# PDF path for exact mode
+PDF_PATH = os.path.join(os.path.dirname(__file__), 'data', 'uploads', 'Manual-for-Development-Project-2024.pdf')
+RAW_PAGES_CACHE = None
+
+def load_pdf_pages():
+    """Load PDF pages for exact mode search."""
+    global RAW_PAGES_CACHE
+    if RAW_PAGES_CACHE is not None:
+        return RAW_PAGES_CACHE
+    
+    pages = []
+    try:
+        import fitz  # PyMuPDF
+        if os.path.exists(PDF_PATH):
+            doc = fitz.open(PDF_PATH)
+            for i in range(len(doc)):
+                pages.append(doc.load_page(i).get_text("text") or "")
+            doc.close()
+            print(f"[Widget API] Loaded {len(pages)} PDF pages for exact mode")
+    except Exception as e:
+        print(f"[Widget API] Could not load PDF: {e}")
+    
+    RAW_PAGES_CACHE = pages
+    return pages
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for widget requests
 
 # Initialize model
 model = None
+groq_client = None
 
 # Session memory store (in-memory, per-session chat history)
 # Format: { session_id: [ { "role": "user/bot", "content": "...", "timestamp": "..." }, ... ] }
@@ -60,6 +95,43 @@ def get_model():
     if model is None:
         model = LocalModel()
     return model
+
+def get_groq_client():
+    """Lazy load Groq client"""
+    global groq_client
+    if groq_client is None and GROQ_AVAILABLE:
+        api_key = os.environ.get('GROQ_API_KEY')
+        if api_key:
+            groq_client = Groq(api_key=api_key)
+        else:
+            print("[Widget API] Warning: GROQ_API_KEY not set")
+    return groq_client
+
+def generate_groq_response(query: str, context: str) -> str:
+    """Generate response using Groq API"""
+    client = get_groq_client()
+    if not client:
+        return "⚠️ Groq API not available. Please set GROQ_API_KEY environment variable."
+    
+    try:
+        system_prompt = """You are PDBOT, an AI assistant for Pakistan's Planning & Development Division.
+Answer questions based ONLY on the provided context from the Manual for Development Projects 2024.
+Be concise, accurate, and cite page numbers when possible.
+If the context doesn't contain the answer, say so clearly."""
+
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Context:\n{context}\n\nQuestion: {query}"}
+            ],
+            max_tokens=500,
+            temperature=0.3
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        print(f"[Groq API] Error: {e}")
+        return f"⚠️ Groq API error: {str(e)}"
 
 def get_session_history(session_id: str) -> List[Dict]:
     """Get chat history for a session"""
@@ -110,14 +182,17 @@ def chat():
         {
             "query": "What is PC-I?",
             "session_id": "uuid",
-            "clear_memory": false  // Optional: clear session memory
+            "clear_memory": false,  // Optional: clear session memory
+            "exact_mode": false,    // Optional: return raw passages
+            "use_groq": false       // Optional: use Groq API
         }
     
     Response:
         {
             "answer": "...",
             "sources": [...],
-            "passages": [...]
+            "passages": [...],
+            "mode": "local|exact|groq"
         }
     """
     try:
@@ -125,6 +200,8 @@ def chat():
         query = data.get('query', '').strip()
         session_id = data.get('session_id', 'widget-session')
         clear_memory = data.get('clear_memory', False)
+        exact_mode = data.get('exact_mode', False)
+        use_groq = data.get('use_groq', False)
         
         # Handle memory clear request
         if clear_memory:
@@ -186,14 +263,69 @@ def chat():
         
         rag_context = "\n\n".join(context_parts)
         
+        # EXACT MODE: Find exact locations like Streamlit version
+        if exact_mode:
+            pdf_pages = load_pdf_pages()
+            exact_locations = find_exact_locations(query, pdf_pages, max_results=5)
+            
+            if exact_locations:
+                exact_answer = "✅ **Answer:**\n\n"
+                for loc in exact_locations[:3]:
+                    page = loc.get('page', '?')
+                    para = loc.get('paragraph', '?')
+                    line = loc.get('line', '?')
+                    sentence = loc.get('sentence', '')
+                    exact_answer += f"**Pg {page}, Para {para}, Line {line}:** \"{sentence}\"\n\n"
+                
+                exact_answer += "📘 **Source:**\n"
+                for loc in exact_locations[:3]:
+                    exact_answer += f"Page {loc.get('page', '?')} – Paragraph {loc.get('paragraph', '?')} – Line {loc.get('line', '?')}\n"
+                
+                exact_sources = [{
+                    'title': 'Manual for Development Projects 2024',
+                    'page': loc.get('page', '?'),
+                    'paragraph': loc.get('paragraph', '?'),
+                    'line': loc.get('line', '?')
+                } for loc in exact_locations[:3]]
+                
+                exact_passages = [{
+                    'text': loc.get('sentence', ''),
+                    'page': loc.get('page', '?'),
+                    'paragraph': loc.get('paragraph', '?'),
+                    'line': loc.get('line', '?')
+                } for loc in exact_locations[:3]]
+            else:
+                exact_answer = "📖 **No exact match found. Here are related passages:**\n\n"
+                for i, p in enumerate(passages, 1):
+                    exact_answer += f"**[{i}] Page {p['page']}** (Relevance: {p['relevance']}%)\n"
+                    exact_answer += f"{p['text']}\n\n"
+                exact_sources = sources
+                exact_passages = passages
+            
+            add_to_session_history(session_id, "bot", exact_answer)
+            print(f"[Widget API] Exact Mode response")
+            
+            return jsonify({
+                'answer': exact_answer,
+                'sources': exact_sources,
+                'passages': exact_passages,
+                'mode': 'exact'
+            })
+        
         # Combine conversation context with RAG context for better understanding
         full_context = rag_context
         if conversation_context:
             full_context = f"{conversation_context}\n\n---\n\nRelevant information from Manual:\n{rag_context}"
         
-        # Generate answer using local model
-        llm = get_model()
-        answer = llm.generate_response(query, full_context)
+        # GROQ MODE: Use Groq API for responses
+        if use_groq:
+            answer = generate_groq_response(query, full_context)
+            response_mode = 'groq'
+        else:
+            # Generate answer using local model
+            llm = get_model()
+            answer = llm.generate_response(query, full_context)
+            response_mode = 'local'
         
         # Clean up answer
         if answer:
@@ -208,12 +340,13 @@ def chat():
         # Add bot response to memory
         add_to_session_history(session_id, "bot", final_answer)
         
-        print(f"[Widget API] Response generated ({len(final_answer)} chars)")
+        print(f"[Widget API] Response generated ({len(final_answer)} chars, mode: {response_mode})")
         
         return jsonify({
             'answer': final_answer,
             'sources': sources,
-            'passages': passages
+            'passages': passages,
+            'mode': response_mode
         })
         
     except Exception as e:
@@ -346,7 +479,7 @@ def health():
     return jsonify({
         'status': 'ok',
         'service': 'PDBOT Widget API',
-        'version': '2.3.0',
+        'version': '2.3.1',
         'features': ['contextual_memory', 'rag_retrieval', 'feedback_collection', 'admin_panel']
     })
 
@@ -394,7 +527,7 @@ def admin_status():
     
     return jsonify({
         'status': 'ok',
-        'version': '2.3.0',
+        'version': '2.3.1',
         'uptime': datetime.now().isoformat(),
         'memory_mb': round(memory_mb, 2),
         'active_sessions': active_sessions,
@@ -443,7 +576,22 @@ if __name__ == '__main__':
     print("="*60)
     print(f"\n  🌐 Local:   http://localhost:{port}")
     print(f"  📱 Network: http://{local_ip}:{port}")
-    print(f"\n  To access from phone, use: http://{local_ip}:{port}")
+    
+    # Try ngrok for external access
+    use_ngrok = os.environ.get('USE_NGROK', '').lower() == 'true'
+    if use_ngrok:
+        try:
+            from pyngrok import ngrok
+            public_url = ngrok.connect(port, "http").public_url
+            print(f"\n  🌍 PUBLIC URL (for phone/external access):")
+            print(f"     {public_url}")
+            print("\n  ⚠️  Share this URL to access from any network!")
+        except Exception as e:
+            print(f"\n  ⚠️  ngrok not available: {e}")
+    else:
+        print(f"\n  To access from phone (same network): http://{local_ip}:{port}")
+        print("  For external access, set USE_NGROK=true")
+    
     print("\n  Endpoints:")
     print("    POST /chat           - Chat with PDBOT (with memory)")
     print("    POST /feedback/*     - Feedback endpoints")

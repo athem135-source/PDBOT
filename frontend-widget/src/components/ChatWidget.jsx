@@ -64,6 +64,8 @@ function ChatWidget() {
   const [newMessageId, setNewMessageId] = useState(null);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [adminCodeBuffer, setAdminCodeBuffer] = useState('');
+  const [exactMode, setExactMode] = useState(() => localStorage.getItem('pdbot_exact_mode') === 'true');
+  const [useGroq, setUseGroq] = useState(() => localStorage.getItem('pdbot_use_groq') === 'true');
   
   // Dragging state
   const [position, setPosition] = useState({ x: null, y: null });
@@ -80,21 +82,28 @@ function ChatWidget() {
   const widgetRef = useRef(null);
   const sessionId = useRef(getSessionId());
   
+  // Persist exact mode and groq settings
+  useEffect(() => {
+    localStorage.setItem('pdbot_exact_mode', exactMode.toString());
+  }, [exactMode]);
+  
+  useEffect(() => {
+    localStorage.setItem('pdbot_use_groq', useGroq.toString());
+  }, [useGroq]);
+  
   // Load saved state on mount
   useEffect(() => {
     const savedState = loadWidgetState();
     setIsOpen(savedState.isOpen);
-    setHasGreeted(savedState.hasGreeted);
     if (savedState.position.x !== null) {
       setPosition(savedState.position);
     }
     
-    // Load chat history
-    const history = loadChatHistory();
-    if (history.length > 0) {
-      setMessages(history);
-      setHasGreeted(true);
-    }
+    // Clear chat on page load - start fresh each time
+    sessionId.current = createNewSession();
+    clearChatHistory();
+    setMessages([]);
+    setHasGreeted(false);
   }, []);
   
   // Save state changes
@@ -197,8 +206,8 @@ function ChatWidget() {
     setIsLoading(true);
     
     try {
-      // Send to API
-      const response = await sendChatMessage(query, sessionId.current);
+      // Send to API with mode flags
+      const response = await sendChatMessage(query, sessionId.current, exactMode, useGroq);
       
       // Add bot response
       const botMsg = {
@@ -252,7 +261,7 @@ function ChatWidget() {
     setIsLoading(true);
     
     try {
-      const response = await sendChatMessage(message.query, sessionId.current);
+      const response = await sendChatMessage(message.query, sessionId.current, exactMode, useGroq);
       
       // Replace the message with new response
       const newBotMsg = {

@@ -16,9 +16,11 @@ const API_BASE_URL = window.PDBOT_API_URL || 'http://localhost:5000';
  * 
  * @param {string} query - The user's question
  * @param {string} sessionId - Unique session identifier
+ * @param {boolean} exactMode - Whether to use exact mode (raw passages)
+ * @param {boolean} useGroq - Whether to use Groq API
  * @returns {Promise<Object>} Response containing answer and sources
  */
-export async function sendChatMessage(query, sessionId) {
+export async function sendChatMessage(query, sessionId, exactMode = false, useGroq = false) {
   try {
     const response = await fetch(`${API_BASE_URL}/chat`, {
       method: 'POST',
@@ -27,7 +29,9 @@ export async function sendChatMessage(query, sessionId) {
       },
       body: JSON.stringify({
         query: query,
-        session_id: sessionId
+        session_id: sessionId,
+        exact_mode: exactMode,
+        use_groq: useGroq
       })
     });
 
@@ -41,6 +45,7 @@ export async function sendChatMessage(query, sessionId) {
       answer: data.answer || data.response || 'No response received.',
       sources: data.sources || [],
       passages: data.passages || [],
+      mode: data.mode || 'local',
       timestamp: new Date().toISOString()
     };
   } catch (error) {
