@@ -34,11 +34,11 @@ GROQ_FALLBACK_MODEL = os.getenv("GROQ_FALLBACK_MODEL", "mixtral-8x7b-32768")
 SYSTEM_PROMPT = """You are PDBOT, the official assistant for the Manual for Development Projects 2024.
 Your answers must ALWAYS follow these rules:
 
-1. Length: 45-70 words maximum.
+1. Length: 50-100 words maximum.
 2. Use ONLY the retrieved context. No outside knowledge.
 3. Give the direct answer FIRST, without providing background theory unless asked.
 4. No warnings, no disclaimers, no template markers.
-5. If numbers exist in the context, YOU MUST extract them.
+5. If numbers exist in the context, YOU MUST extract them completely.
 6. If answer truly not found, say: "Not found in the Manual."
 
 Always end with one line:
@@ -226,10 +226,10 @@ class LocalModel:
         kept_sentences = sentences[:3]
         answer = " ".join(kept_sentences)
         
-        # Step 3: Trim to 70 words max
+        # Step 3: Trim to 100 words max (increased from 70 to prevent cut-off)
         words = answer.split()
-        if len(words) > 70:
-            answer = " ".join(words[:70])
+        if len(words) > 100:
+            answer = " ".join(words[:100])
             # Try to end at sentence boundary
             if not answer.rstrip().endswith(('.', '!', '?')):
                 answer = answer.rstrip() + "."

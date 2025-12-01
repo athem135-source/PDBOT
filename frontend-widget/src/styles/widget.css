@@ -835,10 +835,54 @@
 .pdbot-input-area {
   display: flex;
   align-items: flex-end;
-  gap: 10px;
+  gap: 8px;
   padding: 14px 16px;
   background: var(--pdbot-white);
   border-top: 1px solid var(--pdbot-gray-200);
+}
+
+/* Exact Mode Toggle Button */
+.pdbot-exact-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 44px;
+  padding: 4px 8px;
+  background: var(--pdbot-gray-100);
+  border: 2px solid var(--pdbot-gray-300);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all var(--pdbot-transition);
+  flex-shrink: 0;
+}
+
+.pdbot-exact-toggle:hover {
+  background: var(--pdbot-gray-200);
+  border-color: var(--pdbot-light-green);
+}
+
+.pdbot-exact-toggle.pdbot-exact-active {
+  background: rgba(0, 102, 0, 0.15);
+  border-color: var(--pdbot-dark-green);
+}
+
+.pdbot-exact-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.pdbot-exact-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--pdbot-gray-600);
+  margin-top: 2px;
+}
+
+.pdbot-exact-toggle.pdbot-exact-active .pdbot-exact-label {
+  color: var(--pdbot-dark-green);
 }
 
 .pdbot-input {

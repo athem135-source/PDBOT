@@ -477,10 +477,6 @@ function ChatWidget() {
                 onClearChat={handleClearChat}
                 onDownloadText={handleDownloadText}
                 onDownloadPDF={handleDownloadPDF}
-                exactMode={exactMode}
-                onExactModeToggle={setExactMode}
-                useGroq={useGroq}
-                onGroqToggle={setUseGroq}
               />
               <button 
                 className="pdbot-minimize-btn"
@@ -537,6 +533,17 @@ function ChatWidget() {
               
               {/* Input area */}
               <div className="pdbot-input-area">
+                {/* Exact Mode Toggle */}
+                <button
+                  className={`pdbot-exact-toggle ${exactMode ? 'pdbot-exact-active' : ''}`}
+                  onClick={() => setExactMode(!exactMode)}
+                  title={exactMode ? 'Exact Mode ON - Shows page, paragraph, line' : 'Exact Mode OFF - AI-generated answers'}
+                  aria-label="Toggle Exact Mode"
+                >
+                  <span className="pdbot-exact-icon">📍</span>
+                  <span className="pdbot-exact-label">{exactMode ? 'Exact' : 'AI'}</span>
+                </button>
+                
                 <textarea
                   ref={inputRef}
                   className="pdbot-input"

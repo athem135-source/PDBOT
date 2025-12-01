@@ -360,8 +360,9 @@ def chat():
             response_mode = 'groq'
         else:
             # Generate answer using local model
+            # Use higher max_new_tokens to avoid truncation
             llm = get_model()
-            answer = llm.generate_response(query, full_context)
+            answer = llm.generate_response(query, full_context, max_new_tokens=200)
             response_mode = 'local'
         
         # Clean up answer

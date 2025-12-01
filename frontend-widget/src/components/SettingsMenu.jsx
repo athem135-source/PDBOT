@@ -3,15 +3,13 @@
  * ======================
  * 
  * Three-dot settings menu with options for:
- * - Exact Mode toggle
- * - Groq API toggle
  * - New Chat
  * - Clear Chat
  * - Download Chat (TXT/PDF)
  * - About PDBOT
  * 
  * @author Ministry of Planning, Development & Special Initiatives
- * @version 2.4.0
+ * @version 2.4.1
  */
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -24,10 +22,6 @@ import React, { useState, useRef, useEffect } from 'react';
  * @param {Function} props.onClearChat - Callback for clear chat
  * @param {Function} props.onDownloadText - Callback for download as text
  * @param {Function} props.onDownloadPDF - Callback for download as PDF
- * @param {boolean} props.exactMode - Current exact mode state
- * @param {Function} props.onExactModeToggle - Callback for exact mode toggle
- * @param {boolean} props.useGroq - Current Groq state
- * @param {Function} props.onGroqToggle - Callback for Groq toggle
  * @param {boolean} props.disabled - Whether menu is disabled
  */
 function SettingsMenu({ 
@@ -35,10 +29,6 @@ function SettingsMenu({
   onClearChat, 
   onDownloadText, 
   onDownloadPDF,
-  exactMode = false,
-  onExactModeToggle,
-  useGroq = false,
-  onGroqToggle,
   disabled = false 
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -81,33 +71,6 @@ function SettingsMenu({
       {/* Dropdown menu */}
       {isOpen && (
         <div className="pdbot-settings-dropdown">
-          {/* Exact Mode Toggle */}
-          <button 
-            className={`pdbot-menu-item pdbot-toggle-item ${exactMode ? 'pdbot-active' : ''}`}
-            onClick={() => {
-              if (onExactModeToggle) onExactModeToggle(!exactMode);
-            }}
-          >
-            <span className="pdbot-menu-icon">{exactMode ? '✅' : '⬜'}</span>
-            <span className="pdbot-menu-label">Exact Mode</span>
-            <span className="pdbot-toggle-hint">{exactMode ? 'ON' : 'OFF'}</span>
-          </button>
-          
-          {/* Groq API Toggle */}
-          <button 
-            className={`pdbot-menu-item pdbot-toggle-item ${useGroq ? 'pdbot-active' : ''}`}
-            onClick={() => {
-              if (onGroqToggle) onGroqToggle(!useGroq);
-            }}
-          >
-            <span className="pdbot-menu-icon">{useGroq ? '✅' : '⬜'}</span>
-            <span className="pdbot-menu-label">Use Groq API</span>
-            <span className="pdbot-toggle-hint">{useGroq ? 'ON' : 'OFF'}</span>
-          </button>
-          
-          {/* Divider */}
-          <div className="pdbot-menu-divider"></div>
-          
           {/* New Chat */}
           <button 
             className="pdbot-menu-item"

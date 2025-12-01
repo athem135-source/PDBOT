@@ -102,7 +102,13 @@ This intelligent assistant is designed to support:
 - **Multi-Class Classifier** – 12-class query detection now in Widget API
 - **Off-Scope Detection** – Blocks sports, recipes, medical, entertainment
 - **Red-Line Protection** – Blocks bribery, corruption, misuse requests
+- **Trap Question Detection** – Catches luxury vehicle/fund misuse queries
 - **Guardrail Responses** – Professional rejection messages
+
+### 🎯 UI Improvements
+- **Exact Mode Toggle** – Button next to input box (📍 icon)
+- **AI/Exact Mode Switch** – Toggle between AI-generated and exact page/paragraph/line answers
+- **Improved Answer Length** – Answers no longer cut off mid-sentence
 
 ### 🌐 Open Source Tunnel
 - **Replaced ngrok** – Now uses `localtunnel` (open source)
