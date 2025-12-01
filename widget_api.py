@@ -609,7 +609,7 @@ if __name__ == '__main__':
     port = 5000
     
     print("\n" + "="*60)
-    print("  PDBOT Widget API Server v2.4.0")
+    print("  PDBOT Widget API Server v2.4.8")
     print("  Developed by M. Hassan Arif Afridi")
     print("="*60)
     print(f"\n  🌐 Local:   http://localhost:{port}")
