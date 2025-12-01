@@ -1,75 +1,71 @@
-﻿<![CDATA[<div align="center">
 
-# 🏛️ PDBOT – Planning & Development Intelligent Assistant
+<div align="center">
 
-### Government of Pakistan
-### Ministry of Planning, Development & Special Initiatives
 
----
+🏛️ PDBOT – Planning & Development Intelligent Assistant
 
-![Version](https://img.shields.io/badge/Version-2.2.0-006600?style=for-the-badge)
-![Python](https://img.shields.io/badge/Python-3.10+-1fa67a?style=for-the-badge&logo=python&logoColor=white)
-![React](https://img.shields.io/badge/React-18.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)
-![License](https://img.shields.io/badge/License-Government_Use-d4af37?style=for-the-badge)
+Government of Pakistan
 
-[![Accuracy](https://img.shields.io/badge/Accuracy-85--90%25-brightgreen?style=flat-square)](docs/metrics.md)
-[![Uptime](https://img.shields.io/badge/Uptime-99.9%25-brightgreen?style=flat-square)](docs/sla.md)
-[![Response_Time](https://img.shields.io/badge/Response_Time-<3s-blue?style=flat-square)](docs/performance.md)
+Ministry of Planning, Development & Special Initiatives
 
-**An AI-powered document intelligence system for the Manual for Development Projects 2024, serving the planning and development community of Pakistan with accurate, contextual, and traceable responses.**
+⸻
 
-[🚀 Quick Start](#-quick-start) • [📖 Documentation](#-documentation) • [🏗️ Architecture](#-system-architecture) • [📊 Performance](#-performance-metrics)
+
+An AI-powered document intelligence system for the Manual for Development Projects 2024, serving the planning and development community of Pakistan with accurate, contextual, and traceable responses.
+
+🚀 Quick Start￼ • 📖 Documentation￼ • 🏗️ Architecture￼ • 📊 Performance￼
 
 </div>
 
----
 
-## 📋 Executive Summary
 
-PDBOT is an enterprise-grade Retrieval-Augmented Generation (RAG) system developed to provide instant, accurate responses regarding the **Manual for Development Projects 2024**. The system is designed to support government officials, development practitioners, and stakeholders in accessing procedural information efficiently.
+⸻
 
-### Key Achievements
+📋 Executive Summary
 
-| Metric | Achievement | Target |
-|--------|-------------|--------|
-| **In-Scope Accuracy** | 87.5% | ≥ 85% |
-| **Numeric Accuracy** | 92.3% | ≥ 90% |
-| **Off-Scope Detection** | 100% | 100% |
-| **Response Time** | < 3 seconds | < 5 seconds |
-| **Zero Hallucination** | ✅ Verified | Required |
+PDBOT is an enterprise-grade Retrieval-Augmented Generation (RAG) system developed to provide instant, accurate responses regarding the Manual for Development Projects 2024. The system is designed to support government officials, development practitioners, and stakeholders in accessing procedural information efficiently.
 
----
+Key Achievements
 
-## 🆕 What's New in Version 2.2.0
+Metric	Achievement	Target
+In-Scope Accuracy	87.5%	≥ 85%
+Numeric Accuracy	92.3%	≥ 90%
+Off-Scope Detection	100%	100%
+Response Time	< 3 seconds	< 5 seconds
+Zero Hallucination	✅ Verified	Required
 
-### 🖥️ Standalone React Widget
-- **Independent deployment** – No Streamlit dependency required
-- **Embeddable component** – Easy integration into government portals
-- **Modern UI/UX** – Floating, draggable, minimizable interface
-- **Government branding** – Official color scheme and styling
 
-### 🧠 Contextual Memory
-- **Session-based memory** – Maintains conversation context
-- **Follow-up understanding** – Handles pronouns and references
-- **Automatic cleanup** – Memory management per session
+⸻
 
-### 📄 Source Transparency
-- **View Passages** – See exact text used for response generation
-- **View Sources** – Page-level citations with relevance scores
-- **Audit trail** – Full traceability for governance requirements
+🆕 What’s New in Version 2.2.0
 
-### 🛡️ Enhanced Security
-- **Input sanitization** – Protection against injection attacks
-- **Rate limiting ready** – Infrastructure for production deployment
-- **CORS configuration** – Secure cross-origin requests
+🖥️ Standalone React Widget
+	•	Independent deployment – No Streamlit dependency required
+	•	Embeddable component – Easy integration into government portals
+	•	Modern UI/UX – Floating, draggable, minimizable interface
+	•	Government branding – Official color scheme and styling
 
----
+🧠 Contextual Memory
+	•	Session-based memory – Maintains conversation context
+	•	Follow-up understanding – Handles pronouns and references
+	•	Automatic cleanup – Memory management per session
 
-## 🎯 Core Capabilities
+📄 Source Transparency
+	•	View Passages – See exact text used for response generation
+	•	View Sources – Page-level citations with relevance scores
+	•	Audit trail – Full traceability for governance requirements
 
-### 1. Intelligent Query Processing
+🛡️ Enhanced Security
+	•	Input sanitization – Protection against injection attacks
+	•	Rate limiting ready – Infrastructure for production deployment
+	•	CORS configuration – Secure cross-origin requests
 
-```
+⸻
+
+🎯 Core Capabilities
+
+1. Intelligent Query Processing
+
 ┌─────────────────────────────────────────────────────────────────┐
 │                     PDBOT Query Pipeline                        │
 ├─────────────────────────────────────────────────────────────────┤
@@ -78,32 +74,28 @@ PDBOT is an enterprise-grade Retrieval-Augmented Generation (RAG) system develop
 │           12-Class       Semantic +       Strict 45-70          │
 │           Detection      Reranking        Word Answers          │
 └─────────────────────────────────────────────────────────────────┘
-```
 
-### 2. Multi-Class Query Classification
+2. Multi-Class Query Classification
 
-| Class | Description | Example |
-|-------|-------------|---------|
-| `numeric_query` | Financial/approval limits | "What is the CDWP approval limit?" |
-| `definition_query` | Terminology explanation | "What is PC-I?" |
-| `procedure_query` | Process workflows | "How does project revision work?" |
-| `compliance_query` | Regulatory requirements | "What are M&E requirements?" |
-| `timeline_query` | Duration/deadlines | "How long for ECNEC approval?" |
-| `off_scope` | Non-manual topics | Handled gracefully |
-| `red_line` | Inappropriate content | Blocked with warning |
+Class	Description	Example
+numeric_query	Financial/approval limits	“What is the CDWP approval limit?”
+definition_query	Terminology explanation	“What is PC-I?”
+procedure_query	Process workflows	“How does project revision work?”
+compliance_query	Regulatory requirements	“What are M&E requirements?”
+timeline_query	Duration/deadlines	“How long for ECNEC approval?”
+off_scope	Non-manual topics	Handled gracefully
+red_line	Inappropriate content	Blocked with warning
 
-### 3. Retrieval-Augmented Generation
+3. Retrieval-Augmented Generation
+	•	Sentence-level chunking – 1-3 sentence segments for precision
+	•	Dual-phase retrieval – Vector search + cross-encoder reranking
+	•	Numeric boosting – +25% score for financial content
+	•	Page-level citations – Every response includes source page
 
-- **Sentence-level chunking** – 1-3 sentence segments for precision
-- **Dual-phase retrieval** – Vector search + cross-encoder reranking
-- **Numeric boosting** – +25% score for financial content
-- **Page-level citations** – Every response includes source page
+⸻
 
----
+🏗️ System Architecture
 
-## 🏗️ System Architecture
-
-```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         PDBOT v2.2.0                                │
 ├─────────────────────────────────────────────────────────────────────┤
@@ -132,45 +124,40 @@ PDBOT is an enterprise-grade Retrieval-Augmented Generation (RAG) system develop
 │                    └─────────────┘                                 │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
-```
 
-### Technology Stack
+Technology Stack
 
-| Layer | Technology | Purpose |
-|-------|------------|---------|
-| **Frontend** | React 18, Vite 5 | Modern widget interface |
-| **API** | Flask, Flask-CORS | REST API bridge |
-| **RAG** | LangChain, Qdrant | Vector retrieval |
-| **Embeddings** | all-MiniLM-L6-v2 | Semantic encoding |
-| **Reranking** | ms-marco-MiniLM-L-6-v2 | Relevance scoring |
-| **LLM** | Ollama (Mistral) | Response generation |
-| **Fallback** | Groq (LLaMA 3.1) | Cloud failover |
+Layer	Technology	Purpose
+Frontend	React 18, Vite 5	Modern widget interface
+API	Flask, Flask-CORS	REST API bridge
+RAG	LangChain, Qdrant	Vector retrieval
+Embeddings	all-MiniLM-L6-v2	Semantic encoding
+Reranking	ms-marco-MiniLM-L-6-v2	Relevance scoring
+LLM	Ollama (Mistral)	Response generation
+Fallback	Groq (LLaMA 3.1)	Cloud failover
 
----
 
-## 🚀 Quick Start
+⸻
 
-### Prerequisites
+🚀 Quick Start
 
-- Python 3.10+
-- Node.js 18+ (for widget)
-- Docker Desktop (for Qdrant)
-- 8GB RAM minimum
+Prerequisites
+	•	Python 3.10+
+	•	Node.js 18+ (for widget)
+	•	Docker Desktop (for Qdrant)
+	•	8GB RAM minimum
 
-### Option 1: Unified Launcher (Windows)
+Option 1: Unified Launcher (Windows)
 
-```batch
 # Double-click or run:
 start_pdbot.bat
 
 # Select:
 # [1] React Widget (Modern UI)
 # [2] Streamlit App (Admin Dashboard)
-```
 
-### Option 2: Manual Setup
+Option 2: Manual Setup
 
-```bash
 # 1. Clone repository
 git clone https://github.com/athem135-source/PDBOT.git
 cd PDBOT
@@ -191,17 +178,14 @@ python widget_api.py
 
 # 5b. For Streamlit App
 streamlit run src/app.py
-```
 
----
 
-## 🌐 Website Integration
+⸻
 
-### Embedding the Widget
+🌐 Website Integration
 
-Add the PDBOT widget to any government portal with a single script tag:
+Embedding the Widget
 
-```html
 <!-- PDBOT Widget Integration -->
 <script src="https://your-domain.gov.pk/pdbot/widget.js"></script>
 <script>
@@ -212,21 +196,17 @@ Add the PDBOT widget to any government portal with a single script tag:
     greeting: 'Assalam-o-Alaikum! How can I assist you?'
   });
 </script>
-```
 
-### Production Build
+Production Build
 
-```bash
 cd frontend-widget
 npm run build
 
 # Output in dist/ folder
 # Deploy to your web server
-```
 
-### Docker Deployment
+Docker Deployment
 
-```dockerfile
 # Dockerfile.widget
 FROM node:18-alpine AS builder
 WORKDIR /app
@@ -236,69 +216,66 @@ RUN npm install && npm run build
 FROM nginx:alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 80
-```
 
----
 
-## 📊 Performance Metrics
+⸻
 
-### Accuracy Validation (Based on 50+ Test Cases)
+📊 Performance Metrics
 
-| Category | Tests | Passed | Accuracy |
-|----------|-------|--------|----------|
-| **Definitions** | 12 | 11 | 91.7% |
-| **Numeric/Financial** | 15 | 14 | 93.3% |
-| **Procedures** | 10 | 8 | 80.0% |
-| **Approvals/Limits** | 8 | 7 | 87.5% |
-| **Off-Scope Detection** | 10 | 10 | 100% |
-| **Overall** | 55 | 50 | **90.9%** |
+Accuracy Validation (Based on 50+ Test Cases)
 
-### Response Quality
+Category	Tests	Passed	Accuracy
+Definitions	12	11	91.7%
+Numeric/Financial	15	14	93.3%
+Procedures	10	8	80.0%
+Approvals/Limits	8	7	87.5%
+Off-Scope Detection	10	10	100%
+Overall	55	50	90.9%
 
-- **Average response length**: 52 words (target: 45-70)
-- **Source citation rate**: 100%
-- **Numeric extraction rate**: 93%
-- **False refusal rate**: < 5%
+Response Quality
+	•	Average response length: 52 words (target: 45–70)
+	•	Source citation rate: 100%
+	•	Numeric extraction rate: 93%
+	•	False refusal rate: < 5%
 
-### System Performance
+System Performance
 
-| Metric | Value |
-|--------|-------|
-| Average response time | 2.4 seconds |
-| Vector search latency | < 100ms |
-| Reranking latency | < 200ms |
-| LLM generation | 1.5-2.0 seconds |
-| Memory per session | < 1MB |
+Metric	Value
+Average response time	2.4 seconds
+Vector search latency	< 100ms
+Reranking latency	< 200ms
+LLM generation	1.5–2.0 seconds
+Memory per session	< 1MB
 
----
 
-## 🔒 Security Considerations
+⸻
 
-### Data Protection
-- All queries processed in-memory (no persistent logging of user data)
-- Session-based memory cleared on chat reset
-- No PII collection or storage
+🔒 Security Considerations
 
-### Input Validation
-- Query length limits enforced
-- Special character sanitization
-- Injection attack prevention
+Data Protection
+	•	All queries processed in-memory (no persistent logging of user data)
+	•	Session-based memory cleared on chat reset
+	•	No PII collection or storage
 
-### Network Security
-- CORS restrictions configurable
-- HTTPS recommended for production
-- API rate limiting ready
+Input Validation
+	•	Query length limits enforced
+	•	Special character sanitization
+	•	Injection attack prevention
 
-### Access Control
-- Session-based isolation
-- No cross-session data leakage
-- Configurable authentication hooks
+Network Security
+	•	CORS restrictions configurable
+	•	HTTPS recommended for production
+	•	API rate limiting ready
 
----
+Access Control
+	•	Session-based isolation
+	•	No cross-session data leakage
+	•	Configurable authentication hooks
 
-## 📁 Project Structure
+⸻
 
-```
+📁 Project Structure
+
 PDBOT/
 ├── 📄 README.md                 # This document
 ├── 📄 SECURITY.md               # Security policy
@@ -325,61 +302,65 @@ PDBOT/
 ├── 📂 config/                   # Configuration files
 ├── 📂 feedback/                 # User feedback storage
 └── 📂 data/                     # Data files
-```
 
----
 
-## 🤝 Contributing
+⸻
+
+🤝 Contributing
 
 We welcome contributions from government IT teams and authorized contractors.
 
-### Reporting Issues
+Reporting Issues
+
 Please submit issues through the official channels or create a GitHub issue with:
-- Clear description of the problem
-- Steps to reproduce
-- Expected vs actual behavior
-- System information
+	•	Clear description of the problem
+	•	Steps to reproduce
+	•	Expected vs actual behavior
+	•	System information
 
-### Development Guidelines
-1. Follow PEP 8 for Python code
-2. Use ESLint configuration for JavaScript
-3. Write tests for new features
-4. Document all API changes
+Development Guidelines
+	1.	Follow PEP 8 for Python code
+	2.	Use ESLint configuration for JavaScript
+	3.	Write tests for new features
+	4.	Document all API changes
 
----
+⸻
 
-## 📞 Support & Contact
+📞 Support & Contact
 
-### Technical Support
-- **Email**: pdbot-support@planning.gov.pk
-- **Documentation**: [docs/](docs/)
+Technical Support
+	•	Email: pdbot-support@planning.gov.pk
+	•	Documentation: docs/￼
 
-### Project Information
-- **Developed by**: Ministry of Planning, Development & Special Initiatives
-- **Version**: 2.2.0
-- **Release Date**: December 2024
+Project Information
+	•	Developed by: Ministry of Planning, Development & Special Initiatives
+	•	Version: 2.2.0
+	•	Release Date: December 2024
 
----
+⸻
 
-## 📜 License
+📜 License
 
 This software is developed for and owned by the Government of Pakistan, Ministry of Planning, Development & Special Initiatives. Usage is restricted to authorized government entities and approved contractors.
 
----
+⸻
+
 
 <div align="center">
 
-**🇵🇰 Government of Pakistan**
 
-*Ministry of Planning, Development & Special Initiatives*
+🇵🇰 Government of Pakistan
 
-*"Towards a Progressive and Prosperous Pakistan"*
+Ministry of Planning, Development & Special Initiatives
 
----
+“Towards a Progressive and Prosperous Pakistan”
 
-![Pakistan Flag](https://flagcdn.com/w80/pk.png)
+⸻
 
-**PDBOT v2.2.0** • Built with 🤖 AI for 🏛️ Government
+
+PDBOT v2.2.0 • Built with 🤖 AI for 🏛️ Government
 
 </div>
-]]>
+
+
+
