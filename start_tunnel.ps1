@@ -19,7 +19,7 @@ Set-Location $scriptDir
 # Check if API is running
 Write-Host "[1/2] Checking if Widget API is running..." -ForegroundColor Cyan
 try {
-    $response = Invoke-RestMethod -Uri "http://localhost:5000/health" -TimeoutSec 3
+    $null = Invoke-RestMethod -Uri "http://localhost:5000/health" -TimeoutSec 3
     Write-Host "      ✅ Widget API is running on port 5000" -ForegroundColor Green
 } catch {
     Write-Host "      ❌ Widget API not running!" -ForegroundColor Red
