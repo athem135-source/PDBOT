@@ -1,0 +1,209 @@
+/**
+ * API Utility Functions for PDBOT Widget
+ * ======================================
+ * 
+ * Handles all communication with the PDBOT backend.
+ * 
+ * @author Ministry of Planning, Development & Special Initiatives
+ * @version 1.0.0
+ */
+
+// API base URL - configurable for different environments
+const API_BASE_URL = window.PDBOT_API_URL || '';
+
+/**
+ * Send a chat message to the PDBOT backend
+ * 
+ * @param {string} query - The user's question
+ * @param {string} sessionId - Unique session identifier
+ * @returns {Promise<Object>} Response containing answer and sources
+ */
+export async function sendChatMessage(query, sessionId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: query,
+        session_id: sessionId
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return {
+      success: true,
+      answer: data.answer || data.response || 'No response received.',
+      sources: data.sources || [],
+      timestamp: new Date().toISOString()
+    };
+  } catch (error) {
+    console.error('[PDBOT API] Chat error:', error);
+    return {
+      success: false,
+      answer: 'Sorry, I encountered an error connecting to the server. Please try again.',
+      sources: [],
+      error: error.message,
+      timestamp: new Date().toISOString()
+    };
+  }
+}
+
+/**
+ * Submit feedback for a specific answer
+ * 
+ * @param {Object} feedbackData - Feedback details
+ * @param {string} feedbackData.messageId - ID of the message
+ * @param {string} feedbackData.query - Original question
+ * @param {string} feedbackData.answer - Bot's answer
+ * @param {string} feedbackData.type - 'like' or 'dislike'
+ * @param {string} feedbackData.reason - Reason for dislike (optional)
+ * @param {string} feedbackData.sessionId - Session ID
+ * @returns {Promise<Object>} Submission result
+ */
+export async function submitAnswerFeedback(feedbackData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/feedback/answer`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...feedbackData,
+        timestamp: new Date().toISOString(),
+        source: 'widget'
+      })
+    });
+
+    if (!response.ok) {
+      // Fallback: save to localStorage if API fails
+      saveFeedbackLocally('answer', feedbackData);
+      return { success: true, fallback: true };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('[PDBOT API] Feedback error:', error);
+    // Fallback: save to localStorage
+    saveFeedbackLocally('answer', feedbackData);
+    return { success: true, fallback: true };
+  }
+}
+
+/**
+ * Submit session feedback (after clear/new chat)
+ * 
+ * @param {Object} feedbackData - Session feedback
+ * @param {number} feedbackData.rating - 1-3 stars
+ * @param {string} feedbackData.username - Optional username
+ * @param {string} feedbackData.review - Optional review text
+ * @param {string} feedbackData.sessionId - Session ID
+ * @returns {Promise<Object>} Submission result
+ */
+export async function submitSessionFeedback(feedbackData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/feedback/session`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...feedbackData,
+        timestamp: new Date().toISOString(),
+        source: 'widget'
+      })
+    });
+
+    if (!response.ok) {
+      // Fallback: save to localStorage if API fails
+      saveFeedbackLocally('session', feedbackData);
+      return { success: true, fallback: true };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('[PDBOT API] Session feedback error:', error);
+    // Fallback: save to localStorage
+    saveFeedbackLocally('session', feedbackData);
+    return { success: true, fallback: true };
+  }
+}
+
+/**
+ * Fallback: Save feedback to localStorage when API is unavailable
+ * 
+ * @param {string} type - 'answer' or 'session'
+ * @param {Object} data - Feedback data
+ */
+function saveFeedbackLocally(type, data) {
+  try {
+    const key = `pdbot_feedback_${type}`;
+    const existing = JSON.parse(localStorage.getItem(key) || '[]');
+    existing.push({
+      ...data,
+      timestamp: new Date().toISOString(),
+      pending: true
+    });
+    localStorage.setItem(key, JSON.stringify(existing));
+    console.log(`[PDBOT] Feedback saved locally (${type})`);
+  } catch (error) {
+    console.error('[PDBOT] Failed to save feedback locally:', error);
+  }
+}
+
+/**
+ * Sync pending local feedback to server
+ * Called periodically or when connection is restored
+ */
+export async function syncPendingFeedback() {
+  const types = ['answer', 'session'];
+  
+  for (const type of types) {
+    try {
+      const key = `pdbot_feedback_${type}`;
+      const pending = JSON.parse(localStorage.getItem(key) || '[]');
+      
+      if (pending.length === 0) continue;
+      
+      const synced = [];
+      for (const item of pending) {
+        try {
+          const endpoint = type === 'answer' ? '/feedback/answer' : '/feedback/session';
+          const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...item, synced: true })
+          });
+          
+          if (response.ok) {
+            synced.push(item);
+          }
+        } catch (e) {
+          // Keep in pending
+        }
+      }
+      
+      // Remove synced items
+      const remaining = pending.filter(item => !synced.includes(item));
+      localStorage.setItem(key, JSON.stringify(remaining));
+      
+      if (synced.length > 0) {
+        console.log(`[PDBOT] Synced ${synced.length} ${type} feedback items`);
+      }
+    } catch (error) {
+      console.error(`[PDBOT] Sync error for ${type}:`, error);
+    }
+  }
+}
+
+export default {
+  sendChatMessage,
+  submitAnswerFeedback,
+  submitSessionFeedback,
+  syncPendingFeedback
+};

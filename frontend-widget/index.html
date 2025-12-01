@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDBOT Widget - Development</title>
+  <style>
+    /* Development page styling */
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+    }
+    .dev-info {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #006600;
+      margin-bottom: 10px;
+    }
+    h2 {
+      color: #1fa67a;
+      font-size: 1.2rem;
+    }
+    .badge {
+      display: inline-block;
+      background: #d4af37;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      margin-left: 10px;
+    }
+    code {
+      background: #f4f4f4;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+    .instructions {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    .instructions h3 {
+      margin-top: 0;
+      color: #006600;
+    }
+    .instructions ol {
+      padding-left: 20px;
+    }
+    .instructions li {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Widget mount point -->
+  <div id="pdbot-widget"></div>
+  
+  <!-- Development info -->
+  <div class="dev-info">
+    <h1>🤖 PDBOT Widget <span class="badge">Development Mode</span></h1>
+    <h2>Government of Pakistan - Ministry of Planning, Development & Special Initiatives</h2>
+    
+    <div class="instructions">
+      <h3>📋 Development Instructions</h3>
+      <ol>
+        <li>The widget should appear in the bottom-right corner</li>
+        <li>Click the green button to open the chat</li>
+        <li>Make sure your backend is running at <code>http://localhost:8501</code></li>
+        <li>Chat messages are saved to localStorage</li>
+        <li>Feedback is sent to the <code>/feedback</code> endpoint</li>
+      </ol>
+    </div>
+    
+    <div class="instructions">
+      <h3>🚀 Build for Production</h3>
+      <ol>
+        <li>Run <code>npm run build</code></li>
+        <li>Copy <code>dist/pdbot-widget.js</code> to your website</li>
+        <li>Add the script and mount point to your HTML</li>
+      </ol>
+    </div>
+  </div>
+  
+  <!-- Main entry point -->
+  <script type="module" src="/src/index.jsx"></script>
+</body>
+</html>

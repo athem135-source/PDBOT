@@ -1,0 +1,1188 @@
+/**
+ * PDBOT Widget Styles
+ * ===================
+ * 
+ * Government of Pakistan - Ministry of Planning, Development & Special Initiatives
+ * Official Theme Colors:
+ *   - Dark Green: #006600
+ *   - Light Green: #1fa67a
+ *   - White: #FFFFFF
+ *   - Gold/Accent: #d4af37
+ * 
+ * @author Ministry of Planning, Development & Special Initiatives
+ * @version 1.0.0
+ */
+
+/* ============================================================================
+   CSS Variables (Theme)
+   ============================================================================ */
+
+:root {
+  --pdbot-dark-green: #006600;
+  --pdbot-light-green: #1fa67a;
+  --pdbot-white: #ffffff;
+  --pdbot-gold: #d4af37;
+  --pdbot-gray-100: #f8f9fa;
+  --pdbot-gray-200: #e9ecef;
+  --pdbot-gray-300: #dee2e6;
+  --pdbot-gray-400: #ced4da;
+  --pdbot-gray-500: #adb5bd;
+  --pdbot-gray-600: #6c757d;
+  --pdbot-gray-700: #495057;
+  --pdbot-gray-800: #343a40;
+  --pdbot-gray-900: #212529;
+  --pdbot-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  --pdbot-shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.2);
+  --pdbot-radius: 12px;
+  --pdbot-radius-sm: 8px;
+  --pdbot-transition: 0.2s ease;
+  --pdbot-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* ============================================================================
+   Reset & Base
+   ============================================================================ */
+
+.pdbot-app,
+.pdbot-app *,
+.pdbot-app *::before,
+.pdbot-app *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.pdbot-app {
+  font-family: var(--pdbot-font);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--pdbot-gray-900);
+}
+
+/* ============================================================================
+   Toggle Button (When Widget Closed)
+   ============================================================================ */
+
+.pdbot-toggle-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, var(--pdbot-dark-green), var(--pdbot-light-green));
+  color: var(--pdbot-white);
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-family: var(--pdbot-font);
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: var(--pdbot-shadow-lg);
+  transition: all var(--pdbot-transition);
+  z-index: 9999;
+}
+
+.pdbot-toggle-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 40px rgba(0, 102, 0, 0.3);
+}
+
+.pdbot-toggle-btn:active {
+  transform: scale(0.98);
+}
+
+.pdbot-toggle-icon {
+  font-size: 20px;
+  animation: pdbot-bounce 2s infinite;
+}
+
+@keyframes pdbot-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* ============================================================================
+   Widget Container
+   ============================================================================ */
+
+.pdbot-widget {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 380px;
+  max-width: calc(100vw - 48px);
+  height: 580px;
+  max-height: calc(100vh - 48px);
+  background: var(--pdbot-white);
+  border-radius: var(--pdbot-radius);
+  box-shadow: var(--pdbot-shadow-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 9999;
+  animation: pdbot-slide-up 0.3s ease;
+}
+
+@keyframes pdbot-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pdbot-widget.pdbot-minimized {
+  height: auto;
+}
+
+.pdbot-widget.pdbot-dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
+/* ============================================================================
+   Header
+   ============================================================================ */
+
+.pdbot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, var(--pdbot-dark-green), var(--pdbot-light-green));
+  color: var(--pdbot-white);
+  cursor: grab;
+  user-select: none;
+}
+
+.pdbot-header:active {
+  cursor: grabbing;
+}
+
+.pdbot-header-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pdbot-logo {
+  font-size: 28px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.pdbot-header-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.pdbot-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.pdbot-subtitle {
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+.pdbot-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pdbot-minimize-btn,
+.pdbot-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 6px;
+  color: var(--pdbot-white);
+  cursor: pointer;
+  transition: background var(--pdbot-transition);
+}
+
+.pdbot-minimize-btn:hover,
+.pdbot-close-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ============================================================================
+   Messages Area
+   ============================================================================ */
+
+.pdbot-messages {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  background: var(--pdbot-gray-100);
+  scroll-behavior: smooth;
+}
+
+.pdbot-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pdbot-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.pdbot-messages::-webkit-scrollbar-thumb {
+  background: var(--pdbot-gray-300);
+  border-radius: 3px;
+}
+
+.pdbot-messages::-webkit-scrollbar-thumb:hover {
+  background: var(--pdbot-gray-400);
+}
+
+/* ============================================================================
+   Chat Bubbles
+   ============================================================================ */
+
+.pdbot-bubble-wrapper {
+  display: flex;
+  margin-bottom: 16px;
+  animation: pdbot-fade-in 0.3s ease;
+}
+
+@keyframes pdbot-fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.pdbot-bubble-wrapper.pdbot-user {
+  flex-direction: row-reverse;
+}
+
+.pdbot-avatar {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  background: var(--pdbot-white);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.pdbot-avatar-user {
+  background: var(--pdbot-dark-green);
+  color: var(--pdbot-white);
+}
+
+.pdbot-bubble {
+  max-width: 75%;
+  margin: 0 10px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  position: relative;
+}
+
+.pdbot-bubble-user {
+  background: var(--pdbot-dark-green);
+  color: var(--pdbot-white);
+  border-bottom-right-radius: 4px;
+}
+
+.pdbot-bubble-bot {
+  background: var(--pdbot-white);
+  color: var(--pdbot-gray-800);
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.pdbot-bubble-content {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.pdbot-cursor {
+  display: inline-block;
+  color: var(--pdbot-light-green);
+  animation: pdbot-blink 0.8s infinite;
+  margin-left: 2px;
+}
+
+@keyframes pdbot-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.pdbot-bubble-time {
+  font-size: 10px;
+  color: var(--pdbot-gray-500);
+  margin-top: 6px;
+  text-align: right;
+}
+
+.pdbot-bubble-user .pdbot-bubble-time {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ============================================================================
+   Bubble Actions (Regen, Like, Dislike)
+   ============================================================================ */
+
+.pdbot-bubble-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--pdbot-gray-200);
+}
+
+.pdbot-regen-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid var(--pdbot-gray-300);
+  border-radius: 6px;
+  color: var(--pdbot-gray-600);
+  cursor: pointer;
+  transition: all var(--pdbot-transition);
+}
+
+.pdbot-regen-btn:hover {
+  background: var(--pdbot-gray-100);
+  color: var(--pdbot-light-green);
+  border-color: var(--pdbot-light-green);
+}
+
+.pdbot-regen-btn.pdbot-spinning .pdbot-regen-icon {
+  animation: pdbot-spin 0.5s linear;
+}
+
+@keyframes pdbot-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================================
+   Like/Dislike Buttons
+   ============================================================================ */
+
+.pdbot-like-dislike {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pdbot-feedback-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.pdbot-like-btn,
+.pdbot-dislike-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid var(--pdbot-gray-300);
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all var(--pdbot-transition);
+}
+
+.pdbot-like-btn:hover {
+  background: #e8f5e9;
+  border-color: var(--pdbot-light-green);
+}
+
+.pdbot-dislike-btn:hover {
+  background: #ffebee;
+  border-color: #ef5350;
+}
+
+.pdbot-like-btn.pdbot-active {
+  background: var(--pdbot-light-green);
+  border-color: var(--pdbot-light-green);
+  color: var(--pdbot-white);
+}
+
+.pdbot-dislike-btn.pdbot-active {
+  background: #ef5350;
+  border-color: #ef5350;
+  color: var(--pdbot-white);
+}
+
+.pdbot-like-btn:disabled,
+.pdbot-dislike-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pdbot-feedback-thanks {
+  font-size: 12px;
+  color: var(--pdbot-light-green);
+  font-weight: 500;
+}
+
+/* ============================================================================
+   Dislike Modal
+   ============================================================================ */
+
+.pdbot-dislike-modal {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  width: 250px;
+  background: var(--pdbot-white);
+  border-radius: var(--pdbot-radius-sm);
+  box-shadow: var(--pdbot-shadow);
+  padding: 12px;
+  z-index: 10;
+  animation: pdbot-fade-in 0.2s ease;
+}
+
+.pdbot-dislike-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: var(--pdbot-gray-800);
+}
+
+.pdbot-dislike-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--pdbot-gray-500);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.pdbot-dislike-close:hover {
+  color: var(--pdbot-gray-700);
+}
+
+.pdbot-dislike-reasons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pdbot-reason-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--pdbot-gray-100);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background var(--pdbot-transition);
+}
+
+.pdbot-reason-option:hover {
+  background: var(--pdbot-gray-200);
+}
+
+.pdbot-reason-option.pdbot-selected {
+  background: #e8f5e9;
+  border: 1px solid var(--pdbot-light-green);
+}
+
+.pdbot-reason-option input[type="radio"] {
+  accent-color: var(--pdbot-light-green);
+}
+
+.pdbot-reason-label {
+  font-size: 13px;
+}
+
+.pdbot-custom-reason {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+  border: 1px solid var(--pdbot-gray-300);
+  border-radius: 6px;
+  font-family: var(--pdbot-font);
+  font-size: 13px;
+  resize: none;
+}
+
+.pdbot-custom-reason:focus {
+  outline: none;
+  border-color: var(--pdbot-light-green);
+}
+
+.pdbot-dislike-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.pdbot-skip-btn {
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid var(--pdbot-gray-300);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--pdbot-gray-600);
+  cursor: pointer;
+}
+
+.pdbot-skip-btn:hover {
+  background: var(--pdbot-gray-100);
+}
+
+.pdbot-submit-btn {
+  padding: 6px 12px;
+  background: var(--pdbot-light-green);
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--pdbot-white);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.pdbot-submit-btn:hover {
+  background: var(--pdbot-dark-green);
+}
+
+.pdbot-submit-btn:disabled {
+  background: var(--pdbot-gray-400);
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   Typing Indicator
+   ============================================================================ */
+
+.pdbot-typing-indicator {
+  margin-bottom: 16px;
+  animation: pdbot-fade-in 0.3s ease;
+}
+
+.pdbot-typing-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pdbot-typing-avatar {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  background: var(--pdbot-white);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pdbot-typing-bubble {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--pdbot-white);
+  border-radius: 16px;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.pdbot-typing-text {
+  font-size: 13px;
+  color: var(--pdbot-gray-600);
+}
+
+.pdbot-typing-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.pdbot-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--pdbot-light-green);
+  border-radius: 50%;
+  animation: pdbot-dot-bounce 1.4s infinite ease-in-out both;
+}
+
+.pdbot-dot:nth-child(1) { animation-delay: 0s; }
+.pdbot-dot:nth-child(2) { animation-delay: 0.2s; }
+.pdbot-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes pdbot-dot-bounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+/* ============================================================================
+   Suggested Questions
+   ============================================================================ */
+
+.pdbot-suggested-questions {
+  margin-bottom: 20px;
+}
+
+.pdbot-suggested-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pdbot-gray-700);
+  margin-bottom: 10px;
+}
+
+.pdbot-suggested-icon {
+  font-size: 16px;
+}
+
+.pdbot-suggested-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pdbot-suggested-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--pdbot-white);
+  border: 1px solid var(--pdbot-gray-200);
+  border-radius: var(--pdbot-radius-sm);
+  font-family: var(--pdbot-font);
+  font-size: 13px;
+  color: var(--pdbot-gray-700);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--pdbot-transition);
+}
+
+.pdbot-suggested-btn:hover {
+  background: #e8f5e9;
+  border-color: var(--pdbot-light-green);
+  color: var(--pdbot-dark-green);
+}
+
+.pdbot-suggested-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pdbot-suggested-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pdbot-suggested-arrow {
+  color: var(--pdbot-light-green);
+  font-weight: bold;
+  margin-left: 8px;
+}
+
+/* ============================================================================
+   Settings Menu
+   ============================================================================ */
+
+.pdbot-settings-menu {
+  position: relative;
+}
+
+.pdbot-settings-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 6px;
+  color: var(--pdbot-white);
+  cursor: pointer;
+  transition: background var(--pdbot-transition);
+}
+
+.pdbot-settings-btn:hover,
+.pdbot-settings-btn.pdbot-active {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.pdbot-settings-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 200px;
+  background: var(--pdbot-white);
+  border-radius: var(--pdbot-radius-sm);
+  box-shadow: var(--pdbot-shadow);
+  padding: 8px 0;
+  z-index: 100;
+  animation: pdbot-fade-in 0.2s ease;
+}
+
+.pdbot-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  font-family: var(--pdbot-font);
+  font-size: 13px;
+  color: var(--pdbot-gray-700);
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  transition: background var(--pdbot-transition);
+}
+
+.pdbot-menu-item:hover {
+  background: var(--pdbot-gray-100);
+}
+
+.pdbot-menu-item.pdbot-menu-sub {
+  padding-left: 28px;
+}
+
+.pdbot-menu-item.pdbot-menu-link {
+  color: var(--pdbot-light-green);
+}
+
+.pdbot-menu-icon {
+  font-size: 16px;
+}
+
+.pdbot-menu-label {
+  flex: 1;
+}
+
+.pdbot-menu-external {
+  font-size: 10px;
+  color: var(--pdbot-gray-500);
+}
+
+.pdbot-menu-divider {
+  height: 1px;
+  background: var(--pdbot-gray-200);
+  margin: 8px 0;
+}
+
+.pdbot-menu-group {
+  padding: 4px 0;
+}
+
+.pdbot-menu-group-label {
+  display: block;
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--pdbot-gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================================================
+   Input Area
+   ============================================================================ */
+
+.pdbot-input-area {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--pdbot-white);
+  border-top: 1px solid var(--pdbot-gray-200);
+}
+
+.pdbot-input {
+  flex: 1;
+  padding: 12px 14px;
+  background: var(--pdbot-gray-100);
+  border: 1px solid var(--pdbot-gray-200);
+  border-radius: 20px;
+  font-family: var(--pdbot-font);
+  font-size: 14px;
+  resize: none;
+  min-height: 44px;
+  max-height: 120px;
+  overflow-y: auto;
+  transition: border-color var(--pdbot-transition);
+}
+
+.pdbot-input:focus {
+  outline: none;
+  border-color: var(--pdbot-light-green);
+  background: var(--pdbot-white);
+}
+
+.pdbot-input::placeholder {
+  color: var(--pdbot-gray-500);
+}
+
+.pdbot-send-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: var(--pdbot-dark-green);
+  border: none;
+  border-radius: 50%;
+  color: var(--pdbot-white);
+  cursor: pointer;
+  transition: all var(--pdbot-transition);
+  flex-shrink: 0;
+}
+
+.pdbot-send-btn:hover {
+  background: var(--pdbot-light-green);
+  transform: scale(1.05);
+}
+
+.pdbot-send-btn:disabled {
+  background: var(--pdbot-gray-400);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ============================================================================
+   Footer
+   ============================================================================ */
+
+.pdbot-footer {
+  padding: 10px 16px;
+  background: var(--pdbot-gray-100);
+  text-align: center;
+  border-top: 1px solid var(--pdbot-gray-200);
+}
+
+.pdbot-footer-text {
+  font-size: 10px;
+  color: var(--pdbot-gray-600);
+}
+
+/* ============================================================================
+   Minimized State
+   ============================================================================ */
+
+.pdbot-minimized-content {
+  padding: 12px 16px;
+  text-align: center;
+  cursor: pointer;
+  color: var(--pdbot-gray-600);
+  font-size: 13px;
+}
+
+.pdbot-minimized-content:hover {
+  background: var(--pdbot-gray-100);
+}
+
+/* ============================================================================
+   Feedback Modal
+   ============================================================================ */
+
+.pdbot-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: pdbot-fade-in 0.2s ease;
+}
+
+.pdbot-feedback-modal {
+  width: 360px;
+  max-width: calc(100vw - 48px);
+  background: var(--pdbot-white);
+  border-radius: var(--pdbot-radius);
+  box-shadow: var(--pdbot-shadow-lg);
+  overflow: hidden;
+  animation: pdbot-slide-up 0.3s ease;
+}
+
+.pdbot-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, var(--pdbot-dark-green), var(--pdbot-light-green));
+  color: var(--pdbot-white);
+}
+
+.pdbot-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.pdbot-modal-icon {
+  font-size: 20px;
+}
+
+.pdbot-modal-close {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: var(--pdbot-white);
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pdbot-modal-close:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.pdbot-modal-body {
+  padding: 20px;
+}
+
+.pdbot-form-group {
+  margin-bottom: 18px;
+}
+
+.pdbot-form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pdbot-gray-700);
+  margin-bottom: 8px;
+}
+
+.pdbot-optional {
+  font-weight: normal;
+  color: var(--pdbot-gray-500);
+}
+
+.pdbot-form-input,
+.pdbot-form-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--pdbot-gray-300);
+  border-radius: 8px;
+  font-family: var(--pdbot-font);
+  font-size: 14px;
+  transition: border-color var(--pdbot-transition);
+}
+
+.pdbot-form-input:focus,
+.pdbot-form-textarea:focus {
+  outline: none;
+  border-color: var(--pdbot-light-green);
+}
+
+.pdbot-form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.pdbot-char-count {
+  display: block;
+  text-align: right;
+  font-size: 11px;
+  color: var(--pdbot-gray-500);
+  margin-top: 4px;
+}
+
+.pdbot-form-error {
+  padding: 10px;
+  background: #ffebee;
+  border-radius: 6px;
+  color: #c62828;
+  font-size: 13px;
+}
+
+.pdbot-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 20px;
+  background: var(--pdbot-gray-100);
+  border-top: 1px solid var(--pdbot-gray-200);
+}
+
+/* ============================================================================
+   Rating Stars
+   ============================================================================ */
+
+.pdbot-rating-stars {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.pdbot-stars-container {
+  display: flex;
+  gap: 8px;
+}
+
+.pdbot-star {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  transition: transform var(--pdbot-transition);
+}
+
+.pdbot-star:hover {
+  transform: scale(1.15);
+}
+
+.pdbot-star:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.pdbot-rating-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--pdbot-gray-700);
+}
+
+.pdbot-rating-emoji {
+  font-size: 18px;
+}
+
+.pdbot-rating-text {
+  font-weight: 500;
+}
+
+/* ============================================================================
+   Buttons
+   ============================================================================ */
+
+.pdbot-btn {
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-family: var(--pdbot-font);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--pdbot-transition);
+}
+
+.pdbot-btn-primary {
+  background: var(--pdbot-dark-green);
+  border: none;
+  color: var(--pdbot-white);
+}
+
+.pdbot-btn-primary:hover {
+  background: var(--pdbot-light-green);
+}
+
+.pdbot-btn-primary:disabled {
+  background: var(--pdbot-gray-400);
+  cursor: not-allowed;
+}
+
+.pdbot-btn-secondary {
+  background: transparent;
+  border: 1px solid var(--pdbot-gray-300);
+  color: var(--pdbot-gray-700);
+}
+
+.pdbot-btn-secondary:hover {
+  background: var(--pdbot-gray-100);
+}
+
+.pdbot-btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   Mobile Responsive
+   ============================================================================ */
+
+@media (max-width: 480px) {
+  .pdbot-toggle-btn {
+    bottom: 16px;
+    right: 16px;
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+  
+  .pdbot-toggle-label {
+    display: none;
+  }
+  
+  .pdbot-widget {
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+  }
+  
+  .pdbot-header {
+    border-radius: 0;
+  }
+  
+  .pdbot-bubble {
+    max-width: 85%;
+  }
+  
+  .pdbot-modal-overlay {
+    padding: 16px;
+  }
+  
+  .pdbot-feedback-modal {
+    width: 100%;
+  }
+}
+
+/* ============================================================================
+   Print Styles
+   ============================================================================ */
+
+@media print {
+  .pdbot-app,
+  .pdbot-toggle-btn,
+  .pdbot-widget {
+    display: none !important;
+  }
+}
