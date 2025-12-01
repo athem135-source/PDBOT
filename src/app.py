@@ -575,7 +575,7 @@ def _load_builtin_manual(force: bool = False):
     else:
         st.error("Manual could not be read. Install 'langchain-community' or 'pypdf' to enable PDF reading.")
 
-_HEADER = "<h1 style='margin-bottom:0; font-weight:800;'>PDBOT</h1><p style='opacity:.5;margin-top:0px;font-size:0.9em;'>v2.0.7</p><p style='opacity:.8;margin-top:4px'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</p>"
+_HEADER = "<h1 style='margin-bottom:0; font-weight:800;'>PDBOT</h1><p style='opacity:.5;margin-top:0px;font-size:0.9em;'>v2.0.8</p><p style='opacity:.8;margin-top:4px'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</p>"
 # Single, hardcoded default logo path: place your logo at this location and it will be used automatically
 # Prefer explicit light-theme logo filename for white theme
 HARDCODED_LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "branding_logo-black.png")
@@ -699,7 +699,7 @@ def render_brand_header():
     else:
         html.append("<div class='brand-logo' style='font-weight:700;opacity:.9'>Planning &amp; Development</div>")
     html.append("<div class='brand-title'>PDBOT</div>")
-    html.append("<div style='text-align:center; opacity:0.5; margin-top:4px; font-size:0.9em;'>v2.0.7</div>")
+    html.append("<div style='text-align:center; opacity:0.5; margin-top:4px; font-size:0.9em;'>v2.0.8</div>")
     html.append("</div>")  # close brand-card
     html.append("<div class='brand-sub'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</div>")
     html.append("</div>")
@@ -1906,8 +1906,10 @@ def generate_answer_generative(question: str) -> str:
     # Legacy-style Generative answering: simple prompt -> compose -> sanitize
     # v2.0.5: Ollama only (removed pretrained mode)
     # v2.0.7: Added Groq fallback and force_groq toggle for admin testing
+    # v2.0.8: Strict 45-70 word answers with sanitization
     base_answer = ""
     _force_groq = st.session_state.get("force_groq_fallback", False)
+    _page = hits[0].get("page", 0) if hits else 0
     try:
         gen = LocalModel(model_name=globals().get("model_name", os.getenv("OLLAMA_MODEL", "mistral:latest")), backend="ollama")
         try:
@@ -1917,13 +1919,14 @@ def generate_answer_generative(question: str) -> str:
         except Exception:
             # Proceed with an empty base answer and rely on compose_answer
             pass
-        # FIX #8: Increased max_new_tokens from 1200 to 1800 for fuller answers
+        # v2.0.8: Reduced tokens for stricter output
         base_answer = gen.generate_response(
             question=question,
             context=context_text,
-            max_new_tokens=1800,
+            max_new_tokens=120,
             temperature=0.15,
             force_groq=_force_groq,
+            page=_page,
         ) or ""
     except Exception:
         base_answer = ""
@@ -1937,28 +1940,24 @@ def generate_answer_generative(question: str) -> str:
             except Exception:
                 # We’ll proceed with an empty base answer and rely on compose_answer
                 pass
-            # FIX #8: Increased max_new_tokens from 1200 to 1800 for fuller answers
+            # v2.0.8: Reduced tokens for stricter output
             base_answer = gen.generate_response(
                 question=question,
                 context=context_text,
-                max_new_tokens=1800,
+                max_new_tokens=120,
                 temperature=0.15,
                 force_groq=_force_groq,
+                page=_page,
             ) or ""
     except Exception:
         base_answer = ""
 
-    # v1.6.1: Force minimal word target (compose_answer ignores this now anyway)
-    words_target = 80  # Minimal output only
-    if len(hits) >= 5:
-        words_target = 80  # Still minimal
-
-    composed = compose_answer("Generative", hits, question, base_answer=base_answer, words_target=words_target)
-    cleaned = _sanitize_model_output(composed)
+    # v2.0.8: Use base_answer directly (already sanitized by LocalModel)
+    cleaned = base_answer.strip()
     
-    # v1.7.0: Enforce DYNAMIC numeric safety validation (no hardcoded limits)
-    from src.core.numeric_safety_dynamic import enforce_numeric_safety
-    cleaned = enforce_numeric_safety(question, hits, cleaned)
+    # v2.0.8: Add ✅ prefix if valid answer
+    if cleaned and not cleaned.startswith("Not found") and "✅" not in cleaned:
+        cleaned = "✅ Answer:" + cleaned
     
     # v1.7.0: LIMIT CITATIONS TO TOP 3 SOURCES ONLY (fixes citation spam)
     citations_limited = citations[:3]  # Maximum 3 sources
@@ -2826,6 +2825,10 @@ with tab_chat:
                     else:
                         # Add user message to history first
                         st.session_state.chat_history.append({"role": "user", "content": q})
+                        
+                        # v2.0.8: Display user question immediately in chat
+                        with st.chat_message("user"):
+                            st.markdown(q)
                         
                         with st.spinner("Generating answer…"):
                             # Generate answer

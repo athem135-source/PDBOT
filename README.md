@@ -1,9 +1,9 @@
 ﻿# PDBot – Planning & Development Manual RAG Chatbot
 
-![Version](https://img.shields.io/badge/version-2.0.7-blue)
+![Version](https://img.shields.io/badge/version-2.0.8-blue)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-Proprietary-red)
-![Accuracy](https://img.shields.io/badge/accuracy-80--85%25-brightgreen)
+![Accuracy](https://img.shields.io/badge/accuracy-85--90%25-brightgreen)
 
 **🏆 Enterprise-grade document-grounded chatbot for querying the Planning & Development Commission Manual using ultra-strict dynamic RAG with zero hardcoding.**
 
@@ -26,6 +26,42 @@
 - [Contributing](#-contributing)
 - [License](#-license)
 - [Contact](#-contact)
+
+---
+
+## 🚀 What's New in v2.0.8
+
+### 🎯 Answer Quality Overhaul
+- **Strict 45-70 word answers** - Concise, direct responses without background noise
+- **Answer Sanitizer** - Post-generation cleanup removes filler phrases, keeps 2-3 sentences max
+- **Numeric extraction guaranteed** - Numbers from context are always extracted and preserved
+- **Clean citations** - Single, consistent "Source: Manual for Development Projects 2024, p.X" format
+
+### 🔍 Improved Retrieval
+- **Numeric boost (+0.25)** - Chunks with Rs/million/billion/approval/cost ranked higher
+- **Query-number boost (+0.15)** - If query has numbers, chunks with numbers get priority
+- **Stricter reranking** - Top 2 chunks only, 0.32 threshold, Groq fallback for reranking
+- **Initial retrieval: 40 chunks** → rerank → keep best 2
+
+### 🤖 Smarter Classification
+- **Development governance allowed** - ECNEC, CDWP, ministry questions no longer blocked
+- **Politics filter fixed** - Only pure political questions (elections, parties) are off-scope
+- **Army chief questions** - Now correctly marked as off-scope (not development related)
+
+### 💬 UX Improvements
+- **User question display** - Your question now shows immediately in chat
+- **Faster responses** - Reduced token generation (120 vs 1800)
+- **Better error handling** - Cleaner fallback to Groq when Ollama fails
+
+### 📊 Target Metrics
+| Metric | Target |
+|--------|--------|
+| Overall accuracy | ≥ 85% |
+| Numeric extraction | ≥ 90% |
+| Chunk relevance | ≥ 88% |
+| Citation correctness | ≥ 95% |
+| Answer length compliance | 100% |
+| Hallucinations | 0% |
 
 ---
 

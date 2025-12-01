@@ -1,6 +1,7 @@
 """
-PDBot RAG Pipeline v3.0.0
+PDBot RAG Pipeline v3.1.0 (v2.0.8)
 Sentence-level chunking, strict reranking, numeric boost.
+Groq for reranking ONLY (not generation).
 Zero hardcoding. All answers from PDF only.
 """
 from __future__ import annotations
@@ -8,12 +9,18 @@ from __future__ import annotations
 import os
 import re
 import warnings
+import logging
 from typing import List, Dict, Any, Optional
 
 warnings.filterwarnings("ignore")
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 DEBUG_MODE = os.getenv("PNDBOT_DEBUG", "False").lower() == "true"
+
+# Groq API for reranking (NOT for generation)
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+GROQ_RERANK_MODEL = os.getenv("GROQ_RERANK_MODEL", "llama-3.1-8b-instant")
 
 # Imports with type: ignore for optional dependencies
 SENTENCE_TRANSFORMERS_AVAILABLE = False
@@ -267,12 +274,14 @@ def search_sentences(
     **kwargs
 ) -> List[Dict[str, Any]]:
     """
-    Retrieval pipeline:
+    v2.0.8 Retrieval pipeline:
     1. Initial retrieval: 40 chunks from Qdrant
     2. Post-filter: reject <5 or >130 words
-    3. Numeric boost: +0.25 for Rs/million/billion/cost/approval
-    4. Reranker: keep TOP 2 with score >= 0.30
-    5. Fallback: if none survive, use highest vector chunk
+    3. Numeric boost: +0.25 for Rs/million/billion/cost/approval/allocation/expenditure/release
+    4. Query-number boost: +0.15 if query has numbers and chunk has numbers
+    5. Reranker: keep TOP 2 with score >= 0.32
+    6. Groq rerank fallback if cross-encoder fails
+    7. Fallback: if none survive, use highest vector chunk
     """
     model = get_embedder()
     if model is None:
@@ -297,6 +306,9 @@ def search_sentences(
     
     chunks = []
     fallback_chunk = None
+    
+    # Check if query contains numbers
+    query_has_numbers = bool(re.search(r'\d+', query))
     
     for r in results:
         payload = r.payload or {}
@@ -331,19 +343,34 @@ def search_sentences(
         })
     
     if DEBUG_MODE:
-        print(f"[DEBUG] After initial filter: {len(chunks)} chunks")
+        logging.info(f"[RAG] After initial filter: {len(chunks)} chunks")
     
-    # Step 2: Numeric boost (+0.25 for Rs/million/billion/cost/approval)
-    numeric_patterns = ["rs.", "rs ", "rupees", "million", "billion", "crore", "lakh", "cost", "approval"]
+    # Step 2: Numeric boost (+0.25 for key financial/policy terms)
+    numeric_patterns = [
+        "rs.", "rs ", "rupees", "million", "billion", "crore", "lakh",
+        "approval limit", "allocation", "cost", "expenditure", "release",
+        "ceiling", "threshold", "budget", "fund"
+    ]
     
     for chunk in chunks:
         text_lower = chunk["text"].lower()
+        boost = 0.0
+        
+        # +0.25 for numeric/policy terms
         if any(p in text_lower for p in numeric_patterns):
-            chunk["score"] = min(1.0, chunk["score"] + 0.25)
+            boost += 0.25
             chunk["numeric_boosted"] = True
+        
+        # +0.15 if query has numbers AND chunk has numbers
+        if query_has_numbers and re.search(r'\d+', chunk["text"]):
+            boost += 0.15
+            chunk["number_match"] = True
+        
+        chunk["score"] = min(1.0, chunk["score"] + boost)
     
-    # Step 3: Rerank with cross-encoder (keep TOP 2, threshold 0.30)
+    # Step 3: Rerank with cross-encoder (keep TOP 2, threshold 0.32)
     reranker = get_reranker()
+    rerank_success = False
     
     if reranker and chunks:
         pairs = [[query, c["text"]] for c in chunks]
@@ -355,34 +382,104 @@ def search_sentences(
             # Sort by rerank score
             chunks = sorted(chunks, key=lambda x: x.get("rerank_score", 0), reverse=True)
             
-            # Filter by threshold 0.30 and keep top 2
-            filtered = [c for c in chunks if c.get("rerank_score", 0) >= 0.30][:top_k]
+            # Filter by threshold 0.32 and keep top 2
+            filtered = [c for c in chunks if c.get("rerank_score", 0) >= 0.32][:top_k]
             
             if filtered:
                 chunks = filtered
+                rerank_success = True
             elif chunks:
                 # Fallback: take highest rerank score chunk
                 chunks = [chunks[0]]
+                rerank_success = True
             
             if DEBUG_MODE:
-                print(f"[DEBUG] After reranking: {len(chunks)} chunks")
+                logging.info(f"[RAG] After reranking: {len(chunks)} chunks")
                 for i, c in enumerate(chunks):
-                    print(f"  #{i+1} rerank={c.get('rerank_score', 0):.3f} page={c.get('page')}")
+                    logging.info(f"  #{i+1} rerank={c.get('rerank_score', 0):.3f} page={c.get('page')}")
         
         except Exception as e:
             if DEBUG_MODE:
-                print(f"[DEBUG] Reranking failed: {e}")
+                logging.warning(f"[RAG] Cross-encoder reranking failed: {e}")
+    
+    # Step 4: Groq rerank fallback (if cross-encoder failed)
+    if not rerank_success and chunks and GROQ_API_KEY:
+        try:
+            chunks = _groq_rerank(query, chunks, top_k=top_k)
+            if DEBUG_MODE:
+                logging.info(f"[RAG] Groq rerank: {len(chunks)} chunks")
+        except Exception as e:
+            if DEBUG_MODE:
+                logging.warning(f"[RAG] Groq rerank failed: {e}")
             chunks = sorted(chunks, key=lambda x: x.get("score", 0), reverse=True)[:top_k]
-    else:
+    elif not rerank_success:
         chunks = sorted(chunks, key=lambda x: x.get("score", 0), reverse=True)[:top_k]
     
-    # Step 4: Fallback if none survive
+    # Step 5: Fallback if none survive
     if not chunks and fallback_chunk:
         chunks = [fallback_chunk]
         if DEBUG_MODE:
-            print("[DEBUG] Using fallback chunk (highest vector score)")
+            logging.info("[RAG] Using fallback chunk (highest vector score)")
     
     return chunks
+
+
+def _groq_rerank(query: str, chunks: List[Dict[str, Any]], top_k: int = 2) -> List[Dict[str, Any]]:
+    """
+    Use Groq to score chunk relevance (reranking ONLY, not generation).
+    Returns top chunks sorted by relevance score.
+    """
+    import requests
+    
+    if not GROQ_API_KEY or not chunks:
+        return chunks[:top_k]
+    
+    # Build reranking prompt
+    chunk_texts = "\n\n".join([f"[{i+1}] {c['text'][:300]}" for i, c in enumerate(chunks[:10])])
+    
+    prompt = f"""Rate the relevance of each text chunk to the query on a scale of 0-10.
+Query: {query}
+
+Chunks:
+{chunk_texts}
+
+Return ONLY a JSON array of scores, e.g., [8, 5, 9, 3, 7, 2, 6, 4, 1, 0]
+No explanation, just the array:"""
+    
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+    payload = {
+        "model": GROQ_RERANK_MODEL,
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.1,
+        "max_tokens": 100,
+    }
+    
+    try:
+        r = requests.post(GROQ_API_URL, headers=headers, json=payload, timeout=15)
+        r.raise_for_status()
+        content = r.json().get("choices", [{}])[0].get("message", {}).get("content", "")
+        
+        # Parse scores
+        import json
+        scores = json.loads(content.strip())
+        
+        # Apply scores
+        for i, chunk in enumerate(chunks[:len(scores)]):
+            chunk["groq_rerank_score"] = float(scores[i]) / 10.0
+        
+        # Sort and filter
+        chunks = sorted(chunks, key=lambda x: x.get("groq_rerank_score", 0), reverse=True)
+        filtered = [c for c in chunks if c.get("groq_rerank_score", 0) >= 0.32][:top_k]
+        
+        return filtered if filtered else [chunks[0]] if chunks else []
+    
+    except Exception as e:
+        logging.warning(f"[RAG] Groq rerank parse error: {e}")
+        return chunks[:top_k]
 
 
 def dedup_chunks(candidates: List[Dict[str, Any]], min_chars: int = 28) -> List[Dict[str, Any]]:

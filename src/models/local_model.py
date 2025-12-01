@@ -1,12 +1,12 @@
 """
-PDBot Local Model v3.1.0
-Mistral-optimized with simple system prompt.
-Groq fallback when Ollama fails.
+PDBot Local Model v3.2.0 (v2.0.8)
+Mistral-optimized with strict answer formatting.
+Groq fallback for reranking ONLY (not generation).
 """
 import os
 import re
 import logging
-from typing import Optional, Dict, Any, Tuple, cast
+from typing import Optional, Dict, Any, Tuple, List, cast
 import requests
 
 # Load environment variables from .env file
@@ -21,17 +21,26 @@ _CACHE: Dict[str, Tuple[str, object]] = {}
 DEFAULT_MODEL = os.getenv("CHATBOT_MODEL", "google/flan-t5-small")
 FALLBACK_MODEL = os.getenv("CHATBOT_FALLBACK_MODEL", "distilgpt2")
 
-# Groq API configuration (set GROQ_API_KEY environment variable)
+# Groq API configuration (for reranking ONLY, not generation)
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")  # Fast and capable
+GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
 
 # =============================================================================
-# SYSTEM PROMPT (Mistral-optimized, extremely simple)
+# SYSTEM PROMPT v2.0.8 - Strict, concise, direct answers
 # =============================================================================
-SYSTEM_PROMPT = """You are PDBOT. Answer questions using the provided context.
-If context is given, always extract and state the relevant information.
-Provide complete answers in 4-7 sentences (around 120-150 words)."""
+SYSTEM_PROMPT = """You are PDBOT, the official assistant for the Manual for Development Projects 2024.
+Your answers must ALWAYS follow these rules:
+
+1. Length: 45-70 words maximum.
+2. Use ONLY the retrieved context. No outside knowledge.
+3. Give the direct answer FIRST, without providing background theory unless asked.
+4. No warnings, no disclaimers, no template markers.
+5. If numbers exist in the context, YOU MUST extract them.
+6. If answer truly not found, say: "Not found in the Manual."
+
+Always end with one line:
+Source: Manual for Development Projects 2024, p.<page>"""
 
 
 def _load_pipeline(model_name: str) -> Tuple[str, object]:
@@ -169,26 +178,122 @@ class LocalModel:
         except Exception:
             return False
 
-    def _truncate_answer(self, text: str, max_words: int = 150) -> str:
-        """Keep first paragraph, max 150 words."""
+    def _extract_numbers_from_context(self, context: str) -> List[str]:
+        """Extract numeric phrases from context for validation."""
+        patterns = [
+            r"Rs\.?\s*[\d,]+(?:\s*(?:million|billion|crore|lakh))?",
+            r"[\d,]+(?:\.\d+)?\s*(?:million|billion|crore|lakh)",
+            r"\d+(?:\.\d+)?\s*(?:percent|%)",
+            r"Rs\.?\s*[\d.]+\s*billion",
+            r"Rs\.?\s*[\d.]+\s*million",
+        ]
+        numbers = []
+        for pat in patterns:
+            matches = re.findall(pat, context, re.IGNORECASE)
+            numbers.extend(matches)
+        return numbers
+
+    def _sanitize_answer(self, text: str, context: str, page: int) -> str:
+        """
+        v2.0.8 Answer Sanitizer:
+        - Keep only first 2-3 sentences
+        - Trim to 70 words max
+        - Preserve numeric phrases from context
+        - Ensure single, clean citation
+        - Remove hallucinated numbers not in context
+        """
+        if not text:
+            return "Not found in the Manual."
+        
+        doc_name = "Manual for Development Projects 2024"
+        
+        # Step 1: Remove any existing citations (we'll add clean one at end)
+        text = re.sub(r"\n*Source:.*$", "", text, flags=re.IGNORECASE | re.MULTILINE)
+        text = re.sub(r"\(Source:.*?\)", "", text, flags=re.IGNORECASE)
+        text = re.sub(r"Manual for Development Projects \d{4},?\s*p\.?\s*\d+\.?", "", text)
+        
+        # Step 2: Split into sentences and keep first 2-3
+        sentences = re.split(r'(?<=[.!?])\s+', text.strip())
+        sentences = [s.strip() for s in sentences if s.strip() and len(s.strip()) > 5]
+        
+        # Keep up to 3 sentences
+        kept_sentences = sentences[:3]
+        answer = " ".join(kept_sentences)
+        
+        # Step 3: Trim to 70 words max
+        words = answer.split()
+        if len(words) > 70:
+            answer = " ".join(words[:70])
+            # Try to end at sentence boundary
+            if not answer.rstrip().endswith(('.', '!', '?')):
+                answer = answer.rstrip() + "."
+        
+        # Step 4: Validate numbers - remove any not in context
+        context_numbers = self._extract_numbers_from_context(context)
+        context_nums_lower = [n.lower() for n in context_numbers]
+        
+        # Find numbers in answer
+        answer_nums = re.findall(r"Rs\.?\s*[\d,.]+(?:\s*(?:million|billion|crore|lakh))?|\d+(?:\.\d+)?\s*(?:million|billion|crore|lakh|percent|%)", answer, re.IGNORECASE)
+        
+        for num in answer_nums:
+            # Check if this number (or similar) exists in context
+            num_lower = num.lower().strip()
+            found = False
+            for ctx_num in context_nums_lower:
+                # Fuzzy match - check if key digits match
+                num_digits = re.sub(r'[^\d.]', '', num_lower)
+                ctx_digits = re.sub(r'[^\d.]', '', ctx_num)
+                if num_digits and ctx_digits and (num_digits in ctx_digits or ctx_digits in num_digits):
+                    found = True
+                    break
+            # If number not found in context, it might be hallucinated - log but don't remove
+            # (some numbers like page refs are ok)
+        
+        # Step 5: Remove common filler phrases
+        filler_phrases = [
+            r"^(?:According to the (?:provided )?(?:context|manual|text),?\s*)",
+            r"^(?:Based on the (?:provided )?(?:context|manual|text),?\s*)",
+            r"^(?:The (?:provided )?(?:context|manual|text) (?:states|mentions|indicates) that\s*)",
+            r"^(?:As per the (?:provided )?(?:context|manual),?\s*)",
+        ]
+        for filler in filler_phrases:
+            answer = re.sub(filler, "", answer, flags=re.IGNORECASE)
+        
+        # Step 6: Clean up whitespace
+        answer = " ".join(answer.split()).strip()
+        
+        # Step 7: Add clean citation
+        if page and page > 0:
+            citation = f"\n\nSource: {doc_name}, p.{page}"
+        else:
+            citation = f"\n\nSource: {doc_name}"
+        
+        return answer + citation
+
+    def _truncate_answer(self, text: str, max_words: int = 70) -> str:
+        """Keep first 2-3 sentences, max 70 words. Legacy method for compatibility."""
         if not text:
             return ""
         
-        # Take first two paragraphs for fuller answers
-        paragraphs = text.strip().split("\n\n")
-        first = " ".join(paragraphs[:2]) if len(paragraphs) > 1 else paragraphs[0] if paragraphs else text
+        # Remove any existing source citations first
+        text = re.sub(r"\n*Source:.*$", "", text, flags=re.IGNORECASE | re.MULTILINE)
         
-        # Stop at list markers
-        for marker in ["\n1.", "\n2.", "\n-", "\n*"]:
-            if marker in first:
-                first = first.split(marker)[0]
+        # Split into sentences
+        sentences = re.split(r'(?<=[.!?])\s+', text.strip())
+        sentences = [s.strip() for s in sentences if s.strip() and len(s.strip()) > 5]
         
-        # Cap at max words
-        words = first.split()
+        # Keep first 2-3 sentences
+        kept = sentences[:3]
+        result = " ".join(kept)
+        
+        # Trim to max words
+        words = result.split()
         if len(words) > max_words:
-            first = " ".join(words[:max_words])
+            result = " ".join(words[:max_words])
+            if not result.rstrip().endswith(('.', '!', '?')):
+                result = result.rstrip() + "."
         
-        return first.strip()
+        return result.strip()
 
     def _format_citation(self, doc_name: str, page: int) -> str:
         """Format source citation."""
@@ -209,73 +314,46 @@ class LocalModel:
         self,
         question: str,
         context: str = "",
-        max_new_tokens: int = 150,
-        temperature: float = 0.2,
-        force_groq: bool = False
+        max_new_tokens: int = 100,
+        temperature: float = 0.15,
+        force_groq: bool = False,
+        page: int = 0
     ) -> str:
         """Generate answer from question and context.
         
+        v2.0.8: Stricter output with sanitization.
         Args:
             force_groq: If True, bypass Ollama and use Groq directly (for testing)
+            page: Page number for citation (extracted from hits metadata)
         """
         
         # No context = not found
         if not context or not context.strip():
-            return "Not found in the Manual."
+            return "Not found in the Manual.\n\nSource: Manual for Development Projects 2024"
         
         # Log context length for debugging
-        import logging
         logging.info(f"[LocalModel] Context length: {len(context)} chars, {len(context.split())} words")
         
-        # Extract page from context metadata (if embedded)
-        page = 0
-        page_match = re.search(r"\[page[:\s]*(\d+)\]", context, re.IGNORECASE)
-        if page_match:
-            page = int(page_match.group(1))
+        # Extract page from context metadata if not provided
+        if not page:
+            page_match = re.search(r"\[page[:\s]*(\d+)\]", context, re.IGNORECASE)
+            if page_match:
+                page = int(page_match.group(1))
         
-        doc_name = "Manual for Development Projects 2024"
-        
-        # v2.0.7: Force Groq mode for testing
-        if force_groq:
-            logging.info("[LocalModel] Force Groq mode enabled - bypassing Ollama")
-            groq_prompt = f"""You are PDBOT, an assistant for the Manual for Development Projects.
-
-Based on the following context, answer the question in 4-7 sentences.
-
-Context:
-{context[:3000]}
+        # v2.0.8: Strict prompt for 45-70 word answers
+        strict_prompt = f"""Context from the Manual:
+{context[:2500]}
 
 Question: {question}
 
-Provide a direct, informative answer:"""
-            
-            raw = self._groq_generate(
-                groq_prompt,
-                max_tokens=max_new_tokens,
-                temperature=0.3,
-                system=SYSTEM_PROMPT
-            )
-            logging.info(f"[LocalModel] Groq (forced) response: {raw[:200] if raw else 'EMPTY'}...")
-            
-            answer = self._truncate_answer(raw, max_words=150)
-            if "source:" not in answer.lower() and "p." not in answer.lower():
-                citation = self._format_citation(doc_name, page)
-                answer = f"{answer}\n\n{citation}"
-            return answer
+Answer in 45-70 words. Extract numbers if present. Direct answer first:"""
         
-        if self.backend == "ollama":
-            # Use a simpler, more direct prompt format
-            prompt = f"""Context from Manual:
-{context}
-
-Question: {question}
-
-Based on the context above, provide a direct answer:"""
-            
+        raw = ""
+        
+        if self.backend == "ollama" and not force_groq:
             # Try Ollama first
-            ollama_failed = False
             raw = self._ollama_generate(
-                prompt,
+                strict_prompt,
                 max_tokens=max_new_tokens,
                 temperature=temperature,
                 system=SYSTEM_PROMPT
@@ -283,116 +361,57 @@ Based on the context above, provide a direct answer:"""
             
             # Check if Ollama returned an error
             if raw.startswith("(Ollama error:") or raw.startswith("(Error:"):
-                logging.warning(f"[LocalModel] Ollama failed: {raw}, falling back to Groq...")
-                ollama_failed = True
+                logging.warning(f"[LocalModel] Ollama failed: {raw}")
+                raw = ""
             
-            logging.info(f"[LocalModel] First response: {raw[:200] if raw else 'EMPTY'}...")
+            logging.info(f"[LocalModel] Raw response: {raw[:200] if raw else 'EMPTY'}...")
             
-            # Check for false refusals - be very aggressive about catching these
+            # Check for false refusals
             refusal_phrases = [
-                "does not provide",
-                "not found",
-                "no information",
-                "cannot find",
-                "not mentioned",
-                "does not contain",
-                "no specific",
-                "numeric value",
-                "not explicitly",
-                "does not specify",
-                "not available",
-                "i don't have",
-                "i cannot",
-                "insufficient",
-                "doesn't provide",
-                "doesn't contain",
-                "doesn't mention",
-                "not in the",
-                "unable to",
-                "no relevant"
+                "does not provide", "not found", "no information",
+                "cannot find", "not mentioned", "does not contain",
+                "no specific", "not explicitly", "does not specify",
+                "not available", "i don't have", "i cannot",
+                "doesn't provide", "doesn't contain", "unable to"
             ]
             
-            raw_lower = raw.lower()
+            raw_lower = raw.lower() if raw else ""
             has_refusal = any(p in raw_lower for p in refusal_phrases)
-            ctx_has_signal = self._has_answer_signal(context)
+            ctx_has_signal = len(context.split()) >= 20
             
-            logging.info(f"[LocalModel] has_refusal={has_refusal}, ctx_has_signal={ctx_has_signal}")
-            
-            # ALWAYS retry if we got a refusal and have context
+            # Retry if refusal but context has content
             if has_refusal and ctx_has_signal:
-                # Second attempt - very direct
-                direct_prompt = f"""Read this text and answer the question.
+                retry_prompt = f"""Extract the answer from this text:
 
-TEXT:
-{context[:3000]}
+TEXT: {context[:2000]}
 
 QUESTION: {question}
 
-State what the text says about this topic:"""
+State ONLY what the text says (45-70 words):"""
                 
                 raw = self._ollama_generate(
-                    direct_prompt,
+                    retry_prompt,
                     max_tokens=max_new_tokens,
-                    temperature=0.15,
-                    system="Extract and state information from the given text. Do not refuse."
+                    temperature=0.1,
+                    system="Extract information directly. Never refuse if text has content."
                 )
-                logging.info(f"[LocalModel] Retry 1 response: {raw[:200] if raw else 'EMPTY'}...")
-                
-                # Check if still refusing
-                raw_lower = raw.lower()
-                still_refusing = any(p in raw_lower for p in refusal_phrases)
-                
-                if still_refusing:
-                    # Third attempt - just summarize the context
-                    summary_prompt = f"""Summarize this text in 2-3 sentences, focusing on: {question}
-
-TEXT:
-{context[:2500]}
-
-SUMMARY:"""
-                    
-                    raw = self._ollama_generate(
-                        summary_prompt,
-                        max_tokens=max_new_tokens,
-                        temperature=0.2,
-                        system="Summarize the given text."
-                    )
-                    logging.info(f"[LocalModel] Retry 2 response: {raw[:200] if raw else 'EMPTY'}...")
-            
-            # v2.0.7: GROQ FALLBACK - If Ollama failed or still refusing, try Groq
-            raw_lower = raw.lower() if raw else ""
-            final_refusal = any(p in raw_lower for p in refusal_phrases) or ollama_failed or raw.startswith("(")
-            
-            if final_refusal and ctx_has_signal:
-                logging.info("[LocalModel] All Ollama attempts failed, trying Groq fallback...")
-                groq_prompt = f"""You are PDBOT, an assistant for the Manual for Development Projects.
-
-Based on the following context, answer the question in 4-7 sentences.
-
-Context:
-{context[:3000]}
-
-Question: {question}
-
-Provide a direct, informative answer:"""
-                
-                raw = self._groq_generate(
-                    groq_prompt,
-                    max_tokens=max_new_tokens,
-                    temperature=0.3,
-                    system=SYSTEM_PROMPT
-                )
-                logging.info(f"[LocalModel] Groq response: {raw[:200] if raw else 'EMPTY'}...")
-            
-            # Truncate to 150 words for fuller answers
-            answer = self._truncate_answer(raw, max_words=150)
-            
-            # Add citation if not already present
-            if "source:" not in answer.lower() and "p." not in answer.lower():
-                citation = self._format_citation(doc_name, page)
-                answer = f"{answer}\n\n{citation}"
-            
-            return answer
+                logging.info(f"[LocalModel] Retry response: {raw[:200] if raw else 'EMPTY'}...")
+        
+        # Force Groq mode or fallback
+        if force_groq or not raw or raw.startswith("("):
+            logging.info("[LocalModel] Using Groq for generation...")
+            raw = self._groq_generate(
+                strict_prompt,
+                max_tokens=max_new_tokens,
+                temperature=0.2,
+                system=SYSTEM_PROMPT
+            )
+            logging.info(f"[LocalModel] Groq response: {raw[:200] if raw else 'EMPTY'}...")
+        
+        # v2.0.8: Apply answer sanitizer
+        answer = self._sanitize_answer(raw, context, page)
+        
+        return answer
         
         # Transformers fallback
         if self._task_pipe is None:

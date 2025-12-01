@@ -100,8 +100,20 @@ class QueryClassifier:
         r"\b(cricket|football|soccer|fifa|world cup|olympics|match|tournament|player|team|goal|wicket|score)\b",
     ]
     
+    # v2.0.8: Politics patterns - EXCLUDE development governance terms
+    # Only block pure political questions (elections, party politics)
+    # Allow: governance, government bodies (ECNEC, CDWP, NEC), ministers in development context
     POLITICS_PATTERNS = [
-        r"\b(election|vote|voting|poll|candidate|party|political|politician|minister|government)\b",
+        r"\b(election|vote|voting|poll|candidate|party politics|political party)\b",
+        r"\b(army chief|general bajwa|imran khan|nawaz sharif|political leader)\b",
+        r"\b(protest|march|rally|opposition)\b.*\b(political|party)\b",
+    ]
+    
+    # Development governance terms that should NEVER be blocked
+    DEVELOPMENT_GOVERNANCE_TERMS = [
+        "ecnec", "cdwp", "ddwp", "nec", "planning commission", "ministry",
+        "minister", "division", "forum", "approval", "project", "development",
+        "government", "federal", "provincial", "psdp", "aip", "pc-i", "pc-ii"
     ]
     
     RECIPE_PATTERNS = [
@@ -192,8 +204,11 @@ class QueryClassifier:
                 response_template=get_offscope_response("sports")
             )
         
-        # Politics
-        if any(pattern.search(q) for pattern in self.politics_re):
+        # v2.0.8: Politics - but ALLOW development governance questions
+        # Check if query contains development governance terms
+        has_dev_governance = any(term in q for term in self.DEVELOPMENT_GOVERNANCE_TERMS)
+        
+        if any(pattern.search(q) for pattern in self.politics_re) and not has_dev_governance:
             return QueryClassification(
                 category="off_scope",
                 subcategory="politics",
