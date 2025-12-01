@@ -10,7 +10,7 @@
 
 ---
 
-![Version](https://img.shields.io/badge/Version-2.4.8-006600?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-2.4.9-006600?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![React](https://img.shields.io/badge/React-18.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![Qdrant](https://img.shields.io/badge/Qdrant-Vector_DB-DC382D?style=for-the-badge)
@@ -36,13 +36,14 @@
 
 - [Executive Summary](#-executive-summary)
 - [Video Demo](#-video-demo)
+- [Mobile Access](#-mobile-access)
 - [Key Features](#-key-features)
 - [System Architecture](#-system-architecture)
 - [Quick Start](#-quick-start)
 - [Evaluation & Metrics](#-evaluation--metrics)
 - [Test Logs & Transparency](#-test-logs--transparency)
 - [Accuracy Progression](#-accuracy-progression)
-- [What's New in v2.4.8](#-whats-new-in-v248)
+- [What's New in v2.4.9](#-whats-new-in-v249)
 - [Project Roadmap](#-project-roadmap)
 - [Limitations & Warnings](#-limitations--warnings)
 - [Developer Information](#-developer-information)
@@ -54,11 +55,11 @@
 
 PDBOT is an **enterprise-grade Retrieval-Augmented Generation (RAG) system** developed to provide instant, accurate, and verifiable responses regarding the **Manual for Development Projects 2024** issued by the Government of Pakistan's Ministry of Planning, Development & Special Initiatives.
 
-### 🏆 Key Achievements (v2.4.8)
+### 🏆 Key Achievements (v2.4.9)
 
 ```
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║                         PDBOT PERFORMANCE DASHBOARD v2.4.8                    ║
+║                         PDBOT PERFORMANCE DASHBOARD v2.4.9                    ║
 ╠══════════════════════════════════════════════════════════════════════════════╣
 ║                                                                               ║
 ║   📊 ACCURACY METRICS (Test 37)              🚀 SYSTEM PERFORMANCE           ║
@@ -101,6 +102,52 @@ https://github.com/athem135-source/PDBOT/raw/main/src/assets/PDBOT.mp4
 - 🛡️ Off-scope and red-line detection
 - ⚙️ Admin panel access (secret code: "nufc")
 - 📱 Mobile-responsive design
+
+</div>
+
+---
+
+## 📱 Mobile Access
+
+<div align="center">
+
+### Access PDBOT from Any Device, Anywhere!
+
+PDBOT now supports **external access via Cloudflare Tunnel**, allowing you to use the chatbot from any phone or device on any network.
+
+<table>
+<tr>
+<td align="center"><img src="https://github.com/athem135-source/PDBOT/raw/main/src/assets/mobile-screenshot-1.jpg" width="280" alt="Mobile Chat Interface"/></td>
+<td align="center"><img src="https://github.com/athem135-source/PDBOT/raw/main/src/assets/mobile-screenshot-2.jpg" width="280" alt="Mobile Response View"/></td>
+</tr>
+<tr>
+<td align="center"><b>Chat Interface</b></td>
+<td align="center"><b>Response with Citations</b></td>
+</tr>
+</table>
+
+### 🌐 How to Enable External Access
+
+```powershell
+# 1. Start the main server
+.\run_widget.ps1
+
+# 2. In a new terminal, start the Cloudflare tunnel
+.\start_tunnel.ps1
+
+# 3. Share the generated URL (e.g., https://xxx-xxx.trycloudflare.com)
+```
+
+### ✨ Mobile Features
+
+| Feature | Description |
+|---------|-------------|
+| 📱 **Responsive Design** | Optimized for all screen sizes |
+| 🌙 **Clean Interface** | Minimal, distraction-free chat |
+| ⚡ **Real-time Typing** | Animated typing indicator |
+| 🔒 **Secure Connection** | HTTPS via Cloudflare |
+| 🌍 **Works Anywhere** | Access from any network |
+| 💬 **Full Functionality** | Same accuracy as desktop |
 
 </div>
 
@@ -150,7 +197,7 @@ https://github.com/athem135-source/PDBOT/raw/main/src/assets/PDBOT.mp4
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                        PDBOT v2.4.8 ARCHITECTURE                             │
+│                        PDBOT v2.4.9 ARCHITECTURE                             │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
 │    👤 USER (Browser/Mobile)                                                  │
@@ -285,9 +332,9 @@ https://github.com/athem135-source/PDBOT/raw/main/src/assets/PDBOT.mp4
   • Test 34-37: Final optimizations (93-95%)
 ```
 
-### Comparison: v1.0 vs v2.4.8
+### Comparison: v1.0 vs v2.4.9
 
-| Metric | v1.0.0 | v2.4.8 | Improvement |
+| Metric | v1.0.0 | v2.4.9 | Improvement |
 |--------|--------|--------|-------------|
 | In-Scope Accuracy | 68% | 95% | **+27%** |
 | Numeric Accuracy | 72% | 96.7% | **+24.7%** |
@@ -357,19 +404,22 @@ https://github.com/athem135-source/PDBOT/raw/main/src/assets/PDBOT.mp4
 
 ---
 
-## 🆕 What's New in v2.4.8
+## 🆕 What's New in v2.4.9
 
-### Bug Fixes
-- **Version Sync:** Updated all version strings across widget_api.py and AdminPanel.jsx
+### 📱 Mobile Access (NEW!)
+- **Cloudflare Tunnel:** Access PDBOT from any device, anywhere
+- **Mobile-friendly UI:** Clean, responsive chat interface
+- **External URLs:** Share with anyone on any network
+- **start_tunnel.ps1/bat:** One-click tunnel startup
+
+### 🔧 Stability Fixes
+- **Auto-install:** `qdrant-client` and `waitress` installed on every startup
+- **Version Sync:** All version strings synchronized to v2.4.9
+- **Permanent fix:** No more "module not found" errors
+
+### Previous (v2.4.8)
 - **Qdrant API:** Fixed `client.search()` → `client.query_points()` for v1.12+
-- **Backward Compat:** Falls back for older versions
-
-### Safety (v2.4.4)
-- **Sexual Filter:** Blocks explicit queries
-- **Urdu Abuse:** benchod, madarchod, chutiya, etc.
-
-### Unified Launcher
-- **start_pdbot.bat:** Single menu for all modes
+- **Safety:** Sexual content filter, Urdu abuse detection
 
 ---
 
@@ -379,7 +429,7 @@ https://github.com/athem135-source/PDBOT/raw/main/src/assets/PDBOT.mp4
   OCT 2025                          NOV 2025                      DEC 2025
   ────────                          ────────                      ────────
   Oct 16: Project Start             Nov 5: v2.0 Reranker          Dec 1: v2.2 Widget
-  Oct 25: v1.0 Release              Nov 12: v2.1 Numeric          Dec 2: v2.4.8 ← NOW
+  Oct 25: v1.0 Release              Nov 12: v2.1 Numeric          Dec 2: v2.4.9 ← NOW
   Oct 31: v1.1 Classifier           Nov 20: Bug Fixes             
                                                                    
   UPCOMING                                                         
@@ -444,7 +494,7 @@ Permitted: Evaluation, Academic Research, GoP Internal Use (with approval)
 
 ## 🇵🇰
 
-**PDBOT v2.4.8** | Built with ❤️ for Pakistan
+**PDBOT v2.4.9** | Built with ❤️ for Pakistan
 
 **37 Tests | 400+ Queries | 95% Accuracy | 100% Safety**
 
