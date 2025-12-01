@@ -205,7 +205,7 @@ def _split_into_chunks(text: str) -> List[str]:
 
 def ingest_pdf_sentence_level(
     pdf_path: str,
-    qdrant_url: str = None
+    qdrant_url: Optional[str] = None
 ) -> int:
     """Ingest PDF with sentence-level chunking."""
     if qdrant_url is None:
@@ -275,7 +275,7 @@ def ingest_pdf_sentence_level(
 def search_sentences(
     query: str,
     top_k: int = 2,
-    qdrant_url: str = None,
+    qdrant_url: Optional[str] = None,
     min_score: float = 0.12,
     retrieval_hints: Optional[Dict[str, Any]] = None,
     **kwargs

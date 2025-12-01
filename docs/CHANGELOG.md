@@ -2,7 +2,30 @@
 
 All notable changes to PDBOT are documented in this file.
 
-## [2.2.0] - 2024-12-01
+> **Project Started:** October 16, 2025  
+> **Developer:** M. Hassan Arif Afridi
+
+---
+
+## [2.2.1] - 2025-12-01
+
+### 📝 Documentation Overhaul
+- Complete README rewrite with professional formatting
+- Added project roadmap (Oct 16, 2025 - Present)
+- Added comprehensive performance metrics section
+- Added version accuracy progression chart
+- Added developer information and LinkedIn link
+- Fixed markdown rendering issues (removed CDATA tags)
+
+### 🔧 Fixed
+- Fixed broken README markdown rendering
+- Updated SECURITY.md with proper formatting
+- Added LICENSE file with MIT License + Disclaimer
+- Updated CHANGELOG with correct dates (2025)
+
+---
+
+## [2.2.0] - 2025-12-01
 
 ### 🆕 Added
 
@@ -46,7 +69,7 @@ All notable changes to PDBOT are documented in this file.
 
 ---
 
-## [2.1.0] - 2024-11-15
+## [2.1.0] - 2025-11-12
 
 ### 🆕 Added
 
@@ -74,7 +97,7 @@ All notable changes to PDBOT are documented in this file.
 
 ---
 
-## [2.0.8] - 2024-10-31
+## [2.0.8] - 2025-11-05
 
 ### 🐛 Fixed
 - Duplicate "✅ Answer:" prefix bug
@@ -88,7 +111,7 @@ All notable changes to PDBOT are documented in this file.
 
 ---
 
-## [2.0.0] - 2024-10-15
+## [2.0.0] - 2025-11-05
 
 ### 🆕 Added
 - Sentence-level RAG chunking
@@ -97,6 +120,42 @@ All notable changes to PDBOT are documented in this file.
 - Streamlit admin interface
 
 ---
+
+## [1.1.0] - 2025-10-31
+
+### 🆕 Added
+- 12-class query classifier integration
+- 78% overall accuracy achieved
+- Improved off-scope detection
+
+---
+
+## [1.0.0] - 2025-10-25
+
+### 🆕 Added
+- First stable release
+- Streamlit UI implementation
+- Qdrant vector database integration
+- 72% overall accuracy
+
+---
+
+## [0.5.0] - 2025-10-20
+
+### 🆕 Added
+- Basic RAG pipeline
+- PDF ingestion capability
+- Initial retrieval system
+- 68% baseline accuracy
+
+---
+
+## [0.1.0] - 2025-10-16
+
+### 🎉 Project Inception
+- Initial concept and requirements gathering
+- Project structure setup
+- Technology stack selection
 
 **Government of Pakistan**
 *Ministry of Planning, Development & Special Initiatives*

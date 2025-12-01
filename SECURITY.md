@@ -1,100 +1,140 @@
 # Security Policy
 
-## 🔒 PDBOT Security Guidelines
+<div align="center">
 
-### Government of Pakistan
-### Ministry of Planning, Development & Special Initiatives
+![Security](https://img.shields.io/badge/Security-Policy-red?style=for-the-badge&logo=shield&logoColor=white)
+![Version](https://img.shields.io/badge/Version-2.2.1-006600?style=for-the-badge)
 
----
+**PDBOT Security Guidelines & Vulnerability Reporting**
 
-## Supported Versions
-
-| Version | Supported          | Notes |
-| ------- | ------------------ | ----- |
-| 2.2.x   | ✅ Active Support  | Current stable release |
-| 2.1.x   | ⚠️ Security Only   | Critical patches only |
-| 2.0.x   | ❌ End of Life     | No longer supported |
-| < 2.0   | ❌ End of Life     | No longer supported |
+</div>
 
 ---
 
-## Reporting a Vulnerability
+## 🛡️ Supported Versions
 
-### For Government Personnel
+| Version | Status | Support Level |
+|---------|--------|---------------|
+| 2.2.x | ✅ Current | Full support - security patches & features |
+| 2.1.x | ⚠️ Maintenance | Security patches only |
+| 2.0.x | ❌ Deprecated | No support - please upgrade |
+| < 2.0 | ❌ End of Life | Unsupported |
 
-If you discover a security vulnerability within PDBOT, please report it through official government channels:
+---
 
-1. **Email**: security@planning.gov.pk
-2. **Subject Line**: `[PDBOT Security] - Brief Description`
-3. **Include**:
-   - Detailed description of the vulnerability
+## 🔒 Security Measures
+
+### Data Protection
+
+| Measure | Implementation | Status |
+|---------|----------------|--------|
+| **No PII Storage** | User data processed in-memory only | ✅ Active |
+| **Session Isolation** | Each session completely isolated | ✅ Active |
+| **Memory Cleanup** | Data cleared on session end | ✅ Active |
+| **No Logging of Queries** | User queries not persisted | ✅ Active |
+
+### Input Validation
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    INPUT SECURITY MEASURES                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ✓ Query Length Limit         Maximum 2000 characters           │
+│  ✓ Special Character Filter   Sanitization of dangerous chars   │
+│  ✓ SQL Injection Prevention   Parameterized queries             │
+│  ✓ XSS Prevention             HTML entity encoding              │
+│  ✓ Command Injection Block    Shell metacharacter filtering     │
+│  ✓ Path Traversal Prevention  Filename validation               │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Network Security
+
+| Feature | Recommendation | Status |
+|---------|----------------|--------|
+| **HTTPS/TLS** | Required for production | 🔧 Configure |
+| **CORS** | Restrict to trusted origins | ✅ Configurable |
+| **Rate Limiting** | Implement per-IP limits | 🔧 Ready |
+| **API Authentication** | JWT/API key support | 🔧 Ready |
+
+---
+
+## 🚨 Reporting a Vulnerability
+
+### How to Report
+
+If you discover a security vulnerability in PDBOT:
+
+1. **DO NOT** create a public GitHub issue
+2. **Email** the developer directly at the contact below
+3. **Include** the following information:
+   - Description of the vulnerability
    - Steps to reproduce
    - Potential impact assessment
-   - Any suggested remediation
+   - Any suggested fixes (optional)
+
+### Contact
+
+**Developer:** M. Hassan Arif Afridi  
+**LinkedIn:** [hassanarifafridi](https://www.linkedin.com/in/hassanarifafridi/)  
+**GitHub:** [@athem135-source](https://github.com/athem135-source)
 
 ### Response Timeline
 
 | Severity | Initial Response | Resolution Target |
 |----------|------------------|-------------------|
-| Critical | 4 hours | 24 hours |
-| High | 24 hours | 72 hours |
-| Medium | 48 hours | 1 week |
-| Low | 1 week | 1 month |
+| 🔴 Critical | 24 hours | 48 hours |
+| 🟠 High | 48 hours | 1 week |
+| 🟡 Medium | 1 week | 2 weeks |
+| 🟢 Low | 2 weeks | 1 month |
 
 ---
 
-## Security Measures
-
-### 1. Data Protection
-
-- **No Persistent User Data**: Queries are processed in-memory only
-- **Session Isolation**: Each session is completely isolated
-- **Memory Cleanup**: Session data is cleared on chat reset
-- **No PII Collection**: No personal information is stored
-
-### 2. Input Validation
-
-All user inputs are validated and sanitized:
-- Maximum query length: 2000 characters
-- Special character sanitization
-- SQL/NoSQL injection prevention
-- XSS attack prevention
-- Command injection prevention
-
-### 3. Network Security
-
-- **CORS**: Configurable cross-origin restrictions
-- **HTTPS**: Required for production deployment
-- **Rate Limiting**: Configurable per-IP limits
-- **API Authentication**: JWT/API key support ready
-
----
-
-## Deployment Security Checklist
+## 📋 Security Checklist for Deployment
 
 ### Pre-Deployment
 
-- [ ] Enable HTTPS/TLS
-- [ ] Configure CORS properly
-- [ ] Set up rate limiting
-- [ ] Enable API authentication
-- [ ] Review firewall rules
-- [ ] Update all dependencies
-- [ ] Run security scan
+- [ ] Enable HTTPS/TLS encryption
+- [ ] Configure CORS to trusted domains only
+- [ ] Set up rate limiting (e.g., 100 requests/minute)
+- [ ] Enable API authentication if public-facing
+- [ ] Review and update all dependencies
+- [ ] Run security vulnerability scan
+- [ ] Configure firewall rules
+- [ ] Set up monitoring and alerting
+
+### Post-Deployment
+
+- [ ] Monitor access logs regularly
+- [ ] Set up automated security scanning
+- [ ] Keep dependencies updated
+- [ ] Review security policies quarterly
+- [ ] Conduct periodic penetration testing
 
 ---
 
-## Compliance
+## ⚠️ Disclaimer
 
-PDBOT is designed to comply with:
+```
+THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND.
 
-- Pakistan Electronic Crimes Act (PECA) 2016
-- Government data handling guidelines
-- Ministry IT security policies
+The developer is not responsible for any security breaches that may
+occur due to improper deployment, configuration, or use of this software.
+
+Users are responsible for:
+- Properly configuring security settings
+- Keeping the software updated
+- Following security best practices
+- Complying with applicable regulations
+```
 
 ---
 
-**Government of Pakistan**
-*Ministry of Planning, Development & Special Initiatives*
+<div align="center">
 
-Last Updated: December 2024
+**Last Updated:** December 1, 2025  
+**Version:** 2.2.1
+
+</div>
