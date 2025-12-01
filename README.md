@@ -94,7 +94,7 @@ This intelligent assistant is designed to support:
 > **Release Date:** December 1, 2025 | **Type:** Minor Release
 
 ### 🔧 Admin Panel (NEW!)
-- **Secret Access Code** – Type "nufc" to open admin panel
+- **Secret Access Code** – Type "****" to open admin panel
 - **Backend Status** – Real-time Qdrant, Ollama, memory status
 - **Debug Tools** – Clear server/local memory, change settings
 - **Custom Logo** – Set custom logo URL via admin panel
