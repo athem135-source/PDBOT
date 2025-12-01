@@ -25,7 +25,7 @@
 
 ---
 
-**🤖 An AI-powered Retrieval-Augmented Generation (RAG) system providing instant, accurate, and traceable responses for the Manual for Development Projects 2024**
+**🤖 An AI-powered Retrieval-Augmented Generation (RAG) system providing instant, accurate, and traceable responses for Development Projects**
 
 [🚀 Quick Start](#-quick-start) • [📖 Documentation](#-system-architecture) • [📊 Metrics](#-performance-metrics--test-history) • [🗺️ Roadmap](#-project-roadmap) • [❓ FAQ](#-example-questions)
 
