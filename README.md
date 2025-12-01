@@ -139,7 +139,7 @@ https://github.com/user-attachments/assets/pdbot-demo.mp4
 │  🔞 sexual_content      → Explicit queries → BLOCKED                         │
 │  🤬 abusive_language    → Insults/abuse → Politely redirected                │
 │                                                                               │
-│  🌐 URDU ABUSE DETECTION: benchod, madarchod, chutiya, randi, gandu, etc.    │
+│  🌐 URDU ABUSE DETECTION ALSO.   │
 │                                                                               │
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
