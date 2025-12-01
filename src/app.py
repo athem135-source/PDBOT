@@ -575,7 +575,7 @@ def _load_builtin_manual(force: bool = False):
     else:
         st.error("Manual could not be read. Install 'langchain-community' or 'pypdf' to enable PDF reading.")
 
-_HEADER = "<h1 style='margin-bottom:0; font-weight:800;'>PDBOT</h1><p style='opacity:.5;margin-top:0px;font-size:0.9em;'>v2.0.8</p><p style='opacity:.8;margin-top:4px'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</p>"
+_HEADER = "<h1 style='margin-bottom:0; font-weight:800;'>PDBOT</h1><p style='opacity:.5;margin-top:0px;font-size:0.9em;'>v2.1.0</p><p style='opacity:.8;margin-top:4px'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</p>"
 # Single, hardcoded default logo path: place your logo at this location and it will be used automatically
 # Prefer explicit light-theme logo filename for white theme
 HARDCODED_LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "branding_logo-black.png")
@@ -699,7 +699,7 @@ def render_brand_header():
     else:
         html.append("<div class='brand-logo' style='font-weight:700;opacity:.9'>Planning &amp; Development</div>")
     html.append("<div class='brand-title'>PDBOT</div>")
-    html.append("<div style='text-align:center; opacity:0.5; margin-top:4px; font-size:0.9em;'>v2.0.8</div>")
+    html.append("<div style='text-align:center; opacity:0.5; margin-top:4px; font-size:0.9em;'>v2.1.0</div>")
     html.append("</div>")  # close brand-card
     html.append("<div class='brand-sub'>Ask questions grounded in your official planning manuals — secure, local, and intelligent.</div>")
     html.append("</div>")
@@ -1903,53 +1903,32 @@ def generate_answer_generative(question: str) -> str:
     show_warning = quality_check.get("warning", False)
     warning_reason = quality_check.get("reason", "")
 
-    # Legacy-style Generative answering: simple prompt -> compose -> sanitize
-    # v2.0.5: Ollama only (removed pretrained mode)
-    # v2.0.7: Added Groq fallback and force_groq toggle for admin testing
-    # v2.0.8: Strict 45-70 word answers with sanitization
+    # v2.1.0: Use multi-class classifier for fallback logic
+    from src.core.multi_classifier import get_classification_result
+    classification = get_classification_result(question)
+    query_class = classification.query_class
+    
+    # v2.1.0: Generative answering with automatic Groq fallback
     base_answer = ""
-    _force_groq = st.session_state.get("force_groq_fallback", False)
     _page = hits[0].get("page", 0) if hits else 0
+    
     try:
         gen = LocalModel(model_name=globals().get("model_name", os.getenv("OLLAMA_MODEL", "mistral:latest")), backend="ollama")
-        try:
-            probe = gen.ollama_status()
-            if not probe.get("alive"):
-                raise RuntimeError("Ollama is not reachable. Start Ollama or pull the model.")
-        except Exception:
-            # Proceed with an empty base answer and rely on compose_answer
-            pass
-        # v2.0.8: Reduced tokens for stricter output
-        base_answer = gen.generate_response(
-            question=question,
-            context=context_text,
+        
+        # v2.1.0: Use generate_with_fallback for automatic Groq fallback
+        base_answer = gen.generate_with_fallback(
+            query=question,
+            classification=query_class,
+            retrieved_context=context_text,
+            retrieved_chunks=hits,
+            page=_page,
             max_new_tokens=120,
             temperature=0.15,
-            force_groq=_force_groq,
-            page=_page,
         ) or ""
-    except Exception:
-        base_answer = ""
-    try:
-        if engine == "LLM (Ollama)":
-            gen = LocalModel(model_name=globals().get("model_name", os.getenv("OLLAMA_MODEL", "mistral:latest")), backend="ollama")
-            try:
-                probe = gen.ollama_status()
-                if not probe.get("alive"):
-                    raise RuntimeError("Ollama is not reachable. Start Ollama or pull the model.")
-            except Exception:
-                # We’ll proceed with an empty base answer and rely on compose_answer
-                pass
-            # v2.0.8: Reduced tokens for stricter output
-            base_answer = gen.generate_response(
-                question=question,
-                context=context_text,
-                max_new_tokens=120,
-                temperature=0.15,
-                force_groq=_force_groq,
-                page=_page,
-            ) or ""
-    except Exception:
+        
+    except Exception as e:
+        if DEBUG_MODE:
+            print(f"[DEBUG] Generation error: {e}")
         base_answer = ""
 
     # v2.0.8: Use base_answer directly (already sanitized by LocalModel)
@@ -2034,38 +2013,48 @@ def stream_response(text: str):
             time.sleep(delay_sec)
 
 def generate_answer(question: str) -> tuple[str, list[str]]:
-    # v1.7.0: Updated classification with static templates (NO RAG for red-line queries)
-    # REMOVED: Hardcoded numeric constants check - system now fully dynamic via RAG
-    from src.core.classification import QueryClassifier
-    from src.core.numeric_safety_dynamic import is_numeric_query  # v1.7.0: Dynamic version
+    """
+    v2.1.0: Updated with multi-class classifier and Groq fallback.
+    
+    Classification flow:
+    1. Classify query into 12 classes
+    2. If off_scope/red_line/abusive → return guardrail response
+    3. If in_scope → proceed with RAG + optional retrieval hints
+    4. If fallback_required → use Groq with same guardrails
+    """
+    from src.core.multi_classifier import MultiClassifier, get_classification_result
+    from src.core.templates import get_guardrail_response, get_fallback_response
     
     # Define exception for type safety
     class RetrievalBackendError(Exception):
         """Raised when vector database is unavailable"""
         pass
     
-    classifier = QueryClassifier()
+    # STEP 1: Multi-class classification
+    classifier = MultiClassifier()
     classification = classifier.classify(question)
+    query_class = classification.query_class
     
-    # STEP 1: Check if static template should be used (red-line/off-scope/abuse)
-    if not classification.should_use_rag and classification.response_template:
-        if DEBUG_MODE:
-            print(f"[DEBUG] Classification: {classification.category}/{classification.subcategory} - returning template (NO RAG)")
-        return classification.response_template, []  # No citations for safety queries
-    
-    # STEP 2: v1.7.0 CHANGE - Removed hardcoded numeric constants check
-    # All numeric queries now go through RAG for FULLY DYNAMIC retrieval
-    # This allows system to work with any PDF version (2024, 2025, 2026, etc.)
-    
-    # STEP 3: Proceed with normal RAG pipeline
     if DEBUG_MODE:
-        print(f"[DEBUG] Classification: {classification.category} - proceeding with RAG")
+        print(f"[DEBUG] Classification: {query_class}/{classification.subcategory}")
     
-    # Retrieve
+    # STEP 2: Handle guardrail classes (NO RAG)
+    if query_class in ["off_scope", "red_line", "abusive"]:
+        response = get_guardrail_response(query_class, classification.subcategory or "")
+        if DEBUG_MODE:
+            print(f"[DEBUG] Returning guardrail response for {query_class}")
+        return response, []  # No citations for safety queries
+    
+    # STEP 3: Proceed with RAG pipeline
+    if DEBUG_MODE:
+        print(f"[DEBUG] Proceeding with RAG, hints: {classification.retrieval_hints}")
+    
+    # Retrieve with classification hints
     top_k_local = int(min(8, max(1, int(st.session_state.get("top_k", 6) if "top_k" in st.session_state else (top_k if 'top_k' in globals() else 6)))))
     mode = st.session_state.get("answer_mode", "Generative")
     is_exact = str(mode).lower().startswith("exact")
     eff_top_k = min(8, 3 if is_exact else top_k_local)
+    
     # Build context using vector search when available, else raw pages
     hits = []
     context = ""
@@ -2078,6 +2067,7 @@ def generate_answer(question: str) -> tuple[str, list[str]]:
             if not _RAG_OK or search is None:  # type: ignore
                 raise RuntimeError(f"Retrieval not available: {_RAG_IMPORT_ERR}")
             try:
+                # v2.1.0: Pass retrieval hints to search
                 hits = search(
                     question,
                     top_k=eff_top_k,
@@ -2085,23 +2075,23 @@ def generate_answer(question: str) -> tuple[str, list[str]]:
                     mmr=True,
                     lambda_mult=0.5,
                     min_score=min_score,
+                    retrieval_hints=classification.retrieval_hints,
                 )  # type: ignore
             except TypeError:
                 hits = search(question, top_k=eff_top_k, qdrant_url=_qdrant_url())  # type: ignore
             context = "\n\n".join([h.get("text", "") for h in hits])
         except RetrievalBackendError as e:
-            # Vector database is down - show clear error
             backend_error = str(e)
             hits = []
             context = ""
             if DEBUG_MODE:
                 print(f"[DEBUG] Backend error: {e}")
         except Exception as e:
-            # Unexpected error - log but continue
             hits = []
             context = ""
             if DEBUG_MODE:
                 print(f"[DEBUG] Unexpected retrieval error: {e}")
+    
     if (not hits) and (st.session_state.get("raw_pages") or []):
         try:
             pages_full = st.session_state.get("raw_pages") or []
@@ -2117,7 +2107,6 @@ def generate_answer(question: str) -> tuple[str, list[str]]:
                 } for it in locs_fb]
         except Exception:
             pass
-        # Ensure we still provide context from pages or from the newly built hits
         if not context:
             pages = st.session_state.get("raw_pages") or []
             if hits:

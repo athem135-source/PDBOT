@@ -1,7 +1,8 @@
 """
-PDBot RAG Pipeline v3.1.0 (v2.0.8)
+PDBot RAG Pipeline v3.2.0 (v2.1.0)
 Sentence-level chunking, strict reranking, numeric boost.
-Groq for reranking ONLY (not generation).
+Multi-class classifier integration for retrieval optimization.
+Groq for reranking fallback.
 Zero hardcoding. All answers from PDF only.
 """
 from __future__ import annotations
@@ -271,18 +272,29 @@ def search_sentences(
     top_k: int = 2,
     qdrant_url: str = "http://localhost:6333",
     min_score: float = 0.12,
+    retrieval_hints: Dict[str, Any] = None,
     **kwargs
 ) -> List[Dict[str, Any]]:
     """
-    v2.0.8 Retrieval pipeline:
+    v2.1.0 Retrieval pipeline with classifier hints:
     1. Initial retrieval: 40 chunks from Qdrant
     2. Post-filter: reject <5 or >130 words
-    3. Numeric boost: +0.25 for Rs/million/billion/cost/approval/allocation/expenditure/release
+    3. Numeric boost: +0.25 for Rs/million/billion/cost/approval/allocation
     4. Query-number boost: +0.15 if query has numbers and chunk has numbers
-    5. Reranker: keep TOP 2 with score >= 0.32
-    6. Groq rerank fallback if cross-encoder fails
-    7. Fallback: if none survive, use highest vector chunk
+    5. Classification hints: boost chunks matching query type
+    6. Reranker: keep TOP 2 with score >= 0.32
+    7. Groq rerank fallback if cross-encoder fails
+    8. Fallback: if none survive, use highest vector chunk
+    
+    Args:
+        query: Search query
+        top_k: Number of results to return
+        qdrant_url: Qdrant server URL
+        min_score: Minimum vector similarity score
+        retrieval_hints: Optional hints from classifier (boost_numeric, prefer_procedures, etc.)
     """
+    retrieval_hints = retrieval_hints or {}
+    
     model = get_embedder()
     if model is None:
         raise RuntimeError("Embedding model not available")
@@ -352,6 +364,11 @@ def search_sentences(
         "ceiling", "threshold", "budget", "fund"
     ]
     
+    # v2.1.0: Procedure/formula/monitoring patterns for classifier hints
+    procedure_patterns = ["step", "process", "procedure", "workflow", "approval", "hierarchy", "submit"]
+    formula_patterns = ["formula", "calculation", "estimate", "depreciation", "s-curve", "npv", "irr", "bcr"]
+    monitoring_patterns = ["kpi", "monitoring", "evaluation", "indicator", "target", "output", "outcome", "m&e"]
+    
     for chunk in chunks:
         text_lower = chunk["text"].lower()
         boost = 0.0
@@ -365,6 +382,30 @@ def search_sentences(
         if query_has_numbers and re.search(r'\d+', chunk["text"]):
             boost += 0.15
             chunk["number_match"] = True
+        
+        # v2.1.0: Apply classifier hints
+        if retrieval_hints.get("boost_numeric") and chunk.get("numeric_boosted"):
+            boost += 0.10  # Extra boost for numeric queries
+        
+        if retrieval_hints.get("prefer_procedures"):
+            if any(p in text_lower for p in procedure_patterns):
+                boost += 0.15
+                chunk["procedure_match"] = True
+        
+        if retrieval_hints.get("prefer_formulas"):
+            if any(p in text_lower for p in formula_patterns):
+                boost += 0.15
+                chunk["formula_match"] = True
+        
+        if retrieval_hints.get("prefer_monitoring"):
+            if any(p in text_lower for p in monitoring_patterns):
+                boost += 0.15
+                chunk["monitoring_match"] = True
+        
+        if retrieval_hints.get("multi_sentence"):
+            # Prefer longer chunks for procedure/formula queries
+            if chunk["word_count"] >= 40:
+                boost += 0.10
         
         chunk["score"] = min(1.0, chunk["score"] + boost)
     

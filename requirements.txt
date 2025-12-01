@@ -1,6 +1,6 @@
 # ============================================
-# PDBot Requirements - v2.0.8
-# Enterprise-Grade Security & Dependency Updates
+# PDBot Requirements - v2.1.0
+# Multi-Class Classifier & Smart Groq Fallback
 # ============================================
 
 # ---- Frontend & UI ----

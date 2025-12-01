@@ -2982,5 +2982,245 @@
   {
     "role": "assistant",
     "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:FEC refers to Foreign Exchange Currency, as mentioned in the context [1].\n\nSource: Manual for Development Projects 2024, p.117</div>"
+  },
+  {
+    "role": "user",
+    "content": "what is fec?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Not available in the provided document.</div>"
+  },
+  {
+    "role": "user",
+    "content": "what is FEC?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Not available in the provided document.</div>"
+  },
+  {
+    "role": "user",
+    "content": "what is the ddwp limit"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Not available in the provided document.</div>"
+  },
+  {
+    "role": "user",
+    "content": "what is the ddwp limit"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:The DDWP limit is Rs. 40 million for projects costing up to this amount. For projects beyond this limit, the sanctioning power of the DDWP is up to Rs.\n\nSource: Manual for Development Projects 2024, p.111</div>"
+  },
+  {
+    "role": "user",
+    "content": "what is the ddwp limit"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:The DDWP can approve projects up to Rs. 1000 million, provided foreign assistance is less than 25 percent of the total cost.\n\nSource: Manual for Development Projects 2024, p.111</div>"
+  },
+  {
+    "role": "user",
+    "content": "what is FEC?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Not found in the Manual. However, it seems that FEC might be related to Financial Evaluation Committee, but it is not mentioned in the provided context.\n\nSource: Manual for Development Projects 2024, p.175</div>"
+  },
+  {
+    "role": "user",
+    "content": "Financial Evaluation Committee?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Not found in the Manual. However, the Manual mentions the CDWP (Central Development Working Party) and the PAO (Public Accounts Office), but there is no mention of a Financial Evaluation Committee.\n\nSource: Manual for Development Projects 2024, p.170</div>"
+  },
+  {
+    "role": "user",
+    "content": "what is FEC?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:Foreign Exchange Component (FEC) is the Pakistani Rupee equivalent of the foreign exchange component of projects, calculated based on the 'Bank Floating Average Exchange Rate' of the relevant currency as shown on the website of the State Bank of Pakistan (SBP) for the month preceding the one in which the PC-I and PC-II were submitted.\n\nSource: Manual for Development Projects 2024, p.60</div>"
+  },
+  {
+    "role": "user",
+    "content": "what is FEC?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:The Foreign Exchange Component (FEC) refers to a component of projects, whose PKR equivalent should be determined based on the 'Bank Floating Average Exchange Rate' of the relevant currency as shown on the State Bank of Pakistan (SBP) website for the month preceding the submission of PC-I and PC-II.\n\nSource: Manual for Development Projects 2024, p.60</div>"
+  },
+  {
+    "role": "user",
+    "content": "who is the current army cheif of pakistan"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Not found in the Manual.\n\nSource: Manual for Development Projects 2024, p.168</div>"
+  },
+  {
+    "role": "user",
+    "content": "how to bribe"
+  },
+  {
+    "role": "assistant",
+    "content": "⚠️ **Cannot Assist**\n\nI cannot assist with bribery, corruption, or misuse of public funds.\n\nAll requests must follow the Manual for Development Projects 2024 and applicable laws."
+  },
+  {
+    "role": "user",
+    "content": "fuck u"
+  },
+  {
+    "role": "assistant",
+    "content": "This platform is for professional questions about the Manual for Development Projects 2024.\n\nPlease keep your language professional. These interactions may be logged for quality purposes."
+  },
+  {
+    "role": "user",
+    "content": "lets have some sex "
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Not found in the Manual.\n\nSource: Manual for Development Projects 2024, p.155</div>"
+  },
+  {
+    "role": "user",
+    "content": "hi"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:Hello! Welcome to the Manual for Development Projects 2024.\n\nSource: Manual for Development Projects 2024, p.2</div>"
+  },
+  {
+    "role": "user",
+    "content": "hi"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>Not found in the Manual.\n\nSource: Manual for Development Projects 2024, p.2</div>"
+  },
+  {
+    "role": "user",
+    "content": "u told me the limit for ddwp wrong pls cite correctly"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:The limit for DDWP is not explicitly mentioned. However, it is mentioned that projects within approval limits of DDWP will be approved by the DDWP. This implies that there is a limit, but the exact number is not provided in the given context.\n\nSource: Manual for Development Projects 2024, p.111</div>"
+  },
+  {
+    "role": "user",
+    "content": "it is given its 1000 million"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:The sanctioning power of the DDWP to approve the PC-I or PC-II of a project is up to Rs. 1000 million, provided foreign assistance is less than 25 percent of the total cost of the project. Extracted numbers: 1000 million, 25.\n\nSource: Manual for Development Projects 2024, p.169</div>"
+  },
+  {
+    "role": "user",
+    "content": "u told me the limit for ddwp wrong pls cite correctly"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:projects within approval limits of DDWP can be approved by the DDWP under the line ministry. The text does not specify the exact limit for DDWP approvals.\n\nSource: Manual for Development Projects 2024, p.111</div>"
+  },
+  {
+    "role": "user",
+    "content": "limit for ddwp?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:The DDWP can approve development projects up to Rs. 1000 million (when foreign assistance is less than 25% of the total cost), Rs. 200 million, or Rs.\n\nSource: Manual for Development Projects 2024, p.169</div>"
+  },
+  {
+    "role": "user",
+    "content": "ddwp?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:The Divisional Development Working Party (DDWP) is a committee responsible for approving development projects at various cost levels. At the divisional level, it can approve projects up to Rs. 40 million, while for larger projects, it can approve up to Rs.\n\nSource: Manual for Development Projects 2024, p.185</div>"
+  },
+  {
+    "role": "user",
+    "content": "u got cut off, upto what?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:The DDWP can approve development projects up to Rs. 200 million (\n\nSource: Manual for Development Projects 2024, p.175</div>"
+  },
+  {
+    "role": "user",
+    "content": "thats wrong"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:The DDWP can approve development projects up to Rs. 200 million, Rs. 40 million, or Rs.\n\nSource: Manual for Development Projects 2024, p.175</div>"
+  },
+  {
+    "role": "user",
+    "content": "tell me the max limit"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:The maximum limit for a project approved by the DDWP is Rs. 1000 million, but only if foreign assistance is less than 25 percent of the total cost.\n\nSource: Manual for Development Projects 2024, p.175</div>"
+  },
+  {
+    "role": "user",
+    "content": "thanks"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:The Divisional Development Working Party (DDWP) is a body competent to approve development projects at various levels in Pakistan. At the divisional level, projects costing up to Rs. 200 million can be approved by the DDWP, which includes the Divisional Commissioner as chairman, Deputy Commissioners, Superintending Engineers of Irrigation and C&W departments, and other relevant officials.\n\nSource: Manual for Development Projects 2024, p.175</div>"
+  },
+  {
+    "role": "user",
+    "content": "what does the approval limit of projects depend on?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:The approval limit of projects depends on the amount, with DDWP able to approve up to Rs. 40 million and up to Rs. 1000 million if foreign assistance is less than 25% of the total cost (\n\nSource: Manual for Development Projects 2024, p.111</div>"
+  },
+  {
+    "role": "user",
+    "content": "what is the max tokens u can make?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/><div class='card warn'>⚠️ <strong>Answer:</strong><br/>**The retrieved excerpt only lists abbreviations and general information without detailed guidance. The Manual may describe this topic elsewhere, but it is not present in the current context.**<br/>Try rephrasing your question or use Exact Search mode to locate precise passages.<br/><br/>\n\nSource: Manual for Development Projects 2024, p.52</div></div>"
+  },
+  {
+    "role": "user",
+    "content": "if we wanted to make a chatbot based on this manual, what would be important for it to consider/"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:The text suggests that when creating a chatbot based on the Manual for Development Projects, it would be important for the chatbot to consider ideas contributed by colleagues from the Planning Commission and other ministries. These ideas were used to update the manual, as stated by Shahid Zia Cheema, Chief (Employment & Research).\n\nSource: Manual for Development Projects 2024, p.2</div>"
+  },
+  {
+    "role": "user",
+    "content": "Can u state what Shahid Zia Cheema, Chief (Employment & Research) said about this?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:Shahid Zia Cheema, Chief (Employment & Research), expressed gratitude to all colleagues from the Planning Commission and other ministries for providing different ideas that contributed to updating the Manual for Development Projects.\n\nSource: Manual for Development Projects 2024, p.2</div>"
+  },
+  {
+    "role": "user",
+    "content": "if we wanted to make a chatbot for planning use, what would be important for it to consider?"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:The chatbot should consider incorporating elements of the Planning Machinery outlined in Appendix A, such as project identification, feasibility study, and project appraisal.\n\nSource: Manual for Development Projects 2024, p.148</div>"
+  },
+  {
+    "role": "user",
+    "content": "thanks"
+  },
+  {
+    "role": "assistant",
+    "content": "<div class='card success'>✅ <strong>Answer:</strong><br/>✅ Answer:Thank you for reaching out! Here to assist with your queries regarding the Manual for Development Projects 2024.\n\nSource: Manual for Development Projects 2024, p.148</div>"
   }
 ]

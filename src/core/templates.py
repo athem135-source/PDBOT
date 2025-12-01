@@ -1,6 +1,6 @@
 """
-Static Response Templates for PDBot
-====================================
+Static Response Templates for PDBot v2.1.0
+==========================================
 Pre-defined responses for red-line, off-scope, and abuse queries.
 These BYPASS RAG completely to avoid context pollution.
 """
@@ -9,9 +9,17 @@ These BYPASS RAG completely to avoid context pollution.
 # RED-LINE RESPONSES (Bribery, Corruption, Misuse)
 # ============================================================================
 
-REDLINE_BRIBERY_RESPONSE = """I cannot assist with bribery, corruption, or misuse of public funds. All requests must follow the Manual for Development Projects 2024."""
+REDLINE_BRIBERY_RESPONSE = """⚠️ **Cannot Assist**
 
-REDLINE_MISUSE_RESPONSE = """I cannot assist with misuse or misappropriation of project funds. All requests must follow the Manual for Development Projects 2024."""
+I cannot assist with bribery, corruption, or misuse of public funds.
+
+All requests must follow the Manual for Development Projects 2024 and applicable laws."""
+
+REDLINE_MISUSE_RESPONSE = """⚠️ **Cannot Assist**
+
+I cannot assist with misuse or misappropriation of project funds.
+
+All procurement and expenditure must follow the Manual for Development Projects 2024."""
 
 # ============================================================================
 # OFF-SCOPE RESPONSES
@@ -19,25 +27,32 @@ REDLINE_MISUSE_RESPONSE = """I cannot assist with misuse or misappropriation of 
 
 OFFSCOPE_GENERIC_RESPONSE = """This question is outside the scope of the Manual for Development Projects 2024.
 
-I can only answer queries directly related to government development planning procedures."""
+I can help with:
+- PC-I through PC-V proforma requirements
+- Project approval processes (DDWP/CDWP/ECNEC)
+- Budget allocation and monitoring
 
-OFFSCOPE_MEDICAL_RESPONSE = """This platform is designed only for questions related to the Manual for Development Projects 2024.
+Please ask a question related to development projects."""
 
-I cannot provide medical advice. For personal health concerns, consult a qualified doctor or healthcare professional."""
+OFFSCOPE_MEDICAL_RESPONSE = """This assistant only answers questions about the Manual for Development Projects 2024.
+
+I cannot provide medical advice. For health concerns, please consult a qualified healthcare professional."""
 
 OFFSCOPE_SPORTS_RESPONSE = """This assistant only answers questions about the Manual for Development Projects 2024.
 
-Sports questions are outside this scope."""
+Sports questions are outside this scope. Please ask about development project procedures."""
 
-OFFSCOPE_POLITICS_RESPONSE = """I do not provide political opinions or rank governments.
+OFFSCOPE_POLITICS_RESPONSE = """I do not provide political opinions or commentary.
 
-This assistant is limited to the Manual for Development Projects 2024 and development procedures. Political judgement questions are outside scope."""
+This assistant is limited to the Manual for Development Projects 2024 and development procedures.
+
+I can help with governance-related questions about ECNEC, CDWP, ministries, and project approvals."""
 
 OFFSCOPE_ENTERTAINMENT_RESPONSE = """This assistant only answers questions about the Manual for Development Projects 2024.
 
-Entertainment and celebrity questions are outside this scope."""
+Entertainment questions are outside this scope."""
 
-OFFSCOPE_GENERAL_KNOWLEDGE_RESPONSE = """This question appears to be general knowledge unrelated to development project procedures.
+OFFSCOPE_GENERAL_KNOWLEDGE_RESPONSE = """This question is outside the scope of development project procedures.
 
 I can only answer queries about the Manual for Development Projects 2024."""
 
@@ -47,11 +62,22 @@ I can only answer queries about the Manual for Development Projects 2024."""
 
 ABUSE_HARD_RESPONSE = """This platform is for professional questions about the Manual for Development Projects 2024.
 
-Abusive language doesn't help. These interactions may be logged for internal audit and quality purposes."""
+Please keep your language professional. These interactions may be logged for quality purposes."""
 
 ABUSE_SOFT_BANTER_RESPONSE = """I'm here to help with questions about the Manual for Development Projects 2024.
 
-If my previous answer wasn't helpful, try rephrasing your question or giving more detail."""
+If my previous answer wasn't helpful, try rephrasing your question with more detail."""
+
+# ============================================================================
+# FALLBACK RESPONSE
+# ============================================================================
+
+FALLBACK_NOT_FOUND_RESPONSE = """Not found in the Manual.
+
+The retrieved context does not contain information to answer this question. Try:
+- Rephrasing your question
+- Using Exact Search mode for specific terms
+- Checking the PDF manual directly"""
 
 # ============================================================================
 # HELPER FUNCTIONS
@@ -113,3 +139,31 @@ def get_abuse_response(subcategory: str = "hard") -> str:
         return ABUSE_SOFT_BANTER_RESPONSE
     else:
         return ABUSE_HARD_RESPONSE
+
+
+def get_guardrail_response(classification_class: str, subcategory: str = None) -> str:
+    """
+    v2.1.0: Unified guardrail response generator.
+    
+    Args:
+        classification_class: "off_scope", "red_line", or "abusive"
+        subcategory: Optional subcategory for specific response
+        
+    Returns:
+        Static response string (no RAG, no citations)
+    """
+    if classification_class == "red_line":
+        return get_redline_response(subcategory or "generic")
+    elif classification_class == "abusive":
+        if subcategory == "soft_banter":
+            return get_abuse_response("soft")
+        return get_abuse_response("hard")
+    elif classification_class == "off_scope":
+        return get_offscope_response(subcategory or "generic")
+    else:
+        return OFFSCOPE_GENERIC_RESPONSE
+
+
+def get_fallback_response() -> str:
+    """Get the fallback 'not found' response."""
+    return FALLBACK_NOT_FOUND_RESPONSE

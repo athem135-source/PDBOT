@@ -1,6 +1,6 @@
 ﻿# PDBot – Planning & Development Manual RAG Chatbot
 
-![Version](https://img.shields.io/badge/version-2.0.8-blue)
+![Version](https://img.shields.io/badge/version-2.1.0-blue)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-Proprietary-red)
 ![Accuracy](https://img.shields.io/badge/accuracy-85--90%25-brightgreen)
@@ -11,7 +11,7 @@
 
 ## 📑 Table of Contents
 
-- [What's New (v2.0.0)](#-whats-new-in-v200)
+- [What's New (v2.1.0)](#-whats-new-in-v210)
 - [Overview](#-overview)
 - [Key Features](#-key-features)
 - [Architecture](#-architecture)
@@ -26,6 +26,47 @@
 - [Contributing](#-contributing)
 - [License](#-license)
 - [Contact](#-contact)
+
+---
+
+## 🚀 What's New in v2.1.0
+
+### 🎯 Multi-Class Query Classifier
+- **12-class classification system** - Determines intent BEFORE RAG processing
+  - `in_scope`, `numeric_query`, `definition_query`, `procedure_query`
+  - `compliance_query`, `timeline_query`, `formula_or_method`, `monitoring_evaluation`
+  - `off_scope`, `red_line`, `abusive`, `fallback_required`
+- **Retrieval hints** - Classifier provides hints to boost relevant chunks
+- **Zero hardcoded values** - All classification is pattern-based
+
+### 🔄 Smart Groq Fallback Pipeline
+- **Automatic fallback triggers:**
+  - Local model (Ollama) fails or returns empty
+  - Output has refusal but context has content
+  - Numeric query but no numbers extracted
+- **Same guardrails** - Fallback uses identical system prompt and sanitization
+- **Dual model support** - Primary: `llama-3.1-8b-instant`, Fallback: `mixtral-8x7b-32768`
+
+### 🔍 Enhanced Retrieval with Classification Hints
+- **Procedure boost** - +0.15 for chunks matching procedure patterns
+- **Formula boost** - +0.15 for formula/calculation content
+- **Monitoring boost** - +0.15 for KPI/M&E content
+- **Multi-sentence preference** - Longer chunks for complex queries
+
+### 🛡️ Improved Guardrails
+- **Unified guardrail response system** - `get_guardrail_response()` function
+- **Cleaner off-scope handling** - Consistent responses for all blocked queries
+- **Development governance whitelist** - ECNEC, CDWP, ministry questions always allowed
+
+### 📊 Target Metrics
+| Metric | Target |
+|--------|--------|
+| In-scope accuracy | ≥ 85% |
+| Numeric accuracy | ≥ 90% |
+| Procedural accuracy | ≥ 85% |
+| Off-scope detection | 100% |
+| Red-line detection | 100% |
+| Zero hallucination | 100% |
 
 ---
 
@@ -52,52 +93,6 @@
 - **User question display** - Your question now shows immediately in chat
 - **Faster responses** - Reduced token generation (120 vs 1800)
 - **Better error handling** - Cleaner fallback to Groq when Ollama fails
-
-### 📊 Target Metrics
-| Metric | Target |
-|--------|--------|
-| Overall accuracy | ≥ 85% |
-| Numeric extraction | ≥ 90% |
-| Chunk relevance | ≥ 88% |
-| Citation correctness | ≥ 95% |
-| Answer length compliance | 100% |
-| Hallucinations | 0% |
-
----
-
-## 🚀 What's New in v2.0.7
-
-### 🔌 Groq API Fallback
-- **Automatic Fallback** - When Ollama is unavailable or returns errors, PDBot automatically falls back to Groq API (`llama-3.1-8b-instant`)
-- **Admin Toggle** - New "Force Groq" toggle in Backend status expander for testing Groq directly
-- **Status Indicators** - Admin panel now shows both Ollama and Groq availability status
-
-### ✅ Admin Panel Enhancements
-- Groq fallback status indicator (✅/❌)
-- "Force Groq (bypass Ollama)" toggle for testing
-- Improved backend status display
-
-### 🛠️ v2.0.6 Changes (Previous)
-- Removed unused Qwen pretrained model (~200 lines removed)
-- Simplified to Ollama-only architecture
-- Faster startup time
-
----
-
-## 🚀 What's New in v2.0.0
-
-> **📖 Full Release Notes:** See the [v2.0.0 GitHub Release](https://github.com/athem135-source/PDBOT/releases/tag/v2.0.0) for comprehensive details.
-
-### 🎯 Major Features
-
-**1. Sentence-Level Chunking with Numeric Preservation**
-- **40-55 word chunks** using NLTK sentence tokenization
-- **NEVER splits numeric values** mid-sentence (Rs. 200 million preserved intact)
-- Special handling for currency, percentages, and financial data
-- **Result**: 1,322 chunks (up from 690) with complete numeric values
-
-**2. Forbidden Response Detection & Forced Extraction**
-- Detects when LLM says "does not provide" but context has the answer
 - **Automatically regenerates** with stricter prompt at temperature=0.1
 - Forces direct extraction of numeric values from context
 - **Result**: 75-90% numeric extraction accuracy (up from 40%)
@@ -644,13 +639,17 @@ enableCORS = false
 ```
 PDBOT/
 ├── src/                          # Main application source
-│   ├── app.py                    # Streamlit app (3,139 lines) - Main entry point
-│   ├── rag_langchain.py          # RAG pipeline (450 lines) - Retrieval & reranking
-│   ├── core/                     # Core modules (NEW in v1.5.0)
-│   │   └── classification.py    # Query classification system (310 lines)
+│   ├── app.py                    # Streamlit app - Main entry point
+│   ├── rag_langchain.py          # RAG pipeline - Retrieval & reranking
+│   ├── core/                     # Core modules
+│   │   ├── classification.py     # Legacy query classifier
+│   │   ├── multi_classifier.py   # v2.1.0 Multi-class classifier (12 classes)
+│   │   ├── templates.py          # Guardrail response templates
+│   │   ├── numeric_safety.py     # Numeric query handling
+│   │   └── numeric_safety_dynamic.py  # Dynamic numeric detection
 │   ├── models/                   # LLM backends
 │   │   ├── __init__.py
-│   │   ├── local_model.py        # Ollama integration (315 lines)
+│   │   ├── local_model.py        # Ollama + Groq fallback integration
 │   │   └── pretrained_model.py   # HuggingFace models (legacy)
 │   ├── utils/                    # Utilities
 │   │   ├── __init__.py
@@ -679,11 +678,7 @@ PDBOT/
 ├── .streamlit/                   # Streamlit config
 │   └── config.toml
 │
-├── requirements.txt              # Python dependencies (v1.5.0)
-├── RELEASE_v1.7.0_NOTES.md       # v1.7.0 release documentation
-├── RELEASE_v1.6.1_NOTES.md       # v1.6.1 release documentation
-├── PROJECT_STRUCTURE.md          # Detailed architecture docs
-├── RELEASE_v1.5.0.md            # v1.5.0 release notes
+├── requirements.txt              # Python dependencies
 ├── setup.bat                     # Windows setup script
 ├── run.ps1                       # PowerShell launcher
 ├── run.bat                       # Batch launcher
@@ -691,16 +686,13 @@ PDBOT/
 └── README.md                     # This file
 ```
 
-**Key Files**:
-- `src/app.py` - Streamlit UI, chat logic, admin panel, query classification integration
-- `src/core/classification.py` - Pre-RAG query routing system (NEW in v1.5.0)
-- `src/rag_langchain.py` - RAG pipeline with semantic search and reranking
-- `src/models/local_model.py` - Mistral 7B via Ollama with anti-leakage prompts
+**Key Files (v2.1.0)**:
+- `src/app.py` - Streamlit UI, chat logic, admin panel
+- `src/core/multi_classifier.py` - 12-class query classifier (NEW in v2.1.0)
+- `src/core/templates.py` - Guardrail response templates
+- `src/rag_langchain.py` - RAG pipeline with classifier hints
+- `src/models/local_model.py` - Ollama + Groq fallback with `generate_with_fallback()`
 - `config/manual_path.txt` - Path to PDF manual (user-configurable)
-- `RELEASE_v1.7.0_NOTES.md` - v1.7.0 release documentation
-- `RELEASE_v1.6.1_NOTES.md` - v1.6.1 release documentation
-- `REFACTOR_v1.7.0_SUMMARY.md` - v1.7.0 technical implementation details
-- `PROJECT_STRUCTURE.md` - Detailed architecture and module documentation
 
 ---
 

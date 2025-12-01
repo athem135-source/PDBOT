@@ -1,7 +1,8 @@
 """
-PDBot Local Model v3.2.0 (v2.0.8)
+PDBot Local Model v3.3.0 (v2.1.0)
 Mistral-optimized with strict answer formatting.
-Groq fallback for reranking ONLY (not generation).
+Groq fallback for generation when local model fails.
+Multi-class classifier integration.
 """
 import os
 import re
@@ -21,13 +22,14 @@ _CACHE: Dict[str, Tuple[str, object]] = {}
 DEFAULT_MODEL = os.getenv("CHATBOT_MODEL", "google/flan-t5-small")
 FALLBACK_MODEL = os.getenv("CHATBOT_FALLBACK_MODEL", "distilgpt2")
 
-# Groq API configuration (for reranking ONLY, not generation)
+# Groq API configuration (for fallback generation)
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+GROQ_FALLBACK_MODEL = os.getenv("GROQ_FALLBACK_MODEL", "mixtral-8x7b-32768")
 
 # =============================================================================
-# SYSTEM PROMPT v2.0.8 - Strict, concise, direct answers
+# SYSTEM PROMPT v2.1.0 - Strict, concise, direct answers
 # =============================================================================
 SYSTEM_PROMPT = """You are PDBOT, the official assistant for the Manual for Development Projects 2024.
 Your answers must ALWAYS follow these rules:
@@ -483,3 +485,203 @@ State ONLY what the text says (45-70 words):"""
         )
         
         return out[0].get("generated_text", "").strip()
+
+    def generate_with_fallback(
+        self,
+        query: str,
+        classification: str,
+        retrieved_context: str,
+        retrieved_chunks: Optional[List[Dict[str, Any]]] = None,
+        page: int = 0,
+        max_new_tokens: int = 120,
+        temperature: float = 0.15,
+    ) -> str:
+        """
+        v2.1.0: Generate answer with automatic Groq fallback.
+        
+        Uses Groq API ONLY if:
+        1. Local model (Ollama) fails
+        2. Local output is empty
+        3. Local output has false refusal but context has content
+        4. Numeric query but no numbers extracted
+        
+        Args:
+            query: User's question
+            classification: Query classification (from multi_classifier)
+            retrieved_context: RAG context text
+            retrieved_chunks: List of retrieved chunks with metadata
+            page: Page number for citation
+            max_new_tokens: Max tokens for generation
+            temperature: Generation temperature
+            
+        Returns:
+            Sanitized answer string
+        """
+        retrieved_chunks = retrieved_chunks or []
+        
+        # Step 1: Try local model (Ollama) first
+        local_output = ""
+        try:
+            local_output = self.generate_response(
+                question=query,
+                context=retrieved_context,
+                max_new_tokens=max_new_tokens,
+                temperature=temperature,
+                force_groq=False,
+                page=page,
+            ) or ""
+        except Exception as e:
+            logging.warning(f"[LocalModel] Local generation failed: {e}")
+            local_output = ""
+        
+        # Step 2: Check if fallback is required
+        fallback_needed = self._check_fallback_required(
+            local_output=local_output,
+            retrieved_chunks=retrieved_chunks,
+            query_class=classification
+        )
+        
+        if not fallback_needed:
+            logging.info("[LocalModel] Using local model output")
+            return local_output
+        
+        # Step 3: Use Groq fallback with SAME guardrails
+        logging.info("[LocalModel] Fallback triggered - using Groq API")
+        
+        if not GROQ_API_KEY:
+            logging.warning("[LocalModel] Groq API key not configured, returning local output")
+            return local_output if local_output else "Not found in the Manual.\n\nSource: Manual for Development Projects 2024"
+        
+        # Build strict prompt (same as local)
+        strict_prompt = f"""Context from the Manual:
+{retrieved_context[:2500]}
+
+Question: {query}
+
+Answer in 45-70 words. Extract numbers if present. Direct answer first:"""
+        
+        groq_output = ""
+        try:
+            # Try primary Groq model
+            groq_output = self._groq_generate(
+                strict_prompt,
+                max_tokens=max_new_tokens,
+                temperature=0.2,
+                system=SYSTEM_PROMPT
+            )
+            
+            # If primary fails, try fallback model
+            if not groq_output or groq_output.startswith("(Groq error"):
+                logging.info("[LocalModel] Trying Groq fallback model...")
+                groq_output = self._groq_generate_with_model(
+                    strict_prompt,
+                    model=GROQ_FALLBACK_MODEL,
+                    max_tokens=max_new_tokens,
+                    temperature=0.2,
+                    system=SYSTEM_PROMPT
+                )
+        except Exception as e:
+            logging.error(f"[LocalModel] Groq fallback failed: {e}")
+            groq_output = ""
+        
+        # Step 4: If Groq also fails, return best available
+        if not groq_output or groq_output.startswith("("):
+            if local_output and not local_output.startswith("("):
+                return local_output
+            return "Not found in the Manual.\n\nSource: Manual for Development Projects 2024"
+        
+        # Step 5: Sanitize Groq output with same sanitizer
+        answer = self._sanitize_answer(groq_output, retrieved_context, page)
+        
+        return answer
+    
+    def _groq_generate_with_model(
+        self,
+        prompt: str,
+        model: str,
+        max_tokens: int,
+        temperature: float = 0.2,
+        system: Optional[str] = None
+    ) -> str:
+        """Generate with specific Groq model (for fallback)."""
+        if not GROQ_API_KEY:
+            return "(Groq API key not configured)"
+        
+        headers = {
+            "Authorization": f"Bearer {GROQ_API_KEY}",
+            "Content-Type": "application/json"
+        }
+        
+        messages = []
+        if system:
+            messages.append({"role": "system", "content": system})
+        messages.append({"role": "user", "content": prompt})
+        
+        payload = {
+            "model": model,
+            "messages": messages,
+            "temperature": max(0.1, min(0.7, temperature)),
+            "max_tokens": min(max_tokens, 500),
+        }
+        
+        try:
+            r = requests.post(GROQ_API_URL, headers=headers, json=payload, timeout=30)
+            r.raise_for_status()
+            data = r.json()
+            return str(data.get("choices", [{}])[0].get("message", {}).get("content", "")).strip()
+        except Exception as e:
+            logging.error(f"[Groq] Model {model} error: {e}")
+            return f"(Groq error: {e})"
+    
+    def _check_fallback_required(
+        self,
+        local_output: Optional[str],
+        retrieved_chunks: List[Dict[str, Any]],
+        query_class: str
+    ) -> bool:
+        """
+        Check if fallback to Groq is required.
+        
+        Returns True if:
+        1. Local output is empty/None
+        2. Local output has refusal but chunks have content
+        3. Numeric query but no numbers in output
+        """
+        # Trigger 1: Empty output
+        if not local_output or not local_output.strip():
+            return True
+        
+        # Check for error outputs
+        if local_output.startswith("(Ollama error") or local_output.startswith("(Error"):
+            return True
+        
+        output_lower = local_output.lower()
+        
+        # Trigger 2: "Not found" but chunks have content
+        refusal_phrases = [
+            "not found", "does not provide", "no information",
+            "cannot find", "not mentioned", "does not contain",
+            "not available", "i don't have", "i cannot"
+        ]
+        has_refusal = any(phrase in output_lower for phrase in refusal_phrases)
+        
+        if has_refusal and retrieved_chunks:
+            total_chunk_text = " ".join(c.get("text", "") for c in retrieved_chunks)
+            if len(total_chunk_text.split()) >= 30:
+                return True
+        
+        # Trigger 3: Numeric query but no numbers in output
+        if query_class == "numeric_query":
+            chunk_text = " ".join(c.get("text", "") for c in retrieved_chunks)
+            has_numbers_in_chunks = bool(re.search(
+                r"Rs\.?\s*[\d,]+|[\d,]+\s*(?:million|billion|crore|lakh)|\d+\s*%",
+                chunk_text, re.IGNORECASE
+            ))
+            has_numbers_in_output = bool(re.search(
+                r"Rs\.?\s*[\d,]+|[\d,]+\s*(?:million|billion|crore|lakh)|\d+\s*%",
+                local_output, re.IGNORECASE
+            ))
+            if has_numbers_in_chunks and not has_numbers_in_output:
+                return True
+        
+        return False
