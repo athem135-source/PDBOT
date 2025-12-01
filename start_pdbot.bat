@@ -1,7 +1,7 @@
 @echo off
 REM ============================================
-REM PDBOT Unified Launcher
-REM Government of Pakistan - Ministry of Planning
+REM PDBOT Unified Launcher v2.3.0
+REM Developer: M. Hassan Arif Afridi
 REM ============================================
 
 setlocal enabledelayedexpansion
@@ -10,16 +10,16 @@ setlocal enabledelayedexpansion
 cls
 echo.
 echo  ========================================
-echo      PDBOT - Unified Launcher
-echo      Government of Pakistan
-echo      Ministry of Planning, Development
-echo      ^& Special Initiatives
+echo      PDBOT v2.3.0 - Unified Launcher
+echo      Developer: M. Hassan Arif Afridi
+echo      Planning ^& Development Assistant
 echo  ========================================
 echo.
 echo   Select an option:
 echo.
-echo   [1] React Widget (Modern UI)
-echo       - Floating chat widget
+echo   [1] React Widget (Recommended)
+echo       - Modern floating chat widget
+echo       - Admin Panel (type "nufc")
 echo       - Requires: Qdrant + Flask API
 echo.
 echo   [2] Streamlit App (Full Dashboard)

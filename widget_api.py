@@ -10,20 +10,25 @@ Features:
   - RAG-powered responses from Manual for Development Projects 2024
   - Source and passage tracking
   - Feedback collection
+  - Admin status endpoint
+  - Production WSGI server (waitress)
 
 Endpoints:
   POST /chat - Send a query and get a response
   POST /feedback/answer - Submit answer feedback
   POST /feedback/session - Submit session feedback
+  POST /memory/clear - Clear session memory
   GET  /health - Health check
+  GET  /admin/status - Backend status for admin panel
 
-@author Ministry of Planning, Development & Special Initiatives
-@version 2.2.0
+@author M. Hassan Arif Afridi
+@version 2.3.0
 """
 
 import os
 import sys
 import json
+import socket
 from datetime import datetime
 from typing import Dict, List
 from flask import Flask, request, jsonify
@@ -341,23 +346,120 @@ def health():
     return jsonify({
         'status': 'ok',
         'service': 'PDBOT Widget API',
-        'version': '2.2.0',
-        'features': ['contextual_memory', 'rag_retrieval', 'feedback_collection']
+        'version': '2.3.0',
+        'features': ['contextual_memory', 'rag_retrieval', 'feedback_collection', 'admin_panel']
     })
 
 
-if __name__ == '__main__':
-    print("\n" + "="*50)
-    print("  PDBOT Widget API Server v2.2.0")
-    print("  Government of Pakistan")
-    print("="*50)
-    print("\n  Starting on http://localhost:5000")
-    print("  Endpoints:")
-    print("    POST /chat - Chat with PDBOT (with memory)")
-    print("    POST /feedback/answer - Answer feedback")
-    print("    POST /feedback/session - Session feedback")
-    print("    POST /memory/clear - Clear session memory")
-    print("    GET  /health - Health check")
-    print("\n" + "="*50 + "\n")
+@app.route('/admin/status', methods=['GET'])
+def admin_status():
+    """
+    Admin endpoint - returns detailed backend status.
+    Only accessible with admin code verification on frontend.
+    """
+    try:
+        # Get memory usage
+        import psutil
+        process = psutil.Process(os.getpid())
+        memory_mb = process.memory_info().rss / 1024 / 1024
+    except:
+        memory_mb = 0
     
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # Count active sessions
+    active_sessions = len(session_memory)
+    total_messages = sum(len(msgs) for msgs in session_memory.values())
+    
+    # Check Qdrant status
+    qdrant_status = "unknown"
+    try:
+        from qdrant_client import QdrantClient
+        qdrant_url = os.getenv("QDRANT_URL", "http://localhost:6338")
+        client = QdrantClient(url=qdrant_url, timeout=2)
+        collections = client.get_collections()
+        qdrant_status = "connected"
+    except Exception as e:
+        qdrant_status = f"error: {str(e)[:50]}"
+    
+    # Check Ollama status
+    ollama_status = "unknown"
+    try:
+        import requests
+        resp = requests.get("http://localhost:11434/api/tags", timeout=2)
+        if resp.status_code == 200:
+            ollama_status = "connected"
+        else:
+            ollama_status = "error"
+    except:
+        ollama_status = "not running"
+    
+    return jsonify({
+        'status': 'ok',
+        'version': '2.3.0',
+        'uptime': datetime.now().isoformat(),
+        'memory_mb': round(memory_mb, 2),
+        'active_sessions': active_sessions,
+        'total_messages_in_memory': total_messages,
+        'max_memory_per_session': MAX_MEMORY_MESSAGES,
+        'qdrant_status': qdrant_status,
+        'ollama_status': ollama_status,
+        'qdrant_url': os.getenv("QDRANT_URL", "http://localhost:6338"),
+        'debug_mode': app.debug
+    })
+
+
+@app.route('/admin/clear-all-memory', methods=['POST'])
+def admin_clear_all_memory():
+    """Admin endpoint to clear all session memory"""
+    try:
+        count = len(session_memory)
+        session_memory.clear()
+        return jsonify({
+            'success': True,
+            'message': f'Cleared {count} sessions from memory'
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+def get_local_ip():
+    """Get the local IP address for network access"""
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except:
+        return "127.0.0.1"
+
+
+if __name__ == '__main__':
+    local_ip = get_local_ip()
+    port = 5000
+    
+    print("\n" + "="*60)
+    print("  PDBOT Widget API Server v2.3.0")
+    print("  Developed by M. Hassan Arif Afridi")
+    print("="*60)
+    print(f"\n  🌐 Local:   http://localhost:{port}")
+    print(f"  📱 Network: http://{local_ip}:{port}")
+    print(f"\n  To access from phone, use: http://{local_ip}:{port}")
+    print("\n  Endpoints:")
+    print("    POST /chat           - Chat with PDBOT (with memory)")
+    print("    POST /feedback/*     - Feedback endpoints")
+    print("    POST /memory/clear   - Clear session memory")
+    print("    GET  /health         - Health check")
+    print("    GET  /admin/status   - Backend status (admin)")
+    print("\n" + "="*60)
+    
+    # Check if waitress is available for production server
+    try:
+        from waitress import serve
+        print("\n  ✅ Using Waitress (production WSGI server)")
+        print("="*60 + "\n")
+        serve(app, host='0.0.0.0', port=port, threads=4)
+    except ImportError:
+        print("\n  ⚠️  Waitress not installed. Using Flask dev server.")
+        print("     Install with: pip install waitress")
+        print("="*60 + "\n")
+        app.run(host='0.0.0.0', port=port, debug=False)

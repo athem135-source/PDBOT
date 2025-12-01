@@ -5,8 +5,13 @@
  * Main chat widget component - floating, draggable, minimizable.
  * Contains all chat logic and renders child components.
  * 
- * @author Ministry of Planning, Development & Special Initiatives
- * @version 1.0.0
+ * Features:
+ * - Admin mode (type "nufc" to access)
+ * - Session memory management
+ * - Logo customization
+ * 
+ * @author M. Hassan Arif Afridi
+ * @version 2.3.0
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -17,6 +22,7 @@ import TypingIndicator from './TypingIndicator.jsx';
 import SuggestedQuestions from './SuggestedQuestions.jsx';
 import SettingsMenu from './SettingsMenu.jsx';
 import FeedbackModal from './FeedbackModal.jsx';
+import AdminPanel from './AdminPanel.jsx';
 
 // Utilities
 import { sendChatMessage, clearChatMemory } from '../utils/api.js';
@@ -37,6 +43,12 @@ import { generateMessageId } from '../utils/feedback.js';
 // Greeting message
 const GREETING_MESSAGE = "Assalam-o-Alaikum! I am PDBOT, your planning & development assistant. How can I help you today?";
 
+// Admin code
+const ADMIN_CODE = "nufc";
+
+// Logo URL - Pakistan coat of arms
+const DEFAULT_LOGO = "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Coat_of_arms_of_Pakistan.svg/800px-Coat_of_arms_of_Pakistan.svg.png";
+
 /**
  * ChatWidget - Main floating chat widget
  */
@@ -50,11 +62,17 @@ function ChatWidget() {
   const [hasGreeted, setHasGreeted] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [newMessageId, setNewMessageId] = useState(null);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [adminCodeBuffer, setAdminCodeBuffer] = useState('');
   
   // Dragging state
   const [position, setPosition] = useState({ x: null, y: null });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  
+  // Logo
+  const customLogo = localStorage.getItem('pdbot_logo_path');
+  const logoUrl = customLogo || DEFAULT_LOGO;
   
   // Refs
   const messagesEndRef = useRef(null);
@@ -104,6 +122,27 @@ function ChatWidget() {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [isOpen, isMinimized]);
+  
+  // Admin code detection via keyboard
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!isOpen) return;
+      
+      // Only track letters
+      if (e.key.length === 1 && e.key.match(/[a-z]/i)) {
+        const newBuffer = (adminCodeBuffer + e.key.toLowerCase()).slice(-4);
+        setAdminCodeBuffer(newBuffer);
+        
+        if (newBuffer === ADMIN_CODE) {
+          setShowAdminPanel(true);
+          setAdminCodeBuffer('');
+        }
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, adminCodeBuffer]);
   
   // Show greeting when widget first opens
   useEffect(() => {
@@ -259,15 +298,27 @@ function ChatWidget() {
   
   // Actually perform new chat after feedback
   const performNewChat = async () => {
-    // Clear server-side memory for this session
-    await clearChatMemory(sessionId.current);
+    try {
+      // Clear server-side memory for this session
+      await clearChatMemory(sessionId.current);
+    } catch (err) {
+      console.warn('Failed to clear server memory:', err);
+    }
     
+    // Create new session
     sessionId.current = createNewSession();
+    
+    // Clear all local state
     setMessages([]);
     setHasGreeted(false);
-    clearChatHistory();
+    setInputValue('');
     
-    // Re-trigger greeting
+    // Clear localStorage completely
+    clearChatHistory();
+    localStorage.removeItem('pdbot_chat_history');
+    localStorage.removeItem('pdbot_widget_state');
+    
+    // Re-trigger greeting after a short delay
     setTimeout(() => {
       const greetingMsg = {
         id: generateMessageId(),
@@ -399,10 +450,15 @@ function ChatWidget() {
             onMouseDown={handleDragStart}
           >
             <div className="pdbot-header-info">
-              <span className="pdbot-logo">🤖</span>
+              <img 
+                src={logoUrl} 
+                alt="Pakistan Emblem" 
+                className="pdbot-header-logo"
+                onError={(e) => { e.target.style.display = 'none'; }}
+              />
               <div className="pdbot-header-text">
                 <span className="pdbot-title">PDBOT</span>
-                <span className="pdbot-subtitle">Planning & Development Bot</span>
+                <span className="pdbot-subtitle">Planning & Development Assistant</span>
               </div>
             </div>
             
@@ -526,6 +582,12 @@ function ChatWidget() {
         }}
         onSubmit={handleFeedbackSubmit}
         messageCount={messages.length}
+      />
+      
+      {/* Admin Panel (accessible via "nufc" code) */}
+      <AdminPanel
+        isOpen={showAdminPanel}
+        onClose={() => setShowAdminPanel(false)}
       />
     </>
   );

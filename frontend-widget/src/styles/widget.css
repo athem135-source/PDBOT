@@ -1433,3 +1433,251 @@
   display: flex;
   justify-content: flex-end;
 }
+
+/* ============================================================================
+   Header Logo Image
+   ============================================================================ */
+
+.pdbot-header-logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 2px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* ============================================================================
+   Admin Panel Styles
+   ============================================================================ */
+
+.pdbot-admin-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  animation: pdbot-fade-in 0.2s ease;
+}
+
+.pdbot-admin-panel {
+  width: 420px;
+  max-width: 95vw;
+  max-height: 85vh;
+  background: var(--pdbot-white);
+  border-radius: var(--pdbot-radius);
+  box-shadow: var(--pdbot-shadow-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: pdbot-scale-in 0.2s ease;
+}
+
+@keyframes pdbot-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.pdbot-admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #333, #555);
+  color: white;
+}
+
+.pdbot-admin-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.pdbot-admin-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.pdbot-admin-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.pdbot-admin-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+}
+
+.pdbot-admin-section {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--pdbot-gray-200);
+}
+
+.pdbot-admin-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.pdbot-admin-section h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pdbot-gray-700);
+}
+
+.pdbot-admin-loading {
+  color: var(--pdbot-gray-500);
+  font-style: italic;
+}
+
+.pdbot-admin-error {
+  color: #dc3545;
+  font-size: 13px;
+}
+
+.pdbot-admin-status-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.pdbot-admin-status-item {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  background: var(--pdbot-gray-100);
+  border-radius: 8px;
+}
+
+.pdbot-admin-label {
+  font-size: 11px;
+  color: var(--pdbot-gray-600);
+  margin-bottom: 4px;
+}
+
+.pdbot-admin-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pdbot-gray-800);
+}
+
+.pdbot-admin-value.status-ok {
+  color: var(--pdbot-dark-green);
+}
+
+.pdbot-admin-value.status-error {
+  color: #dc3545;
+}
+
+.pdbot-admin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--pdbot-gray-100);
+  border: 1px solid var(--pdbot-gray-300);
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+
+.pdbot-admin-btn:hover {
+  background: var(--pdbot-gray-200);
+}
+
+.pdbot-admin-btn-primary {
+  background: var(--pdbot-dark-green);
+  color: white;
+  border-color: var(--pdbot-dark-green);
+}
+
+.pdbot-admin-btn-primary:hover {
+  background: #005500;
+}
+
+.pdbot-admin-btn-warning {
+  background: #fff3cd;
+  border-color: #ffc107;
+  color: #856404;
+}
+
+.pdbot-admin-btn-warning:hover {
+  background: #ffe69c;
+}
+
+.pdbot-admin-input-group {
+  margin-bottom: 12px;
+}
+
+.pdbot-admin-input-group label {
+  display: block;
+  font-size: 12px;
+  color: var(--pdbot-gray-600);
+  margin-bottom: 4px;
+}
+
+.pdbot-admin-input-group input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--pdbot-gray-300);
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.pdbot-admin-input-group input:focus {
+  outline: none;
+  border-color: var(--pdbot-dark-green);
+  box-shadow: 0 0 0 3px rgba(0, 102, 0, 0.1);
+}
+
+.pdbot-admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pdbot-admin-debug {
+  background: var(--pdbot-gray-100);
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-family: monospace;
+}
+
+.pdbot-admin-debug p {
+  margin: 4px 0;
+  word-break: break-all;
+}
+
+.pdbot-admin-footer {
+  padding: 12px 20px;
+  background: var(--pdbot-gray-100);
+  border-top: 1px solid var(--pdbot-gray-200);
+  font-size: 11px;
+  color: var(--pdbot-gray-500);
+  text-align: center;
+}
+

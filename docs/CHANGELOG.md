@@ -7,6 +7,38 @@ All notable changes to PDBOT are documented in this file.
 
 ---
 
+## [2.3.0] - 2025-12-01
+
+### 🆕 Added
+
+#### Admin Panel
+- Hidden admin panel (access code: "nufc")
+- Backend status monitoring (Qdrant, Ollama, memory)
+- Clear server/local memory functions
+- Custom logo URL setting
+- Debug information display
+
+#### Mobile Access
+- Network IP display on server startup
+- Access widget from any device on same network
+- Production WSGI server (Waitress)
+
+#### Widget Improvements
+- Pakistan emblem logo in header
+- Better error handling for server connection
+- Improved clear chat functionality
+
+### 🔧 Changed
+- Replaced Flask dev server with Waitress (production WSGI)
+- Clear chat now clears both server AND local storage
+- Updated version to 2.3.0 across all files
+
+### 📦 Dependencies
+- Added `waitress>=3.0.0` for production server
+- Added `psutil>=5.9.0` for admin status monitoring
+
+---
+
 ## [2.2.1] - 2025-12-01
 
 ### 📝 Documentation Overhaul

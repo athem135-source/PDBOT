@@ -1,12 +1,18 @@
 # ============================================
-# PDBot Requirements - v2.1.0
-# Multi-Class Classifier & Smart Groq Fallback
+# PDBot Requirements - v2.3.0
+# React Widget, Admin Panel, Production WSGI
 # ============================================
 
 # ---- Frontend & UI ----
 streamlit>=1.40.0              # Interactive web UI framework (security patches)
 requests>=2.32.3               # HTTP library (CVE-2024-35195 fixed in 2.32.3)
 python-dotenv>=1.0.0           # Load environment variables from .env file
+
+# ---- Widget API Server ----
+flask>=3.0.0                   # REST API framework
+flask-cors>=4.0.0              # CORS support for widget
+waitress>=3.0.0                # Production WSGI server (replaces Flask dev server)
+psutil>=5.9.0                  # System monitoring for admin panel
 
 # ---- Document Processing ----
 pypdf>=5.1.0                   # PDF extraction (security updates, better error handling)

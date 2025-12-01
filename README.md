@@ -10,7 +10,7 @@
 
 ---
 
-![Version](https://img.shields.io/badge/Version-2.2.1-006600?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-2.3.0-006600?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![React](https://img.shields.io/badge/React-18.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![Qdrant](https://img.shields.io/badge/Qdrant-Vector_DB-DC382D?style=for-the-badge)
@@ -36,10 +36,11 @@
 ## 📋 Table of Contents
 
 - [Executive Summary](#-executive-summary)
-- [What's New in v2.2.1](#-whats-new-in-v221)
+- [What's New in v2.3.0](#-whats-new-in-v230)
 - [Key Features](#-key-features)
 - [System Architecture](#-system-architecture)
 - [Quick Start](#-quick-start)
+- [Mobile Access](#-mobile-access)
 - [Example Questions](#-example-questions)
 - [Performance Metrics & Test History](#-performance-metrics--test-history)
 - [Project Roadmap](#-project-roadmap)
@@ -88,31 +89,63 @@ This intelligent assistant is designed to support:
 
 ---
 
-## 🆕 What's New in v2.2.1
+## 🆕 What's New in v2.3.0
 
-> **Release Date:** December 1, 2025 | **Type:** Minor Patch
+> **Release Date:** December 1, 2025 | **Type:** Minor Release
 
-### 🖥️ React Widget (v2.2.0)
-- **Standalone Embeddable Widget** – Deploy on any government portal
-- **Modern Floating UI** – Draggable, minimizable, responsive design
-- **Government Branding** – Official Pakistan color scheme (Green #006600)
-- **No Streamlit Dependency** – Pure React + Flask architecture
+### 🔧 Admin Panel (NEW!)
+- **Secret Access Code** – Type "nufc" to open admin panel
+- **Backend Status** – Real-time Qdrant, Ollama, memory status
+- **Debug Tools** – Clear server/local memory, change settings
+- **Custom Logo** – Set custom logo URL via admin panel
 
-### 🧠 Contextual Memory (v2.2.0)
-- **Session-Based Memory** – Maintains conversation context within session
-- **Follow-up Understanding** – Handles pronouns like "What about its cost?"
-- **Automatic Cleanup** – Memory cleared on "New Chat" action
+### 📱 Mobile Access (NEW!)
+- **Network IP Display** – Server shows local network IP on startup
+- **Phone Browser Support** – Access widget from any device on same network
+- **Production WSGI** – Waitress server for stable production use
 
-### 📄 Source Transparency (v2.2.0)
-- **View Passages Button** – See exact text chunks used for answers
-- **View Sources Button** – Page numbers with relevance scores
-- **Full Audit Trail** – Complete traceability for governance
+### 🛠️ Bug Fixes
+- **Clear Chat** – Now properly clears both server and local storage
+- **Session Persistence** – Fixed chat history persisting incorrectly
+- **WSGI Warning** – Replaced Flask dev server with Waitress
 
-### 🛡️ v2.2.1 Patch Fixes
-- Fixed README markdown rendering issues
-- Updated documentation structure
-- Added comprehensive roadmap
-- Enhanced metrics documentation
+### 🖥️ React Widget Improvements
+- **Pakistan Emblem Logo** – Official emblem in header
+- **Better Error Handling** – Graceful server connection errors
+- **Version Bump** – Widget updated to v2.3.0
+
+---
+
+## 📱 Mobile Access
+
+Access PDBOT from your phone or any device on the same network:
+
+### Step 1: Start the Server
+```powershell
+python widget_api.py
+```
+
+### Step 2: Note the Network IP
+The server will display:
+```
+🌐 Local:   http://localhost:5000
+📱 Network: http://192.168.x.x:5000
+
+To access from phone, use: http://192.168.x.x:5000
+```
+
+### Step 3: Access from Phone
+1. Connect your phone to the **same WiFi network**
+2. Open browser and go to the Network URL shown
+3. For the widget: `http://192.168.x.x:5173` (Vite dev server)
+
+### Production Deployment
+For production, build the widget and serve via nginx/apache:
+```powershell
+cd frontend-widget
+npm run build
+# Deploy dist/ folder to web server
+```
 
 ---
 
@@ -127,6 +160,7 @@ This intelligent assistant is designed to support:
 | **📖 100% Source Citations** | Every answer includes page reference | Full traceability |
 | **🚫 Zero Hallucinations** | Strict retrieval-based generation | Government-grade reliability |
 | **⚡ <3s Response Time** | Optimized RAG pipeline | Efficient user experience |
+| **🔧 Admin Panel** | Hidden admin access (code: nufc) | Debug & configuration |
 | **🧠 Contextual Memory** | Understands follow-up questions | Natural conversation flow |
 | **📱 Embeddable Widget** | Deploy on any website | Easy integration |
 
