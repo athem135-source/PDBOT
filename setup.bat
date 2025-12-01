@@ -1,6 +1,6 @@
 @echo off
 REM ============================================
-REM PDBOT Complete Setup Script v2.4.5
+REM PDBOT Complete Setup Script v2.4.8
 REM Developer: M. Hassan Arif Afridi
 REM One-time setup for all dependencies
 REM ============================================
@@ -10,7 +10,7 @@ cd /d "%~dp0"
 
 echo.
 echo  ========================================
-echo   PDBOT v2.4.5 - Complete Setup
+echo   PDBOT v2.4.8 - Complete Setup
 echo   Developer: M. Hassan Arif Afridi
 echo  ========================================
 echo.

@@ -1,6 +1,6 @@
 @echo off
 REM ============================================
-REM PDBOT Unified Launcher v2.4.4
+REM PDBOT Unified Launcher v2.4.8
 REM Developer: M. Hassan Arif Afridi
 REM ============================================
 
@@ -13,7 +13,7 @@ cd /d "%~dp0"
 cls
 echo.
 echo  ========================================
-echo      PDBOT v2.4.4 - Unified Launcher
+echo      PDBOT v2.4.8 - Unified Launcher
 echo      Developer: M. Hassan Arif Afridi
 echo      Planning ^& Development Assistant
 echo  ========================================
@@ -87,7 +87,7 @@ goto menu
 cls
 echo.
 echo  ========================================
-echo   Starting PDBOT React Widget v2.4.4
+echo   Starting PDBOT React Widget v2.4.8
 echo  ========================================
 echo.
 
