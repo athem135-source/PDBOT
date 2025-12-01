@@ -1186,3 +1186,250 @@
     display: none !important;
   }
 }
+
+/* ============================================================================
+   Accuracy Warning
+   ============================================================================ */
+
+.pdbot-accuracy-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(212, 175, 55, 0.1);
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+  font-size: 10px;
+  color: var(--pdbot-gray-600);
+}
+
+.pdbot-warning-icon {
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.pdbot-warning-text {
+  line-height: 1.4;
+}
+
+/* ============================================================================
+   Detail Buttons (Passages / Sources)
+   ============================================================================ */
+
+.pdbot-bubble-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--pdbot-gray-200);
+}
+
+.pdbot-detail-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.pdbot-detail-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--pdbot-gray-100);
+  border: 1px solid var(--pdbot-gray-300);
+  border-radius: 12px;
+  font-size: 11px;
+  color: var(--pdbot-gray-700);
+  cursor: pointer;
+  transition: all var(--pdbot-transition);
+}
+
+.pdbot-detail-btn:hover {
+  background: var(--pdbot-light-green);
+  border-color: var(--pdbot-light-green);
+  color: var(--pdbot-white);
+}
+
+.pdbot-detail-icon {
+  font-size: 12px;
+}
+
+.pdbot-detail-label {
+  font-weight: 500;
+}
+
+.pdbot-feedback-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ============================================================================
+   Details Modal (Passages / Sources)
+   ============================================================================ */
+
+.pdbot-details-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10002;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+.pdbot-details-modal {
+  background: var(--pdbot-white);
+  border-radius: var(--pdbot-radius);
+  box-shadow: var(--pdbot-shadow-lg);
+  width: 100%;
+  max-width: 500px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease;
+}
+
+.pdbot-details-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, var(--pdbot-dark-green), var(--pdbot-light-green));
+  color: var(--pdbot-white);
+  border-radius: var(--pdbot-radius) var(--pdbot-radius) 0 0;
+}
+
+.pdbot-details-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.pdbot-details-icon {
+  font-size: 20px;
+}
+
+.pdbot-details-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  color: var(--pdbot-white);
+  font-size: 20px;
+  cursor: pointer;
+  transition: background var(--pdbot-transition);
+}
+
+.pdbot-details-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.pdbot-details-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+}
+
+.pdbot-details-empty {
+  text-align: center;
+  color: var(--pdbot-gray-500);
+  padding: 20px;
+}
+
+.pdbot-details-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pdbot-details-item {
+  padding: 12px;
+  background: var(--pdbot-gray-100);
+  border-radius: var(--pdbot-radius-sm);
+  border-left: 3px solid var(--pdbot-light-green);
+}
+
+/* Passage styles */
+.pdbot-passage-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.pdbot-passage-num {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pdbot-dark-green);
+}
+
+.pdbot-passage-meta {
+  font-size: 10px;
+  color: var(--pdbot-gray-500);
+}
+
+.pdbot-passage-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--pdbot-gray-800);
+}
+
+/* Source styles */
+.pdbot-source-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.pdbot-source-icon {
+  font-size: 16px;
+}
+
+.pdbot-source-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pdbot-gray-800);
+}
+
+.pdbot-source-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--pdbot-gray-600);
+}
+
+.pdbot-source-page {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pdbot-source-relevance {
+  color: var(--pdbot-light-green);
+  font-weight: 500;
+}
+
+.pdbot-details-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--pdbot-gray-200);
+  display: flex;
+  justify-content: flex-end;
+}

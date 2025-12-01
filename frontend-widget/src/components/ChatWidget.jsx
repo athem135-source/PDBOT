@@ -19,7 +19,7 @@ import SettingsMenu from './SettingsMenu.jsx';
 import FeedbackModal from './FeedbackModal.jsx';
 
 // Utilities
-import { sendChatMessage } from '../utils/api.js';
+import { sendChatMessage, clearChatMemory } from '../utils/api.js';
 import { 
   getSessionId, 
   createNewSession,
@@ -167,7 +167,8 @@ function ChatWidget() {
         role: 'bot',
         content: response.answer,
         query: query, // Store original query for regenerate
-        sources: response.sources,
+        sources: response.sources || [],
+        passages: response.passages || [],
         timestamp: new Date().toISOString()
       };
       
@@ -257,7 +258,10 @@ function ChatWidget() {
   };
   
   // Actually perform new chat after feedback
-  const performNewChat = () => {
+  const performNewChat = async () => {
+    // Clear server-side memory for this session
+    await clearChatMemory(sessionId.current);
+    
     sessionId.current = createNewSession();
     setMessages([]);
     setHasGreeted(false);
@@ -312,14 +316,18 @@ function ChatWidget() {
   
   // Dragging handlers
   const handleDragStart = (e) => {
-    if (e.target.closest('.pdbot-header')) {
-      setIsDragging(true);
-      const rect = widgetRef.current.getBoundingClientRect();
-      setDragOffset({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      });
+    // Don't start drag if clicking on buttons or menu
+    if (e.target.closest('button') || e.target.closest('.pdbot-settings-menu')) {
+      return;
     }
+    
+    e.preventDefault();
+    setIsDragging(true);
+    const rect = widgetRef.current.getBoundingClientRect();
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
   };
   
   const handleDragMove = useCallback((e) => {
@@ -482,6 +490,15 @@ function ChatWidget() {
                 </button>
               </div>
               
+              {/* Accuracy Warning */}
+              <div className="pdbot-accuracy-warning">
+                <span className="pdbot-warning-icon">⚠️</span>
+                <span className="pdbot-warning-text">
+                  Responses are AI-generated from the Manual for Development Projects 2024. 
+                  Always verify important information with official sources.
+                </span>
+              </div>
+              
               {/* Footer */}
               <div className="pdbot-footer">
                 <span className="pdbot-footer-text">
@@ -503,7 +520,10 @@ function ChatWidget() {
       {/* Feedback Modal */}
       <FeedbackModal
         isOpen={showFeedbackModal}
-        onClose={() => setShowFeedbackModal(false)}
+        onClose={() => {
+          setShowFeedbackModal(false);
+          performNewChat();  // Always clear chat when modal closes
+        }}
         onSubmit={handleFeedbackSubmit}
         messageCount={messages.length}
       />

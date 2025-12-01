@@ -18,6 +18,9 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 DEBUG_MODE = os.getenv("PNDBOT_DEBUG", "False").lower() == "true"
 
+# Qdrant configuration
+QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6338")
+
 # Groq API for reranking (NOT for generation)
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
@@ -202,9 +205,11 @@ def _split_into_chunks(text: str) -> List[str]:
 
 def ingest_pdf_sentence_level(
     pdf_path: str,
-    qdrant_url: str = "http://localhost:6333"
+    qdrant_url: str = None
 ) -> int:
     """Ingest PDF with sentence-level chunking."""
+    if qdrant_url is None:
+        qdrant_url = QDRANT_URL
     if not os.path.isfile(pdf_path):
         raise FileNotFoundError(pdf_path)
     
@@ -270,7 +275,7 @@ def ingest_pdf_sentence_level(
 def search_sentences(
     query: str,
     top_k: int = 2,
-    qdrant_url: str = "http://localhost:6333",
+    qdrant_url: str = None,
     min_score: float = 0.12,
     retrieval_hints: Optional[Dict[str, Any]] = None,
     **kwargs
@@ -293,6 +298,8 @@ def search_sentences(
         min_score: Minimum vector similarity score
         retrieval_hints: Optional hints from classifier (boost_numeric, prefer_procedures, etc.)
     """
+    if qdrant_url is None:
+        qdrant_url = QDRANT_URL
     retrieval_hints = retrieval_hints or {}
     
     model = get_embedder()

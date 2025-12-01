@@ -125,18 +125,6 @@ function SettingsMenu({
             <span className="pdbot-menu-icon">ℹ️</span>
             <span className="pdbot-menu-label">About PDBOT</span>
           </button>
-          
-          {/* GitHub */}
-          <a 
-            className="pdbot-menu-item pdbot-menu-link"
-            href="https://github.com/athem135-source/PDBOT"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <span className="pdbot-menu-icon">💻</span>
-            <span className="pdbot-menu-label">GitHub</span>
-            <span className="pdbot-menu-external">↗</span>
-          </a>
         </div>
       )}
     </div>

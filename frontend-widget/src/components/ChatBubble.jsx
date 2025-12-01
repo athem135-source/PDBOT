@@ -6,18 +6,19 @@
  * feedback buttons (like/dislike/regenerate), and styling based on role.
  * 
  * @author Ministry of Planning, Development & Special Initiatives
- * @version 1.0.0
+ * @version 1.1.0
  */
 
 import React, { useState, useEffect, useRef } from 'react';
 import LikeDislikeButtons from './LikeDislikeButtons.jsx';
 import RegenButton from './RegenButton.jsx';
+import DetailsModal from './DetailsModal.jsx';
 
 /**
  * ChatBubble - Displays a single chat message
  * 
  * @param {Object} props
- * @param {Object} props.message - Message object { id, role, content, timestamp }
+ * @param {Object} props.message - Message object { id, role, content, timestamp, passages, sources }
  * @param {boolean} props.isNew - Whether this is a new message (triggers animation)
  * @param {Function} props.onRegenerate - Callback for regenerate button
  * @param {Function} props.onFeedback - Callback for like/dislike feedback
@@ -33,10 +34,15 @@ function ChatBubble({
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  const [showPassages, setShowPassages] = useState(false);
+  const [showSources, setShowSources] = useState(false);
   const contentRef = useRef(null);
   
   const isUser = message.role === 'user';
   const isBot = message.role === 'bot' || message.role === 'assistant';
+  
+  // Check if message has passages/sources (not for greeting)
+  const hasDetails = isBot && (message.passages?.length > 0 || message.sources?.length > 0);
   
   // Typewriter effect for new bot messages
   useEffect(() => {
@@ -53,7 +59,8 @@ function ChatBubble({
       
       const typeChar = () => {
         if (index < text.length) {
-          setDisplayedText(prev => prev + text[index]);
+          const currentChar = text[index]; // Capture current character
+          setDisplayedText(prev => prev + currentChar);
           index++;
           setTimeout(typeChar, getDelay());
         } else {
@@ -112,15 +119,43 @@ function ChatBubble({
         {/* Feedback buttons for completed bot messages */}
         {isBot && isComplete && showFeedback && (
           <div className="pdbot-bubble-actions">
-            <RegenButton 
-              onRegenerate={() => onRegenerate && onRegenerate(message)}
-              disabled={isTyping}
-            />
-            <LikeDislikeButtons
-              message={message}
-              onFeedback={onFeedback}
-              disabled={isTyping}
-            />
+            {/* Detail buttons (View Passages / View Sources) */}
+            {hasDetails && (
+              <div className="pdbot-detail-buttons">
+                {message.passages?.length > 0 && (
+                  <button 
+                    className="pdbot-detail-btn"
+                    onClick={() => setShowPassages(true)}
+                    title="View supporting passages"
+                  >
+                    <span className="pdbot-detail-icon">📄</span>
+                    <span className="pdbot-detail-label">Passages</span>
+                  </button>
+                )}
+                {message.sources?.length > 0 && (
+                  <button 
+                    className="pdbot-detail-btn"
+                    onClick={() => setShowSources(true)}
+                    title="View sources"
+                  >
+                    <span className="pdbot-detail-icon">📚</span>
+                    <span className="pdbot-detail-label">Sources</span>
+                  </button>
+                )}
+              </div>
+            )}
+            
+            <div className="pdbot-feedback-buttons">
+              <RegenButton 
+                onRegenerate={() => onRegenerate && onRegenerate(message)}
+                disabled={isTyping}
+              />
+              <LikeDislikeButtons
+                message={message}
+                onFeedback={onFeedback}
+                disabled={isTyping}
+              />
+            </div>
           </div>
         )}
       </div>
@@ -129,6 +164,24 @@ function ChatBubble({
       {isUser && (
         <div className="pdbot-avatar pdbot-avatar-user">👤</div>
       )}
+      
+      {/* Passages Modal */}
+      <DetailsModal
+        isOpen={showPassages}
+        onClose={() => setShowPassages(false)}
+        title="Supporting Passages"
+        type="passages"
+        data={message.passages || []}
+      />
+      
+      {/* Sources Modal */}
+      <DetailsModal
+        isOpen={showSources}
+        onClose={() => setShowSources(false)}
+        title="Source References"
+        type="sources"
+        data={message.sources || []}
+      />
     </div>
   );
 }

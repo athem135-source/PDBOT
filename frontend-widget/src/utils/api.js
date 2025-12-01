@@ -9,7 +9,7 @@
  */
 
 // API base URL - configurable for different environments
-const API_BASE_URL = window.PDBOT_API_URL || '';
+const API_BASE_URL = window.PDBOT_API_URL || 'http://localhost:5000';
 
 /**
  * Send a chat message to the PDBOT backend
@@ -40,6 +40,7 @@ export async function sendChatMessage(query, sessionId) {
       success: true,
       answer: data.answer || data.response || 'No response received.',
       sources: data.sources || [],
+      passages: data.passages || [],
       timestamp: new Date().toISOString()
     };
   } catch (error) {
@@ -157,6 +158,37 @@ function saveFeedbackLocally(type, data) {
 }
 
 /**
+ * Clear chat memory on the server
+ * Called when starting a new chat session
+ * 
+ * @param {string} sessionId - Session ID to clear
+ * @returns {Promise<Object>} Result
+ */
+export async function clearChatMemory(sessionId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/memory/clear`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        session_id: sessionId
+      })
+    });
+
+    if (!response.ok) {
+      console.warn('[PDBOT API] Failed to clear memory on server');
+      return { success: false };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('[PDBOT API] Clear memory error:', error);
+    return { success: false };
+  }
+}
+
+/**
  * Sync pending local feedback to server
  * Called periodically or when connection is restored
  */
@@ -205,5 +237,6 @@ export default {
   sendChatMessage,
   submitAnswerFeedback,
   submitSessionFeedback,
+  clearChatMemory,
   syncPendingFeedback
 };
