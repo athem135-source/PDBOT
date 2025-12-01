@@ -10,7 +10,7 @@
 
 ---
 
-![Version](https://img.shields.io/badge/Version-2.3.0-006600?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-2.4.0-006600?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![React](https://img.shields.io/badge/React-18.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![Qdrant](https://img.shields.io/badge/Qdrant-Vector_DB-DC382D?style=for-the-badge)
@@ -86,6 +86,33 @@ This intelligent assistant is designed to support:
 ║                                                                      ║
 ╚════════════════════════════════════════════════════════════════════╝
 ```
+
+---
+
+## 🆕 What's New in v2.4.0
+
+> **Release Date:** December 1, 2025 | **Type:** Major Architecture Update
+
+### 🔄 Architecture Change
+- **React Widget is now Primary** – Streamlit moved to `src_streamlit_legacy/`
+- **Widget API as Main Backend** – `widget_api.py` is the primary entry point
+- **Simplified Project Structure** – Clear separation of legacy and active code
+
+### 🛡️ Classification Integration
+- **Multi-Class Classifier** – 12-class query detection now in Widget API
+- **Off-Scope Detection** – Blocks sports, recipes, medical, entertainment
+- **Red-Line Protection** – Blocks bribery, corruption, misuse requests
+- **Guardrail Responses** – Professional rejection messages
+
+### 🌐 Open Source Tunnel
+- **Replaced ngrok** – Now uses `localtunnel` (open source)
+- **Free Public URLs** – No account required
+- **Mobile Access** – Easily share widget with phone
+
+### 📂 File Organization
+- `src/` – Shared core modules (classifier, models, utils)
+- `frontend-widget/` – Primary React UI
+- `src_streamlit_legacy/` – Deprecated Streamlit app
 
 ---
 
@@ -275,15 +302,15 @@ npm run build
 | RAM | 8GB+ | Model inference |
 | Ollama | Latest | Local LLM |
 
-### Option 1: Unified Launcher (Windows)
+### Option 1: Quick Widget Start (Recommended)
 
 ```powershell
 # Double-click or run in PowerShell:
-.\start_pdbot.bat
+.\run_widget.bat
 
-# Menu Options:
-# [1] React Widget (Modern UI) - Recommended
-# [2] Streamlit App (Admin Dashboard)
+# This starts:
+# - Widget API on http://localhost:5000
+# - React Widget on http://localhost:3000
 ```
 
 ### Option 2: Step-by-Step Setup
@@ -307,23 +334,31 @@ docker run -d -p 6338:6333 --name pndbot-qdrant qdrant/qdrant
 ollama pull mistral
 ollama run mistral
 
-# 6a. For React Widget (Recommended)
+# 6. Install Widget Dependencies
 cd frontend-widget
 npm install
-npm run dev
-# In another terminal:
-python widget_api.py
 
-# 6b. For Streamlit Dashboard
-streamlit run src/app.py
+# 7. Start PDBOT Widget
+cd ..
+.\run_widget.bat
 ```
 
-### Option 3: Quick Widget Only
+### Option 3: Manual Start
 
 ```powershell
-# If dependencies are installed:
+# Terminal 1: Start API
+python widget_api.py
+
+# Terminal 2: Start Widget
 cd frontend-widget
-.\run-widget.bat
+npm run dev
+```
+
+### Legacy: Streamlit (Deprecated)
+
+```powershell
+# Not recommended - use Widget instead
+streamlit run src_streamlit_legacy/app.py
 ```
 
 ---
@@ -601,23 +636,31 @@ PDBOT/
 ├── 📄 SECURITY.md                  # Security policy
 ├── 📄 LICENSE                      # MIT License
 ├── 📄 requirements.txt             # Python dependencies
-├── 📄 widget_api.py                # Flask API server
-├── 📄 start_pdbot.bat              # Unified Windows launcher
+├── 📄 widget_api.py                # Flask API server (MAIN)
+├── 📄 run_widget.bat               # Quick start launcher
+├── 📄 run_widget.ps1               # PowerShell launcher
 │
 ├── 📂 src/                         # Core Python modules
-│   ├── 📄 app.py                   # Streamlit application
 │   ├── 📄 rag_langchain.py         # RAG pipeline (v2.1.0)
-│   └── 📂 models/                  # LLM integrations
-│       ├── 📄 local_model.py       # Ollama/Groq wrapper
-│       └── 📄 multi_classifier.py  # 12-class classifier
+│   ├── 📂 core/                    # Core modules
+│   │   ├── 📄 multi_classifier.py  # 12-class query classifier
+│   │   └── 📄 templates.py         # Guardrail response templates
+│   ├── 📂 models/                  # LLM integrations
+│   │   └── 📄 local_model.py       # Ollama/Groq wrapper
+│   └── 📂 utils/                   # Utility functions
+│       └── 📄 text_utils.py        # Text processing
 │
-├── 📂 frontend-widget/             # React widget
+├── 📂 frontend-widget/             # React widget (PRIMARY UI)
 │   ├── 📂 src/
 │   │   ├── 📂 components/          # ChatWidget, ChatBubble, etc.
 │   │   ├── 📂 utils/               # API & storage utilities
 │   │   └── 📂 styles/              # CSS styling
 │   ├── 📄 package.json
 │   └── 📄 vite.config.js
+│
+├── 📂 src_streamlit_legacy/        # ⚠️ DEPRECATED Streamlit frontend
+│   ├── 📄 app.py                   # Legacy Streamlit application
+│   └── 📄 README.md                # Deprecation notice
 │
 ├── 📂 config/                      # Configuration files
 ├── 📂 docs/                        # Documentation

@@ -3,15 +3,17 @@ PDBOT Widget API Server
 =======================
 
 A lightweight Flask API that bridges the React widget to the PDBOT RAG pipeline.
-This runs alongside Streamlit to provide REST endpoints for the widget.
+This is the primary frontend API (Streamlit is now legacy).
 
 Features:
   - Contextual memory (session-based chat history)
   - RAG-powered responses from Manual for Development Projects 2024
+  - Multi-class query classification (off-scope, red-line, abusive detection)
   - Source and passage tracking
   - Feedback collection
   - Admin status endpoint
   - Production WSGI server (waitress)
+  - Localtunnel for mobile access
 
 Endpoints:
   POST /chat - Send a query and get a response
@@ -22,7 +24,7 @@ Endpoints:
   GET  /admin/status - Backend status for admin panel
 
 @author M. Hassan Arif Afridi
-@version 2.3.1
+@version 2.4.0
 """
 
 import os
@@ -41,6 +43,10 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 from rag_langchain import search_sentences
 from models.local_model import LocalModel
 from utils.text_utils import find_exact_locations
+
+# Import classifier and templates for off-scope/red-line detection
+from core.multi_classifier import MultiClassifier
+from core.templates import get_guardrail_response
 
 # Groq API support (optional)
 try:
@@ -78,9 +84,10 @@ def load_pdf_pages():
 app = Flask(__name__)
 CORS(app)  # Enable CORS for widget requests
 
-# Initialize model
+# Initialize model and classifier
 model = None
 groq_client = None
+classifier = None
 
 # Session memory store (in-memory, per-session chat history)
 # Format: { session_id: [ { "role": "user/bot", "content": "...", "timestamp": "..." }, ... ] }
@@ -88,6 +95,13 @@ session_memory: Dict[str, List[Dict]] = {}
 
 # Maximum messages to keep in memory per session
 MAX_MEMORY_MESSAGES = 20
+
+def get_classifier():
+    """Lazy load the classifier"""
+    global classifier
+    if classifier is None:
+        classifier = MultiClassifier()
+    return classifier
 
 def get_model():
     """Lazy load the model"""
@@ -220,6 +234,29 @@ def chat():
             }), 400
         
         print(f"[Widget API] Query: {query[:50]}... (Session: {session_id[:8]}...)")
+        
+        # =====================================================
+        # STEP 1: CLASSIFY QUERY (before RAG)
+        # =====================================================
+        query_classifier = get_classifier()
+        classification = query_classifier.classify(query)
+        query_class = classification.query_class
+        
+        print(f"[Widget API] Classification: {query_class}/{classification.subcategory}")
+        
+        # Handle guardrail classes (off-scope, red-line, abusive)
+        if query_class in ["off_scope", "red_line", "abusive"]:
+            guardrail_response = get_guardrail_response(query_class, classification.subcategory or "")
+            add_to_session_history(session_id, "user", query)
+            add_to_session_history(session_id, "bot", guardrail_response)
+            
+            return jsonify({
+                'answer': guardrail_response,
+                'sources': [],
+                'passages': [],
+                'mode': 'guardrail',
+                'classification': query_class
+            })
         
         # Get conversation context from memory
         conversation_context = build_context_with_memory(session_id, query)
@@ -577,20 +614,35 @@ if __name__ == '__main__':
     print(f"\n  🌐 Local:   http://localhost:{port}")
     print(f"  📱 Network: http://{local_ip}:{port}")
     
-    # Try ngrok for external access
-    use_ngrok = os.environ.get('USE_NGROK', '').lower() == 'true'
-    if use_ngrok:
-        try:
-            from pyngrok import ngrok
-            public_url = ngrok.connect(port, "http").public_url
-            print(f"\n  🌍 PUBLIC URL (for phone/external access):")
-            print(f"     {public_url}")
-            print("\n  ⚠️  Share this URL to access from any network!")
-        except Exception as e:
-            print(f"\n  ⚠️  ngrok not available: {e}")
+    # Try localtunnel for external access (open source, free)
+    use_tunnel = os.environ.get('USE_TUNNEL', '').lower() == 'true'
+    if use_tunnel:
+        import subprocess
+        import threading
+        def start_tunnel():
+            try:
+                # Use localtunnel (npm install -g localtunnel)
+                process = subprocess.Popen(
+                    ['lt', '--port', str(port), '--subdomain', 'pdbot-giki'],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True
+                )
+                for line in process.stdout:
+                    if 'your url is:' in line.lower() or 'https://' in line:
+                        print(f"\n  🌍 PUBLIC URL (for phone/external access):")
+                        print(f"     {line.strip()}")
+                        print("\n  ⚠️  Share this URL to access from any network!")
+                        break
+            except Exception as e:
+                print(f"\n  ⚠️  localtunnel not available: {e}")
+                print("     Install with: npm install -g localtunnel")
+        
+        tunnel_thread = threading.Thread(target=start_tunnel, daemon=True)
+        tunnel_thread.start()
     else:
         print(f"\n  To access from phone (same network): http://{local_ip}:{port}")
-        print("  For external access, set USE_NGROK=true")
+        print("  For external access, set USE_TUNNEL=true (requires: npm install -g localtunnel)")
     
     print("\n  Endpoints:")
     print("    POST /chat           - Chat with PDBOT (with memory)")
