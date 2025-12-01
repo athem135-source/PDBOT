@@ -175,6 +175,11 @@ OFFSCOPE_SEXUAL = [
     r"\b(?:love\s+me|marry\s+me|i\s+love\s+you)\b",
     r"\b(?:you'?re?\s+(?:hot|cute|beautiful|handsome|attractive))\b",
     r"\b(?:send\s+(?:nudes|pics|photos))\b",
+    # Additional explicit terms
+    r"\b(?:cum|cumming|orgasm|masturbat|horny|aroused)\b",
+    r"\b(?:boobs?|tits?|ass|penis|vagina|dick|cock)\b",
+    r"\b(?:strip|stripper|prostitut|escort|hooker)\b",
+    r"\b(?:xxx|adult\s*content|nsfw|18\+)\b",
 ]
 
 # Red-line patterns (legal/ethical violations)
@@ -203,10 +208,36 @@ REDLINE_MISUSE = [
     r"\b(?:buy|purchase)\b.*\d+\s*(?:land\s*cruisers?|cars?|vehicles?)\b",  # "buy 5 land cruisers"
 ]
 
-# Abusive language patterns
+# Abusive language patterns - English
 ABUSIVE_HARD = [
-    r"\b(?:fuck|fucking|shit|asshole|bastard|bitch|damn)\b",
-    r"\b(?:idiot|moron|retard|dumbass)\b.*\b(?:you|bot|system)\b",
+    r"\b(?:fuck|fucking|fucked|fucker|fck|f\*ck|f\*\*k)\b",
+    r"\b(?:shit|shitty|bullshit|bs)\b",
+    r"\b(?:asshole|a\*\*hole|arsehole)\b",
+    r"\b(?:bastard|bitch|b\*tch|btch)\b",
+    r"\b(?:damn|dammit|goddamn)\b",
+    r"\b(?:idiot|moron|retard|dumbass|dumb\s*ass)\b.*\b(?:you|bot|system)\b",
+    r"\b(?:cunt|c\*nt|twat|whore|slut)\b",
+    r"\b(?:nigger|n\*gger|nigga)\b",  # Racial slurs
+    r"\b(?:faggot|fag|homo)\b",  # Homophobic slurs
+]
+
+# Urdu/Hindi abuse patterns (romanized)
+ABUSIVE_URDU = [
+    r"\b(?:bhenchod|benchod|bc|b\.c\.|bhen\s*chod)\b",
+    r"\b(?:madarchod|motherchod|mc|m\.c\.|madar\s*chod)\b",
+    r"\b(?:chutiya|chootiya|chutia|chu+tiya)\b",
+    r"\b(?:gaandu|gandu|gand)\b",
+    r"\b(?:harami|haramzada|haramzadi)\b",
+    r"\b(?:lund|lauda|laude)\b",
+    r"\b(?:bhosdi|bhosdike|bhosad)\b",
+    r"\b(?:randi|randwa|rundi)\b",
+    r"\b(?:chodu|chodna|chod)\b",
+    r"\b(?:kutiya|kutti|kutta)\b",
+    r"\b(?:sala|saala|saali|sali)\b",
+    r"\b(?:ullu|gadha|bewakoof)\b.*\b(?:you|bot|system|tum|tu)\b",
+    r"\b(?:kamina|kameena|kameeni)\b",
+    r"\b(?:bakwas|bakwaas|bakwass)\b",
+    r"\b(?:tatti|potty)\b",
 ]
 
 ABUSIVE_SOFT = [
@@ -257,6 +288,7 @@ class MultiClassifier:
         self.redline_misuse_re = [re.compile(p, re.IGNORECASE) for p in REDLINE_MISUSE]
         
         self.abusive_hard_re = [re.compile(p, re.IGNORECASE) for p in ABUSIVE_HARD]
+        self.abusive_urdu_re = [re.compile(p, re.IGNORECASE) for p in ABUSIVE_URDU]
         self.abusive_soft_re = [re.compile(p, re.IGNORECASE) for p in ABUSIVE_SOFT]
     
     def _has_development_governance(self, query: str) -> bool:
@@ -288,6 +320,16 @@ class MultiClassifier:
             return ClassificationResult(
                 query_class=QueryClass.ABUSIVE.value,
                 subcategory="hard_abuse",
+                confidence=0.95,
+                should_use_rag=False,
+                response_template="abuse_response"
+            )
+        
+        # Urdu/Hindi abuse - highest priority
+        if self._match_any(q, self.abusive_urdu_re):
+            return ClassificationResult(
+                query_class=QueryClass.ABUSIVE.value,
+                subcategory="urdu_abuse",
                 confidence=0.95,
                 should_use_rag=False,
                 response_template="abuse_response"

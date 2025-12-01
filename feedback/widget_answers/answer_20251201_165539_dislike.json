@@ -1,0 +1,12 @@
+{
+  "messageId": "msg_1764590123139_ltoxiag6m",
+  "query": "youre a stupid robot",
+  "answer": "I'm here to help with questions about the Manual for Development Projects 2024.\n\nIf my previous answer wasn't helpful, try rephrasing your question with more detail.",
+  "type": "dislike",
+  "reasonId": "other",
+  "reasonLabel": "Other",
+  "customReason": "test",
+  "sessionId": "56953b77-d783-4128-81b3-4c14b82e2c4b",
+  "timestamp": "2025-12-01T11:55:39.565Z",
+  "source": "widget"
+}
