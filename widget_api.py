@@ -24,7 +24,7 @@ Endpoints:
   GET  /admin/status - Backend status for admin panel
 
 @author M. Hassan Arif Afridi
-@version 2.4.0
+@version 2.4.7
 """
 
 import os

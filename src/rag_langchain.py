@@ -315,11 +315,21 @@ def search_sentences(
     
     # Step 1: Initial retrieval (40 candidates)
     try:
-        results = client.search(
-            collection_name=COLLECTION,
-            query_vector=qvec.tolist(),
-            limit=40
-        )
+        # Use query_points for newer qdrant-client versions (v1.12+)
+        if hasattr(client, 'query_points'):
+            results = client.query_points(
+                collection_name=COLLECTION,
+                query=qvec.tolist(),
+                limit=40
+            ).points
+        else:
+            # Fallback to search for older versions
+            search_fn = getattr(client, 'search')
+            results = search_fn(
+                collection_name=COLLECTION,
+                query_vector=qvec.tolist(),
+                limit=40
+            )
     except Exception as e:
         raise RuntimeError(f"Qdrant search failed: {e}")
     

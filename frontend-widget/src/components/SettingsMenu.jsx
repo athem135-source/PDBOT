@@ -9,7 +9,7 @@
  * - About PDBOT
  * 
  * @author Ministry of Planning, Development & Special Initiatives
- * @version 2.4.1
+ * @version 2.4.7
  */
 
 import React, { useState, useRef, useEffect } from 'react';

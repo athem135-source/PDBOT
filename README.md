@@ -10,7 +10,7 @@
 
 ---
 
-![Version](https://img.shields.io/badge/Version-2.4.0-006600?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-2.4.7-006600?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![React](https://img.shields.io/badge/React-18.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![Qdrant](https://img.shields.io/badge/Qdrant-Vector_DB-DC382D?style=for-the-badge)
