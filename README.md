@@ -33,7 +33,7 @@
 
 An AI-powered document intelligence system for the **Manual for Development Projects 2024**, serving the planning and development community of Pakistan with accurate, contextual, and traceable responses.
 
-[🚀 Quick Start](#-quick-start) • [📖 Documentation](#-documentation) • [🏗️ System Architecture](#️-system-architecture) • [📊 Performance](#-performance-metrics)
+[🚀 Quick Start](#-quick-start) • [📖 Documentation](#-documentation) • [🏗️ Architecture](#️-system-architecture) • [📊 Performance](#-performance-metrics)
 
 ---
 
@@ -85,7 +85,7 @@ PDBOT is an enterprise-grade Retrieval-Augmented Generation (RAG) system develop
 
 > **Design Goal:** Provide short, precise, source-backed answers while minimizing hallucination and maintaining strict procedural correctness for the Manual for Development Projects 2024.
 
-[⬆️ Back to Top](#️-pdbot--planning--development-intelligent-assistant)
+[⬆️ Back to Top](#-pdbot--planning--development-intelligent-assistant)
 
 ---
 
@@ -112,7 +112,7 @@ PDBOT is an enterprise-grade Retrieval-Augmented Generation (RAG) system develop
 - **Rate limiting ready** – Infrastructure hooks for production deployment
 - **CORS configuration** – Secure cross-origin requests for government domains
 
-[⬆️ Back to Top](#️-pdbot--planning--development-intelligent-assistant)
+[⬆️ Back to Top](#-pdbot--planning--development-intelligent-assistant)
 
 ---
 
@@ -157,7 +157,7 @@ flowchart LR
 - **Numeric boosting** – +25% score boost for numeric/financial passages
 - **Page-level citations** – Every response includes source page information
 
-[⬆️ Back to Top](#️-pdbot--planning--development-intelligent-assistant)
+[⬆️ Back to Top](#-pdbot--planning--development-intelligent-assistant)
 
 ---
 
@@ -218,7 +218,7 @@ flowchart TB
 | 🐳 Dockerfile | Build configs |
 | 📦 Batch/PowerShell | Windows scripts |
 
-[⬆️ Back to Top](#️-pdbot--planning--development-intelligent-assistant)
+[⬆️ Back to Top](#-pdbot--planning--development-intelligent-assistant)
 
 ---
 
@@ -270,7 +270,7 @@ python widget_api.py
 streamlit run src/app.py
 ```
 
-[⬆️ Back to Top](#️-pdbot--planning--development-intelligent-assistant)
+[⬆️ Back to Top](#-pdbot--planning--development-intelligent-assistant)
 
 ---
 
@@ -317,7 +317,7 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 80
 ```
 
-[⬆️ Back to Top](#️-pdbot--planning--development-intelligent-assistant)
+[⬆️ Back to Top](#-pdbot--planning--development-intelligent-assistant)
 
 ---
 
@@ -351,7 +351,7 @@ EXPOSE 80
 | LLM generation | 1.5–2.0 seconds |
 | Memory per session | < 1 MB |
 
-[⬆️ Back to Top](#️-pdbot--planning--development-intelligent-assistant)
+[⬆️ Back to Top](#-pdbot--planning--development-intelligent-assistant)
 
 ---
 
@@ -372,7 +372,7 @@ EXPOSE 80
 - Rate limiting infrastructure ready
 - HTTPS required for production
 
-[⬆️ Back to Top](#️-pdbot--planning--development-intelligent-assistant)
+[⬆️ Back to Top](#-pdbot--planning--development-intelligent-assistant)
 
 ---
 
