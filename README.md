@@ -10,7 +10,7 @@
 
 ---
 
-![Version](https://img.shields.io/badge/Version-2.4.7-006600?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-2.4.8-006600?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![React](https://img.shields.io/badge/React-18.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![Qdrant](https://img.shields.io/badge/Qdrant-Vector_DB-DC382D?style=for-the-badge)
@@ -42,7 +42,7 @@
 - [Evaluation & Metrics](#-evaluation--metrics)
 - [Test Logs & Transparency](#-test-logs--transparency)
 - [Accuracy Progression](#-accuracy-progression)
-- [What's New in v2.4.7](#-whats-new-in-v247)
+- [What's New in v2.4.8](#-whats-new-in-v248)
 - [Project Roadmap](#-project-roadmap)
 - [Limitations & Warnings](#-limitations--warnings)
 - [Developer Information](#-developer-information)
@@ -54,11 +54,11 @@
 
 PDBOT is an **enterprise-grade Retrieval-Augmented Generation (RAG) system** developed to provide instant, accurate, and verifiable responses regarding the **Manual for Development Projects 2024** issued by the Government of Pakistan's Ministry of Planning, Development & Special Initiatives.
 
-### 🏆 Key Achievements (v2.4.7)
+### 🏆 Key Achievements (v2.4.8)
 
 ```
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║                         PDBOT PERFORMANCE DASHBOARD v2.4.7                    ║
+║                         PDBOT PERFORMANCE DASHBOARD v2.4.8                    ║
 ╠══════════════════════════════════════════════════════════════════════════════╣
 ║                                                                               ║
 ║   📊 ACCURACY METRICS (Test 37)              🚀 SYSTEM PERFORMANCE           ║
@@ -92,7 +92,7 @@ PDBOT is an **enterprise-grade Retrieval-Augmented Generation (RAG) system** dev
 
 ### Watch PDBOT in Action
 
-https://github.com/user-attachments/assets/pdbot-demo.mp4
+https://github.com/athem135-source/PDBOT/raw/main/src/assets/PDBOT.mp4
 
 **Demo Highlights:**
 - 🎯 Real-time query classification
@@ -150,7 +150,7 @@ https://github.com/user-attachments/assets/pdbot-demo.mp4
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                        PDBOT v2.4.7 ARCHITECTURE                             │
+│                        PDBOT v2.4.8 ARCHITECTURE                             │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
 │    👤 USER (Browser/Mobile)                                                  │
@@ -285,9 +285,9 @@ https://github.com/user-attachments/assets/pdbot-demo.mp4
   • Test 34-37: Final optimizations (93-95%)
 ```
 
-### Comparison: v1.0 vs v2.4.7
+### Comparison: v1.0 vs v2.4.8
 
-| Metric | v1.0.0 | v2.4.7 | Improvement |
+| Metric | v1.0.0 | v2.4.8 | Improvement |
 |--------|--------|--------|-------------|
 | In-Scope Accuracy | 68% | 95% | **+27%** |
 | Numeric Accuracy | 72% | 96.7% | **+24.7%** |
@@ -352,14 +352,15 @@ https://github.com/user-attachments/assets/pdbot-demo.mp4
 
 | Test | Query | Issue | Fix Applied |
 |------|-------|-------|-------------|
-| 31-33 | "DDWP limit?" | Qdrant API change | v2.4.7: query_points() |
+| 31-33 | "DDWP limit?" | Qdrant API change | v2.4.8: query_points() |
 | Widget 3 | "how to have sex" | No filter | v2.4.4: Sexual filter |
 
 ---
 
-## 🆕 What's New in v2.4.7
+## 🆕 What's New in v2.4.8
 
 ### Bug Fixes
+- **Version Sync:** Updated all version strings across widget_api.py and AdminPanel.jsx
 - **Qdrant API:** Fixed `client.search()` → `client.query_points()` for v1.12+
 - **Backward Compat:** Falls back for older versions
 
@@ -378,7 +379,7 @@ https://github.com/user-attachments/assets/pdbot-demo.mp4
   OCT 2025                          NOV 2025                      DEC 2025
   ────────                          ────────                      ────────
   Oct 16: Project Start             Nov 5: v2.0 Reranker          Dec 1: v2.2 Widget
-  Oct 25: v1.0 Release              Nov 12: v2.1 Numeric          Dec 2: v2.4.7 ← NOW
+  Oct 25: v1.0 Release              Nov 12: v2.1 Numeric          Dec 2: v2.4.8 ← NOW
   Oct 31: v1.1 Classifier           Nov 20: Bug Fixes             
                                                                    
   UPCOMING                                                         
@@ -443,7 +444,7 @@ Permitted: Evaluation, Academic Research, GoP Internal Use (with approval)
 
 ## 🇵🇰
 
-**PDBOT v2.4.7** | Built with ❤️ for Pakistan
+**PDBOT v2.4.8** | Built with ❤️ for Pakistan
 
 **37 Tests | 400+ Queries | 95% Accuracy | 100% Safety**
 

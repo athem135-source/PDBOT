@@ -3,7 +3,7 @@
 <div align="center">
 
 ![Security](https://img.shields.io/badge/Security-Policy-red?style=for-the-badge&logo=shield&logoColor=white)
-![Version](https://img.shields.io/badge/Version-2.2.1-006600?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-2.4.8-006600?style=for-the-badge)
 
 **PDBOT Security Guidelines & Vulnerability Reporting**
 
@@ -15,10 +15,8 @@
 
 | Version | Status | Support Level |
 |---------|--------|---------------|
-| 2.2.x | ✅ Current | Full support - security patches & features |
-| 2.1.x | ⚠️ Maintenance | Security patches only |
-| 2.0.x | ❌ Deprecated | No support - please upgrade |
-| < 2.0 | ❌ End of Life | Unsupported |
+| 2.4.8 | ✅ Current | Full support - security patches & features |
+| < 2.4.8 | ❌ Unsupported | Please upgrade to latest version |
 
 ---
 
@@ -134,7 +132,7 @@ Users are responsible for:
 
 <div align="center">
 
-**Last Updated:** December 1, 2025  
-**Version:** 2.2.1
+**Last Updated:** December 2, 2025  
+**Version:** 2.4.8
 
 </div>
