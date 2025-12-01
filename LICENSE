@@ -1,24 +1,85 @@
-Proprietary License
+PROPRIETARY SOFTWARE LICENSE
+============================
 
-Copyright © 2025 Hassan Arif Afridi
-Owned by: Government of Pakistan Ministry of Planning and Development and Special Initiatives
+Copyright (c) 2025 M. Hassan Arif Afridi. All Rights Reserved.
 
-PROPRIETARY AND CONFIDENTIAL
+PDBOT - Planning & Development Intelligent Assistant
+Version 2.4.7
 
-This software and all associated documentation is proprietary and confidential. It is developed exclusively for the Government of Pakistan's Ministry of Planning, Development & Special Initiatives.
+================================================================================
+                              LICENSE AGREEMENT
+================================================================================
+
+This software and associated documentation files (the "Software") are the 
+exclusive property of M. Hassan Arif Afridi (the "Owner").
+
+GRANT OF LICENSE:
+-----------------
+This license grants you NO rights to use, copy, modify, or distribute the 
+Software without explicit written permission from the Owner.
 
 RESTRICTIONS:
-- Unauthorized use, reproduction, copying, modification, or distribution is strictly prohibited
-- This software may only be used by authorized personnel of the Government of Pakistan
-- No part of this software may be reverse-engineered, decompiled, or disassembled
-- Commercial use is strictly forbidden without explicit written consent
-- Distribution to third parties is prohibited
+-------------
+1. COPYING: You may NOT copy, reproduce, or duplicate the Software or any 
+   portion thereof without prior written consent from the Owner.
 
-For inquiries, permissions, or licensing requests, contact:
-Hassan Arif Afridi
-Email: hassanarifafridi@gmail.com
-Government of Pakistan
-Ministry of Planning, Development & Special Initiatives
+2. MODIFICATION: You may NOT modify, adapt, translate, reverse engineer, 
+   decompile, disassemble, or create derivative works based on the Software.
 
-This license is effective as of December 1, 2025.
-All rights reserved.
+3. DISTRIBUTION: You may NOT distribute, sublicense, lease, rent, loan, or 
+   otherwise transfer the Software to any third party.
+
+4. COMMERCIAL USE: You may NOT use the Software for any commercial purpose 
+   without obtaining a commercial license from the Owner.
+
+5. REVERSE ENGINEERING: You may NOT reverse engineer, disassemble, or 
+   decompile the Software, except to the extent that such activity is 
+   expressly permitted by applicable law.
+
+PERMITTED USE:
+--------------
+The following uses are permitted under this license:
+
+1. EVALUATION: You may use the Software for evaluation and demonstration 
+   purposes only, for a limited time period.
+
+2. ACADEMIC RESEARCH: You may use the Software for non-commercial academic 
+   research, provided proper attribution is given to the Owner.
+
+3. GOVERNMENT USE: The Government of Pakistan may use the Software for 
+   internal purposes, subject to prior written approval from the Owner.
+
+INTELLECTUAL PROPERTY:
+----------------------
+The Software, including but not limited to its code, algorithms, design, 
+documentation, and any related materials, is protected by intellectual 
+property laws, including copyright laws of Pakistan and international treaties.
+
+DISCLAIMER OF WARRANTIES:
+-------------------------
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+
+LIMITATION OF LIABILITY:
+------------------------
+IN NO EVENT SHALL THE OWNER BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, 
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF 
+THIS SOFTWARE.
+
+GOVERNING LAW:
+--------------
+This license shall be governed by and construed in accordance with the laws 
+of Pakistan.
+
+CONTACT INFORMATION:
+--------------------
+Developer: M. Hassan Arif Afridi
+LinkedIn: https://www.linkedin.com/in/hassanarifafridi/
+GitHub: https://github.com/athem135-source
+
+================================================================================
+                           END OF LICENSE AGREEMENT
+================================================================================
+
+Last Updated: December 2, 2025
