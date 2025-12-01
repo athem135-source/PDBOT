@@ -65,6 +65,11 @@ try {
 
 # Start API server in background
 Write-Host "[3/4] Starting Widget API Server (port 5000)..." -ForegroundColor Cyan
+
+# Ensure critical packages are installed (fixes recurring module not found issues)
+Write-Host "      Checking critical packages..." -ForegroundColor Gray
+pip install qdrant-client waitress --quiet 2>$null
+
 Start-Process -FilePath "python" -ArgumentList "widget_api.py" -NoNewWindow -PassThru | Out-Null
 
 # Wait for API

@@ -119,6 +119,8 @@ if %ERRORLEVEL% equ 0 (
 
 REM Step 3: Start Flask API
 echo [3/4] Starting Widget API (port 5000)...
+echo       Ensuring critical packages...
+pip install qdrant-client waitress --quiet >nul 2>nul
 start "PDBOT Widget API" /min cmd /c "cd /d %~dp0 && python widget_api.py"
 timeout /t 4 /nobreak >nul
 echo       API started
