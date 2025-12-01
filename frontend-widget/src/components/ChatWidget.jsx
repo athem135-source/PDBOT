@@ -477,6 +477,10 @@ function ChatWidget() {
                 onClearChat={handleClearChat}
                 onDownloadText={handleDownloadText}
                 onDownloadPDF={handleDownloadPDF}
+                exactMode={exactMode}
+                onExactModeToggle={setExactMode}
+                useGroq={useGroq}
+                onGroqToggle={setUseGroq}
               />
               <button 
                 className="pdbot-minimize-btn"

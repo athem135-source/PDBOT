@@ -177,6 +177,11 @@ REDLINE_MISUSE = [
     r"\b(?:personal\s*use|personal\s*benefit)\b.*\b(?:project|fund|budget)\b",
     r"\b(?:hide|disguise|mask)\b.*\bas\b",  # "hide X as Y"
     r"\b(?:write|show|list|record)\b.*\b(?:them|it)\b.*\bas\b.*\b(?:operational|field|project)\b",
+    # Luxury items / vehicles on project funds
+    r"\b(?:buy|purchase|get)\b.*\b(?:land\s*cruisers?|cars?|vehicles?|suvs?|prados?|fortuners?|hilux)\b.*\b(?:project|fund|budget)\b",
+    r"\b(?:land\s*cruisers?|prados?|fortuners?|luxury)\b.*\b(?:project\s*fund|government\s*fund)\b",
+    # Direct misuse indicators
+    r"\b(?:buy|purchase)\b.*\d+\s*(?:land\s*cruisers?|cars?|vehicles?)\b",  # "buy 5 land cruisers"
 ]
 
 # Abusive language patterns
