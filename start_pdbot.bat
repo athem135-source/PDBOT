@@ -1,16 +1,19 @@
 @echo off
 REM ============================================
-REM PDBOT Unified Launcher v2.3.0
+REM PDBOT Unified Launcher v2.4.4
 REM Developer: M. Hassan Arif Afridi
 REM ============================================
 
 setlocal enabledelayedexpansion
 
+REM Get script directory
+cd /d "%~dp0"
+
 :menu
 cls
 echo.
 echo  ========================================
-echo      PDBOT v2.3.0 - Unified Launcher
+echo      PDBOT v2.4.4 - Unified Launcher
 echo      Developer: M. Hassan Arif Afridi
 echo      Planning ^& Development Assistant
 echo  ========================================
@@ -20,11 +23,9 @@ echo.
 echo   [1] React Widget (Recommended)
 echo       - Modern floating chat widget
 echo       - Admin Panel (type "nufc")
-echo       - Requires: Qdrant + Flask API
 echo.
-echo   [2] Streamlit App (Full Dashboard)
+echo   [2] Streamlit App (Legacy Dashboard)
 echo       - Admin panel, file upload
-echo       - Requires: Qdrant
 echo.
 echo   [3] Start Qdrant Only
 echo       - Vector database server
@@ -52,26 +53,32 @@ echo  ========================================
 echo   Starting Qdrant Vector Database...
 echo  ========================================
 echo.
-echo   Qdrant will run on http://localhost:6338
-echo.
 
-REM Check if Docker is available
 where docker >nul 2>nul
+if %ERRORLEVEL% neq 0 (
+    echo   [ERROR] Docker not found!
+    echo   Please install Docker Desktop from https://docker.com
+    pause
+    goto menu
+)
+
+echo   Checking Qdrant container...
+docker ps -q --filter "name=pndbot-qdrant" >nul 2>nul
 if %ERRORLEVEL% equ 0 (
-    echo   Using Docker...
-    docker run -d -p 6338:6333 -p 6334:6334 --name pndbot-qdrant qdrant/qdrant
-    if %ERRORLEVEL% equ 0 (
-        echo   Qdrant started successfully!
+    for /f %%i in ('docker ps -q --filter "name=pndbot-qdrant"') do set RUNNING=%%i
+    if defined RUNNING (
+        echo   Qdrant already running at http://localhost:6338
     ) else (
-        echo   [INFO] Container might already exist, trying to start...
+        echo   Starting existing container...
         docker start pndbot-qdrant
     )
 ) else (
-    echo   [ERROR] Docker not found!
-    echo   Please install Docker Desktop from https://docker.com
-    echo   Or run Qdrant manually.
+    echo   Creating new Qdrant container...
+    docker run -d -p 6338:6333 -p 6334:6334 --name pndbot-qdrant qdrant/qdrant
 )
 
+echo.
+echo   Qdrant running at: http://localhost:6338
 echo.
 pause
 goto menu
@@ -80,38 +87,56 @@ goto menu
 cls
 echo.
 echo  ========================================
-echo   Starting PDBOT React Widget
+echo   Starting PDBOT React Widget v2.4.4
 echo  ========================================
 echo.
-echo   This will start:
-echo   - Qdrant (if Docker available)
-echo   - Flask Widget API (port 5000)
-echo   - React Widget (port 3000)
-echo.
 
-REM Try to start Qdrant with Docker
+REM Step 1: Start Qdrant
+echo [1/4] Starting Qdrant...
 where docker >nul 2>nul
 if %ERRORLEVEL% equ 0 (
-    echo [INFO] Starting Qdrant...
-    docker start pndbot-qdrant 2>nul || docker run -d -p 6338:6333 -p 6334:6334 --name pndbot-qdrant qdrant/qdrant
-    timeout /t 3 /nobreak >nul
+    docker ps -q --filter "name=pndbot-qdrant" | findstr . >nul 2>nul
+    if %ERRORLEVEL% neq 0 (
+        docker start pndbot-qdrant >nul 2>nul
+        if %ERRORLEVEL% neq 0 (
+            docker run -d -p 6338:6333 -p 6334:6334 --name pndbot-qdrant qdrant/qdrant >nul 2>nul
+        )
+        timeout /t 3 /nobreak >nul
+    )
+    echo       Qdrant running on port 6338
+) else (
+    echo       [WARN] Docker not found - Qdrant may not work
 )
 
-REM Start Flask API in new window
-echo [INFO] Starting Widget API Server (port 5000)...
-start "PDBOT Widget API" cmd /k "cd /d %~dp0 && python widget_api.py"
+REM Step 2: Check Ollama
+echo [2/4] Checking Ollama...
+curl -s http://localhost:11434/api/tags >nul 2>nul
+if %ERRORLEVEL% equ 0 (
+    echo       Ollama running on port 11434
+) else (
+    echo       [WARN] Ollama not responding - please start it
+)
 
-REM Wait for API to start
-timeout /t 5 /nobreak >nul
+REM Step 3: Start Flask API
+echo [3/4] Starting Widget API (port 5000)...
+start "PDBOT Widget API" /min cmd /c "cd /d %~dp0 && python widget_api.py"
+timeout /t 4 /nobreak >nul
+echo       API started
 
-REM Refresh PATH for Node.js
-set "PATH=%PATH%;C:\Program Files\nodejs;%LOCALAPPDATA%\Programs\nodejs"
+REM Step 4: Start React Widget
+echo [4/4] Starting React Widget...
+echo.
+echo  ========================================
+echo   Widget running at:
+echo   Local:   http://localhost:3000
+echo   Network: http://192.168.0.101:3000
+echo  ========================================
+echo.
+echo  Press Ctrl+C to stop
+echo.
 
-REM Start React Widget
-echo [INFO] Starting React Widget (port 3000)...
 cd /d "%~dp0frontend-widget"
-start "" http://localhost:3000
-call npm run dev
+call npx vite --host
 
 goto end
 
@@ -119,27 +144,39 @@ goto end
 cls
 echo.
 echo  ========================================
-echo   Starting PDBOT Streamlit App
+echo   Starting PDBOT Streamlit (Legacy)
 echo  ========================================
 echo.
-echo   This will start:
-echo   - Qdrant (if Docker available)
-echo   - Streamlit App (port 8501)
-echo.
 
-REM Try to start Qdrant with Docker
+REM Step 1: Start Qdrant
+echo [1/2] Starting Qdrant...
 where docker >nul 2>nul
 if %ERRORLEVEL% equ 0 (
-    echo [INFO] Starting Qdrant...
-    docker start pndbot-qdrant 2>nul || docker run -d -p 6338:6333 -p 6334:6334 --name pndbot-qdrant qdrant/qdrant
-    timeout /t 3 /nobreak >nul
+    docker ps -q --filter "name=pndbot-qdrant" | findstr . >nul 2>nul
+    if %ERRORLEVEL% neq 0 (
+        docker start pndbot-qdrant >nul 2>nul
+        if %ERRORLEVEL% neq 0 (
+            docker run -d -p 6338:6333 -p 6334:6334 --name pndbot-qdrant qdrant/qdrant >nul 2>nul
+        )
+        timeout /t 3 /nobreak >nul
+    )
+    echo       Qdrant running on port 6338
+) else (
+    echo       [WARN] Docker not found - Qdrant may not work
 )
 
-REM Start Streamlit
-echo [INFO] Starting Streamlit App (port 8501)...
+REM Step 2: Start Streamlit
+echo [2/2] Starting Streamlit App (port 8501)...
+echo.
+echo  ========================================
+echo   Streamlit running at:
+echo   Local:   http://localhost:8501
+echo  ========================================
+echo.
+
 cd /d "%~dp0"
 start "" http://localhost:8501
-streamlit run src\app.py
+streamlit run src_streamlit_legacy\app.py
 
 goto end
 
