@@ -210,6 +210,37 @@
         
         .status.connected { color: #2e7d32; }
         .status.disconnected { color: #c62828; }
+        
+        /* Exact Mode Toggle */
+        .mode-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .mode-btn {
+            padding: 8px 16px;
+            border: 2px solid #006600;
+            border-radius: 20px;
+            background: white;
+            color: #006600;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .mode-btn.active {
+            background: #006600;
+            color: white;
+        }
+        
+        .mode-btn:hover:not(.active) {
+            background: #e8f5e9;
+        }
     </style>
 </head>
 <body>
@@ -219,6 +250,11 @@
     </div>
     
     <div class="status" id="status">Connecting...</div>
+    
+    <div class="mode-toggle">
+        <button class="mode-btn active" id="aiModeBtn" onclick="setMode('ai')">🤖 AI Mode</button>
+        <button class="mode-btn" id="exactModeBtn" onclick="setMode('exact')">📍 Exact Mode</button>
+    </div>
     
     <div class="chat-container">
         <div class="messages" id="messages">
@@ -245,6 +281,22 @@
         // Session ID for memory
         const sessionId = 'mobile_' + Math.random().toString(36).substr(2, 9);
         const API_URL = window.location.origin;
+        let exactMode = false;
+        
+        // Mode toggle
+        function setMode(mode) {
+            exactMode = (mode === 'exact');
+            document.getElementById('aiModeBtn').classList.toggle('active', !exactMode);
+            document.getElementById('exactModeBtn').classList.toggle('active', exactMode);
+            
+            // Update placeholder
+            const input = document.getElementById('userInput');
+            if (exactMode) {
+                input.placeholder = 'Search exact text in Manual...';
+            } else {
+                input.placeholder = 'Ask about development projects...';
+            }
+        }
         
         // Check connection
         async function checkConnection() {
@@ -308,7 +360,8 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         query: query,
-                        session_id: sessionId
+                        session_id: sessionId,
+                        exact_mode: exactMode
                     })
                 });
                 
