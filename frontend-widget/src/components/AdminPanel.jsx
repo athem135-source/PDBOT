@@ -174,7 +174,7 @@ function AdminPanel({ isOpen, onClose }) {
             <div className="pdbot-admin-debug">
               <p><strong>Session ID:</strong> {localStorage.getItem('pdbot_session_id') || 'none'}</p>
               <p><strong>API URL:</strong> {customApiUrl}</p>
-              <p><strong>Widget Version:</strong> 2.3.0</p>
+              <p><strong>Widget Version:</strong> 2.4.8</p>
               <p><strong>User Agent:</strong> {navigator.userAgent.slice(0, 50)}...</p>
             </div>
           </div>
@@ -182,7 +182,7 @@ function AdminPanel({ isOpen, onClose }) {
         
         {/* Footer */}
         <div className="pdbot-admin-footer">
-          <span>PDBOT Admin v2.3.0 | Code: nufc</span>
+          <span>PDBOT Admin v2.4.8 | Code: nufc</span>
         </div>
       </div>
     </div>

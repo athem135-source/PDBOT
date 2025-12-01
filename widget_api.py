@@ -24,7 +24,7 @@ Endpoints:
   GET  /admin/status - Backend status for admin panel
 
 @author M. Hassan Arif Afridi
-@version 2.4.7
+@version 2.4.8
 """
 
 import os
@@ -517,7 +517,7 @@ def health():
     return jsonify({
         'status': 'ok',
         'service': 'PDBOT Widget API',
-        'version': '2.3.1',
+        'version': '2.4.8',
         'features': ['contextual_memory', 'rag_retrieval', 'feedback_collection', 'admin_panel']
     })
 
@@ -565,7 +565,7 @@ def admin_status():
     
     return jsonify({
         'status': 'ok',
-        'version': '2.3.1',
+        'version': '2.4.8',
         'uptime': datetime.now().isoformat(),
         'memory_mb': round(memory_mb, 2),
         'active_sessions': active_sessions,
