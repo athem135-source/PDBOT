@@ -272,7 +272,7 @@ def search_sentences(
     top_k: int = 2,
     qdrant_url: str = "http://localhost:6333",
     min_score: float = 0.12,
-    retrieval_hints: Dict[str, Any] = None,
+    retrieval_hints: Optional[Dict[str, Any]] = None,
     **kwargs
 ) -> List[Dict[str, Any]]:
     """

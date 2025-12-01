@@ -5,6 +5,8 @@ Pre-defined responses for red-line, off-scope, and abuse queries.
 These BYPASS RAG completely to avoid context pollution.
 """
 
+from typing import Optional
+
 # ============================================================================
 # RED-LINE RESPONSES (Bribery, Corruption, Misuse)
 # ============================================================================
@@ -141,7 +143,7 @@ def get_abuse_response(subcategory: str = "hard") -> str:
         return ABUSE_HARD_RESPONSE
 
 
-def get_guardrail_response(classification_class: str, subcategory: str = None) -> str:
+def get_guardrail_response(classification_class: str, subcategory: Optional[str] = None) -> str:
     """
     v2.1.0: Unified guardrail response generator.
     
