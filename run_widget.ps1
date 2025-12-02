@@ -68,12 +68,12 @@ Write-Host "[3/4] Starting Widget API Server (port 5000)..." -ForegroundColor Cy
 
 # Ensure critical packages are installed (fixes recurring module not found issues)
 Write-Host "      Checking critical packages..." -ForegroundColor Gray
-pip install qdrant-client waitress --quiet 2>$null
+pip install qdrant-client waitress sentence-transformers --quiet 2>$null
 
 Start-Process -FilePath "python" -ArgumentList "widget_api.py" -NoNewWindow -PassThru | Out-Null
 
-# Wait for API
-Start-Sleep -Seconds 4
+# Wait for API (longer to allow embedding model to load)
+Start-Sleep -Seconds 10
 
 # Start React widget
 Write-Host "[4/4] Starting React Widget..." -ForegroundColor Cyan
