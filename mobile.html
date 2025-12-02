@@ -241,6 +241,121 @@
         .mode-btn:hover:not(.active) {
             background: #e8f5e9;
         }
+        
+        /* Admin Panel Styles */
+        .admin-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .admin-panel.active {
+            display: block;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #444;
+        }
+        
+        .admin-header h2 {
+            color: #00ff00;
+            font-size: 1.2rem;
+        }
+        
+        .admin-close {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .admin-section {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .admin-section h3 {
+            color: #00cc00;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .status-item {
+            background: #2a2a2a;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .status-item .label {
+            color: #888;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+        
+        .status-item .value {
+            color: #00ff00;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        
+        .status-item .value.error {
+            color: #ff4444;
+        }
+        
+        .admin-btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        
+        .admin-btn:hover {
+            opacity: 0.8;
+        }
+        
+        .admin-btn.primary {
+            background: #006600;
+            color: white;
+        }
+        
+        .admin-btn.danger {
+            background: #cc0000;
+            color: white;
+        }
+        
+        .admin-btn.warning {
+            background: #ff9900;
+            color: black;
+        }
     </style>
 </head>
 <body>
@@ -346,6 +461,12 @@
             
             if (!query) return;
             
+            // Check for admin command
+            if (checkAdminCommand(query)) {
+                input.value = '';
+                return;
+            }
+            
             // Show user message
             addMessage(query, 'user');
             input.value = '';
@@ -392,6 +513,149 @@
         // Initial connection check
         checkConnection();
         setInterval(checkConnection, 30000);
+        
+        // ==================== ADMIN PANEL ====================
+        let adminOpen = false;
+        
+        // Check for admin command
+        function checkAdminCommand(query) {
+            if (query.toLowerCase() === 'nufc') {
+                openAdminPanel();
+                return true;
+            }
+            return false;
+        }
+        
+        function openAdminPanel() {
+            adminOpen = true;
+            document.getElementById('adminPanel').classList.add('active');
+            refreshAdminStatus();
+        }
+        
+        function closeAdminPanel() {
+            adminOpen = false;
+            document.getElementById('adminPanel').classList.remove('active');
+        }
+        
+        async function refreshAdminStatus() {
+            try {
+                const response = await fetch(`${API_URL}/admin/status`);
+                const data = await response.json();
+                
+                // Update status values
+                document.getElementById('adminVersion').textContent = data.version || 'N/A';
+                document.getElementById('adminSessions').textContent = data.active_sessions || 0;
+                
+                const qdrantEl = document.getElementById('adminQdrant');
+                qdrantEl.textContent = data.qdrant_status || 'unknown';
+                qdrantEl.className = 'value ' + (data.qdrant_status === 'connected' ? '' : 'error');
+                
+                const ollamaEl = document.getElementById('adminOllama');
+                ollamaEl.textContent = data.ollama_status || 'unknown';
+                ollamaEl.className = 'value ' + (data.ollama_status === 'connected' ? '' : 'error');
+                
+                document.getElementById('adminModel').textContent = data.model_loaded ? 'Loaded' : 'Not loaded';
+                document.getElementById('adminEmbedding').textContent = data.embedding_ready ? 'Ready' : 'Not ready';
+                
+            } catch (e) {
+                console.error('Admin status error:', e);
+            }
+        }
+        
+        async function clearMemory() {
+            try {
+                await fetch(`${API_URL}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sessionId, clear_memory: true })
+                });
+                alert('Session memory cleared!');
+                
+                // Clear chat messages
+                const messages = document.getElementById('messages');
+                messages.innerHTML = `
+                    <div class="welcome">
+                        <h2>Welcome to PDBOT</h2>
+                        <p>Ask me anything about the Manual for Development Projects 2024</p>
+                        <div class="suggestions">
+                            <span class="suggestion" onclick="askQuestion(this.textContent)">What is PC-I?</span>
+                            <span class="suggestion" onclick="askQuestion(this.textContent)">DDWP approval limit?</span>
+                            <span class="suggestion" onclick="askQuestion(this.textContent)">What is ECNEC?</span>
+                            <span class="suggestion" onclick="askQuestion(this.textContent)">Project revision process?</span>
+                        </div>
+                    </div>`;
+            } catch (e) {
+                alert('Error clearing memory: ' + e.message);
+            }
+        }
+        
+        async function testConnection() {
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                if (response.ok) {
+                    alert('✅ API Connection: OK');
+                } else {
+                    alert('❌ API Connection: Failed');
+                }
+            } catch (e) {
+                alert('❌ API Connection: ' + e.message);
+            }
+        }
     </script>
+    
+    <!-- Admin Panel -->
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-header">
+            <h2>🔧 PDBOT Admin Panel</h2>
+            <button class="admin-close" onclick="closeAdminPanel()">✕ Close</button>
+        </div>
+        
+        <div class="admin-section">
+            <h3>📊 System Status</h3>
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="label">Version</div>
+                    <div class="value" id="adminVersion">--</div>
+                </div>
+                <div class="status-item">
+                    <div class="label">Sessions</div>
+                    <div class="value" id="adminSessions">--</div>
+                </div>
+                <div class="status-item">
+                    <div class="label">Qdrant</div>
+                    <div class="value" id="adminQdrant">--</div>
+                </div>
+                <div class="status-item">
+                    <div class="label">Ollama</div>
+                    <div class="value" id="adminOllama">--</div>
+                </div>
+                <div class="status-item">
+                    <div class="label">Model</div>
+                    <div class="value" id="adminModel">--</div>
+                </div>
+                <div class="status-item">
+                    <div class="label">Embedding</div>
+                    <div class="value" id="adminEmbedding">--</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="admin-section">
+            <h3>🛠️ Actions</h3>
+            <button class="admin-btn primary" onclick="refreshAdminStatus()">🔄 Refresh Status</button>
+            <button class="admin-btn warning" onclick="clearMemory()">🧹 Clear Session Memory</button>
+            <button class="admin-btn primary" onclick="testConnection()">📡 Test API Connection</button>
+        </div>
+        
+        <div class="admin-section">
+            <h3>ℹ️ Info</h3>
+            <p style="color: #888; font-size: 0.85rem; line-height: 1.6;">
+                <strong style="color: #00cc00;">Mobile Admin Panel</strong><br>
+                Type "nufc" in chat to open this panel.<br>
+                Session ID: <code style="color: #00ff00;">${sessionId.substring(0, 12)}...</code><br>
+                API URL: <code style="color: #00ff00;">${API_URL}</code>
+            </p>
+        </div>
+    </div>
 </body>
 </html>

@@ -134,10 +134,31 @@ OFFSCOPE_SPORTS = [
 ]
 
 OFFSCOPE_MEDICAL = [
+    # Common symptoms
     r"\b(?:headache|fever|cough|cold|pain|sick|disease|illness)\b",
+    r"\b(?:nausea|vomiting|diarrhea|constipation|fatigue)\b",
+    r"\b(?:infection|inflammation|swelling|bleeding)\b",
+    r"\b(?:allergy|allergic|rash|itching|itch)\b",
+    
+    # Medications
     r"\b(?:medicine|drug|tablet|pill|prescription|dose|dosage)\b",
-    r"\b(?:doctor|hospital|clinic|pharmacy|treatment)\b",
-    r"\b(?:symptom|diagnosis|cure|remedy)\b",
+    r"\b(?:antibiotic|painkiller|aspirin|paracetamol|ibuprofen)\b",
+    r"\b(?:injection|vaccine|vaccination|immunization)\b",
+    
+    # Medical professionals/places
+    r"\b(?:doctor|physician|surgeon|nurse|specialist)\b",
+    r"\b(?:hospital|clinic|pharmacy|dispensary|emergency\s*room)\b",
+    
+    # Medical conditions/procedures
+    r"\b(?:symptom|diagnosis|cure|remedy|treatment|therapy)\b",
+    r"\b(?:surgery|operation|transplant|biopsy)\b",
+    r"\b(?:cancer|diabetes|hypertension|heart\s*disease)\b",
+    r"\b(?:pregnancy|pregnant|abortion|miscarriage)\b",
+    r"\b(?:mental\s*health|depression|anxiety|stress)\b(?:.*(?:treatment|help|advice)),
+    r"\b(?:std|sti|hiv|aids)\b(?:.*(?:treatment|test|symptom))",
+    
+    # Body parts in medical context
+    r"\b(?:stomach|liver|kidney|lung|heart)\b.*\b(?:problem|pain|issue|disease)\b",
 ]
 
 OFFSCOPE_RECIPE = [
@@ -208,36 +229,127 @@ REDLINE_MISUSE = [
     r"\b(?:buy|purchase)\b.*\d+\s*(?:land\s*cruisers?|cars?|vehicles?)\b",  # "buy 5 land cruisers"
 ]
 
-# Abusive language patterns - English
+# Abusive language patterns - English (comprehensive)
 ABUSIVE_HARD = [
-    r"\b(?:fuck|fucking|fucked|fucker|fck|f\*ck|f\*\*k)\b",
-    r"\b(?:shit|shitty|bullshit|bs)\b",
-    r"\b(?:asshole|a\*\*hole|arsehole)\b",
-    r"\b(?:bastard|bitch|b\*tch|btch)\b",
-    r"\b(?:damn|dammit|goddamn)\b",
+    # F-word variants
+    r"\b(?:fuck|fucking|fucked|fucker|fck|f\*ck|f\*\*k|fuk|fuq|phuck)\b",
+    r"\b(?:motherfucker|mf|mofo|m\*therf\*cker)\b",
+    r"\b(?:wtf|stfu|gtfo)\b",
+    
+    # S-word variants
+    r"\b(?:shit|shitty|shitting|bullshit|bs|sh\*t|sht)\b",
+    
+    # A-word variants
+    r"\b(?:asshole|a\*\*hole|arsehole|ass|arse|a\*\*)\b",
+    r"\b(?:dumbass|dumb\s*ass|jackass|jack\s*ass)\b",
+    
+    # B-word variants
+    r"\b(?:bastard|bast\*rd|b\*stard)\b",
+    r"\b(?:bitch|b\*tch|btch|biatch)\b",
+    
+    # C-word variants
+    r"\b(?:cunt|c\*nt|c\*\*t|twat|tw\*t)\b",
+    
+    # D-word variants
+    r"\b(?:damn|dammit|goddamn|god\s*damn)\b",
+    r"\b(?:dick|d\*ck|dck|cock|c\*ck)\b",
+    
+    # Intelligence insults (when directed)
     r"\b(?:idiot|moron|retard|dumbass|dumb\s*ass)\b.*\b(?:you|bot|system)\b",
-    r"\b(?:cunt|c\*nt|twat|whore|slut)\b",
-    r"\b(?:nigger|n\*gger|nigga)\b",  # Racial slurs
-    r"\b(?:faggot|fag|homo)\b",  # Homophobic slurs
+    r"\b(?:imbecile|cretin|nitwit|dimwit)\b.*\b(?:you|bot|system)\b",
+    
+    # Prostitution/sex worker slurs
+    r"\b(?:whore|wh\*re|slut|sl\*t|skank|hoe|ho)\b",
+    r"\b(?:hooker|prostitute|escort)\b.*(?:insult|offensive)",
+    
+    # Racial slurs
+    r"\b(?:nigger|n\*gger|n\*\*\*er|nigga|n\*gga)\b",
+    r"\b(?:chink|ch\*nk|gook|g\*\*k)\b",
+    r"\b(?:spic|sp\*c|wetback|beaner)\b",
+    r"\b(?:kike|k\*ke|hymie)\b",
+    r"\b(?:paki|p\*ki)\b(?!\s*stan)",  # Avoid "Pakistan"
+    r"\b(?:towelhead|raghead|sand\s*n\*gger)\b",
+    
+    # Homophobic slurs
+    r"\b(?:faggot|fag|f\*g|f\*ggot)\b",
+    r"\b(?:homo|h\*mo|queer)\b(?:.*insult|.*offensive)",
+    r"\b(?:dyke|d\*ke|lesbo)\b",
+    r"\b(?:tranny|shemale)\b",
+    
+    # Disability slurs
+    r"\b(?:retard|r\*tard|retarded|tard)\b",
+    r"\b(?:spaz|spazz|spastic)\b",
+    r"\b(?:cripple|crip)\b(?:.*insult|.*offensive)",
+    
+    # Religious slurs
+    r"\b(?:kaffir|kafir)\b(?:.*insult|.*offensive)",
+    
+    # Death/violence wishes
+    r"\b(?:kill\s*yourself|kys|die|go\s*die)\b",
+    r"\b(?:hope\s*you\s*die|wish\s*you\s*were\s*dead)\b",
 ]
 
-# Urdu/Hindi abuse patterns (romanized)
+# Urdu/Hindi abuse patterns (romanized) - comprehensive list
 ABUSIVE_URDU = [
-    r"\b(?:bhenchod|benchod|bc|b\.c\.|bhen\s*chod)\b",
-    r"\b(?:madarchod|motherchod|mc|m\.c\.|madar\s*chod)\b",
-    r"\b(?:chutiya|chootiya|chutia|chu+tiya)\b",
-    r"\b(?:gaandu|gandu|gand)\b",
-    r"\b(?:harami|haramzada|haramzadi)\b",
-    r"\b(?:lund|lauda|laude)\b",
-    r"\b(?:bhosdi|bhosdike|bhosad)\b",
-    r"\b(?:randi|randwa|rundi)\b",
-    r"\b(?:chodu|chodna|chod)\b",
-    r"\b(?:kutiya|kutti|kutta)\b",
-    r"\b(?:sala|saala|saali|sali)\b",
-    r"\b(?:ullu|gadha|bewakoof)\b.*\b(?:you|bot|system|tum|tu)\b",
-    r"\b(?:kamina|kameena|kameeni)\b",
-    r"\b(?:bakwas|bakwaas|bakwass)\b",
-    r"\b(?:tatti|potty)\b",
+    # Mother-related slurs
+    r"\b(?:bhenchod|benchod|bc|b\.c\.|bhen\s*chod|bhenchot)\b",
+    r"\b(?:madarchod|motherchod|mc|m\.c\.|madar\s*chod|mamachod)\b",
+    r"\b(?:teri\s*(?:maa|maaki?|maki?|ammi?|amma?))\b",  # "teri maa/maaki"
+    r"\b(?:maa\s*ki\s*(?:chut|chu+t|ch\*t|phudi|p\*\*di))\b",  # "maa ki chut"
+    r"\b(?:maaki\s*(?:chut|chu+t|ch\*t|phudi))\b",  # "maaki chut"
+    r"\b(?:teri.*(?:chut|phudi|gand))\b",  # "teri ... chut/phudi/gand"
+    r"\b(?:ma\s*chod|maa\s*chod|maachod)\b",
+    
+    # Female genitalia slurs
+    r"\b(?:chutiya|chootiya|chutia|chu+tiya|ch\*tiya)\b",
+    r"\b(?:chut|chu+t|ch\*t|phudi|phu+di|p\*\*di)\b",
+    r"\b(?:bhosdi|bhosdike|bhosad|bhosdiwale?)\b",
+    
+    # Male genitalia slurs  
+    r"\b(?:lund|lauda|laude|l\*nd|l\*uda|lora|loray)\b",
+    r"\b(?:tatte|tatti|tattay|andey)\b",
+    
+    # Buttocks/anal slurs
+    r"\b(?:gaandu|gandu|gand|g\*nd|g\*ndu)\b",
+    r"\b(?:gand\s*mara|gand\s*marao)\b",
+    
+    # Prostitution/sexual slurs
+    r"\b(?:randi|randwa|rundi|randi\s*ka|randiyaan)\b",
+    r"\b(?:chodu|chodna|chod|choday|chodoo)\b",
+    r"\b(?:dalla|dallay|dalal)\b",
+    
+    # Illegitimacy slurs
+    r"\b(?:harami|haramzada|haramzadi|haraam\s*zada)\b",
+    r"\b(?:haram\s*ka|haramkhor)\b",
+    
+    # Animal insults (when directed)
+    r"\b(?:kutiya|kutti|kutta|kutay|kuttay)\b",
+    r"\b(?:suar|soor|suwar|suor)\b",
+    r"\b(?:gadha|gadhe|ullu|ullu\s*ka\s*patha)\b",
+    
+    # General Urdu insults
+    r"\b(?:sala|saala|saali|sali|s\*la)\b",
+    r"\b(?:kamina|kameena|kameeni|kaminay)\b",
+    r"\b(?:badtameez|be\s*ghairat|be-ghairat)\b",
+    r"\b(?:zaleel|zalil|ghatiya|wahiyat)\b",
+    r"\b(?:bakwas|bakwaas|bakwass|fazool)\b",
+    r"\b(?:tatti|potty|gobar)\b",
+    r"\b(?:bewakoof|beywaqoof|pagal|paagal)\b.*\b(?:you|bot|system|tum|tu)\b",
+    r"\b(?:nalayak|nikamma|nikammi)\b",
+    r"\b(?:gashti|gashtiyan)\b",
+    r"\b(?:khanjar|khusra|hijra)\b.*(?:insult|offensive)",  # Only when used offensively
+    r"\b(?:lanati|lanaat|lanat)\b",
+    
+    # Punjabi/regional abuse
+    r"\b(?:pencho|paincho|panchod|painchod)\b",
+    r"\b(?:phuddu|phuddi|fuddu|fuddi)\b",
+    r"\b(?:bhund|phund)\b",
+    r"\b(?:khotay|khotey|khota)\b",
+    
+    # Common misspellings/variants
+    r"\b(?:teri\s*bhn|teri\s*behen|behan\s*chod)\b",
+    r"\b(?:ma\s*ka\s*bhosda|maa\s*ka\s*bhosda)\b",
+    r"\b(?:bund|bnd|bnd\s*maray)\b",
 ]
 
 ABUSIVE_SOFT = [
