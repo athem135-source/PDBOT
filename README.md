@@ -138,6 +138,12 @@ PDBOT now supports **external access via Cloudflare Tunnel**, allowing you to us
 # 3. Share the generated URL (e.g., https://xxx-xxx.trycloudflare.com)
 ```
 
+### 📱 Mobile Admin Panel
+
+Type **`nufc`** in the mobile chat to access the Admin Panel with:
+- System status (Version, Sessions, Qdrant, Ollama)
+- Actions: Refresh Status, Clear Memory, Test Connection
+
 ### ✨ Mobile Features
 
 | Feature | Description |
@@ -186,10 +192,28 @@ PDBOT now supports **external access via Cloudflare Tunnel**, allowing you to us
 │  🔞 sexual_content      → Explicit queries → BLOCKED                         │
 │  🤬 abusive_language    → Insults/abuse → Politely redirected                │
 │                                                                               │
-│  🌐 URDU ABUSE DETECTION ALSO.   │
-│                                                                               │
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
+
+### 🚫 Content Filter (v2.4.9-patch2)
+
+PDBOT includes a comprehensive profanity and inappropriate content filter that blocks:
+
+| Category | Examples Blocked | Patterns |
+|----------|-----------------|----------|
+| **🇵🇰 Urdu/Hindi Abuse** | teri maaki chut, bhenchod, madarchod, chutiya, gandu, randi | 50+ patterns |
+| **🇬🇧 English Profanity** | f-word, s-word, racial slurs, homophobic slurs | 40+ patterns |
+| **🔞 Sexual Content** | Explicit terms, inappropriate requests | 25+ patterns |
+| **☠️ Violence/Hate** | Death wishes, KYS, racial slurs | 15+ patterns |
+| **🏥 Medical (Off-scope)** | Symptoms, diseases, medications | 20+ patterns |
+
+**Urdu Abuse Detection includes:**
+- Mother-related slurs (maa ki chut, maaki, etc.)
+- Genitalia slurs (chut, lund, phudi, gand)  
+- Prostitution slurs (randi, dalla)
+- Illegitimacy insults (harami, haramzada)
+- Punjabi variants (pencho, phuddu)
+- Common misspellings & leetspeak variants
 
 ---
 
