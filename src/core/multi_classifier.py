@@ -154,8 +154,8 @@ OFFSCOPE_MEDICAL = [
     r"\b(?:surgery|operation|transplant|biopsy)\b",
     r"\b(?:cancer|diabetes|hypertension|heart\s*disease)\b",
     r"\b(?:pregnancy|pregnant|abortion|miscarriage)\b",
-    r"\b(?:mental\s*health|depression|anxiety|stress)\b(?:.*(?:treatment|help|advice)),
-    r"\b(?:std|sti|hiv|aids)\b(?:.*(?:treatment|test|symptom))",
+    r"\b(?:mental\s*health|depression|anxiety|stress)\b.*(?:treatment|help|advice)",
+    r"\b(?:std|sti|hiv|aids)\b.*(?:treatment|test|symptom)",
     
     # Body parts in medical context
     r"\b(?:stomach|liver|kidney|lung|heart)\b.*\b(?:problem|pain|issue|disease)\b",
