@@ -339,6 +339,8 @@ ABUSIVE_URDU = [
     r"\b(?:gashti|gashtiyan)\b",
     r"\b(?:khanjar|khusra|hijra)\b.*(?:insult|offensive)",  # Only when used offensively
     r"\b(?:lanati|lanaat|lanat)\b",
+    r"\b(?:bharwa|bharway|bharwi|bharway)\b",  # Pimp insult
+    r"\b(?:chakka|chakkay|chakke)\b",  # Derogatory term
     
     # Punjabi/regional abuse
     r"\b(?:pencho|paincho|panchod|painchod)\b",
