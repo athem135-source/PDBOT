@@ -1,14 +1,14 @@
 # ============================================
 # PDBOT Widget - Quick Start (PowerShell)
 # Government of Pakistan - Ministry of Planning
-# Version 2.4.8
+# Version 2.4.9
 # ============================================
 
-$Host.UI.RawUI.WindowTitle = "PDBOT Widget v2.4.8"
+$Host.UI.RawUI.WindowTitle = "PDBOT Widget v2.4.9"
 
 Write-Host ""
 Write-Host " ========================================"
-Write-Host "   🤖 PDBOT Widget v2.4.8"
+Write-Host "   🤖 PDBOT Widget v2.4.9"
 Write-Host "   Government of Pakistan"
 Write-Host "   Ministry of Planning, Development"
 Write-Host "   & Special Initiatives"
@@ -18,6 +18,16 @@ Write-Host ""
 # Get script directory
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $scriptDir
+
+# Activate virtual environment if it exists
+$venvPath = Join-Path $scriptDir ".venv\Scripts\Activate.ps1"
+if (Test-Path $venvPath) {
+    Write-Host "[VENV] Activating virtual environment..." -ForegroundColor Green
+    & $venvPath
+} else {
+    Write-Host "[WARN] Virtual environment not found at .venv" -ForegroundColor Yellow
+    Write-Host "      Run: python -m venv .venv" -ForegroundColor Yellow
+}
 
 # Check Python
 if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
@@ -65,10 +75,6 @@ try {
 
 # Start API server in background
 Write-Host "[3/4] Starting Widget API Server (port 5000)..." -ForegroundColor Cyan
-
-# Ensure critical packages are installed (fixes recurring module not found issues)
-Write-Host "      Checking critical packages..." -ForegroundColor Gray
-pip install qdrant-client waitress sentence-transformers --quiet 2>$null
 
 Start-Process -FilePath "python" -ArgumentList "widget_api.py" -NoNewWindow -PassThru | Out-Null
 

@@ -1,6 +1,6 @@
 @echo off
 REM ============================================
-REM PDBOT Unified Launcher v2.4.8
+REM PDBOT Unified Launcher v2.4.9
 REM Developer: M. Hassan Arif Afridi
 REM ============================================
 
@@ -9,11 +9,17 @@ setlocal enabledelayedexpansion
 REM Get script directory
 cd /d "%~dp0"
 
+REM Activate virtual environment if it exists
+if exist ".venv\Scripts\activate.bat" (
+    echo [VENV] Activating virtual environment...
+    call .venv\Scripts\activate.bat
+)
+
 :menu
 cls
 echo.
 echo  ========================================
-echo      PDBOT v2.4.8 - Unified Launcher
+echo      PDBOT v2.4.9 - Unified Launcher
 echo      Developer: M. Hassan Arif Afridi
 echo      Planning ^& Development Assistant
 echo  ========================================
@@ -87,7 +93,7 @@ goto menu
 cls
 echo.
 echo  ========================================
-echo   Starting PDBOT React Widget v2.4.8
+echo   Starting PDBOT React Widget v2.4.9
 echo  ========================================
 echo.
 
@@ -119,9 +125,7 @@ if %ERRORLEVEL% equ 0 (
 
 REM Step 3: Start Flask API
 echo [3/4] Starting Widget API (port 5000)...
-echo       Ensuring critical packages...
-pip install qdrant-client waitress sentence-transformers --quiet >nul 2>nul
-start "PDBOT Widget API" /min cmd /c "cd /d %~dp0 && python widget_api.py"
+start "PDBOT Widget API" /min cmd /c "cd /d %~dp0 && call .venv\Scripts\activate.bat && python widget_api.py"
 timeout /t 10 /nobreak >nul
 echo       API started
 
