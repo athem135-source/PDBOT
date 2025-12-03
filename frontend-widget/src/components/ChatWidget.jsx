@@ -66,6 +66,7 @@ function ChatWidget() {
   const [adminCodeBuffer, setAdminCodeBuffer] = useState('');
   const [exactMode, setExactMode] = useState(() => localStorage.getItem('pdbot_exact_mode') === 'true');
   const [useGroq, setUseGroq] = useState(() => localStorage.getItem('pdbot_use_groq') === 'true');
+  const [suggestedQuestions, setSuggestedQuestions] = useState([]);  // v2.5.0-patch2: Dynamic follow-up questions
   
   // Dragging state
   const [position, setPosition] = useState({ x: null, y: null });
@@ -193,6 +194,9 @@ function ChatWidget() {
     const query = inputValue.trim();
     if (!query || isLoading) return;
     
+    // Clear suggested questions while waiting for new ones
+    setSuggestedQuestions([]);
+    
     // Add user message
     const userMsg = {
       id: generateMessageId(),
@@ -222,6 +226,11 @@ function ChatWidget() {
       
       setMessages(prev => [...prev, botMsg]);
       setNewMessageId(botMsg.id);
+      
+      // v2.5.0-patch2: Update suggested questions from response
+      if (response.suggested_questions && response.suggested_questions.length > 0) {
+        setSuggestedQuestions(response.suggested_questions);
+      }
     } catch (error) {
       console.error('Chat error:', error);
       
@@ -504,9 +513,10 @@ function ChatWidget() {
             <>
               {/* Messages area */}
               <div className="pdbot-messages">
-                {/* Suggested questions (show at start) */}
-                {messages.length <= 1 && !isLoading && (
+                {/* Suggested questions - show defaults at start, or dynamic after responses */}
+                {(messages.length <= 1 || suggestedQuestions.length > 0) && !isLoading && (
                   <SuggestedQuestions
+                    questions={suggestedQuestions.length > 0 ? suggestedQuestions : undefined}
                     onSelect={handleSuggestedClick}
                     disabled={isLoading}
                   />

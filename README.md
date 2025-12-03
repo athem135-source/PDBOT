@@ -10,7 +10,7 @@
 
 ---
 
-![Version](https://img.shields.io/badge/Version-2.5.0-006600?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-2.5.0--patch2-006600?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![React](https://img.shields.io/badge/React-18.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![Qdrant](https://img.shields.io/badge/Qdrant-Vector_DB-DC382D?style=for-the-badge)
@@ -442,6 +442,11 @@ PDBOT includes a comprehensive profanity and inappropriate content filter that b
 - **Passages Panel:** View supporting text excerpts
 - **Download Feature:** Download answers as .txt files
 - **Suggestion Buttons:** Tap to ask follow-up questions
+
+### 🖥️ React Widget Improvements (patch2)
+- **Dynamic Follow-up Questions:** Widget now displays suggested questions from API
+- **Context-Aware Suggestions:** Questions update based on conversation topic
+- **Fixed Stats Dashboard:** ASCII-compatible PowerShell script
 
 ### 📊 Statistics Dashboard
 - **Real-time Monitoring:** `run_stats.bat` for live server stats

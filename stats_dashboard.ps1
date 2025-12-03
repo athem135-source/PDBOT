@@ -1,5 +1,5 @@
 # ============================================================================
-# PDBOT Statistics Dashboard v2.5.0-patch1
+# PDBOT Statistics Dashboard v2.5.0-patch2
 # ============================================================================
 # Displays real-time statistics about the PDBOT server
 # Run: .\stats_dashboard.ps1
@@ -17,10 +17,10 @@ $Host.UI.RawUI.WindowTitle = "PDBOT Statistics Dashboard"
 function Show-Banner {
     Clear-Host
     Write-Host ""
-    Write-Host "  ╔══════════════════════════════════════════════════════════╗" -ForegroundColor Green
-    Write-Host "  ║        PDBOT Statistics Dashboard v2.5.0-patch1         ║" -ForegroundColor Green
-    Write-Host "  ║        Planning & Development Bot Monitor               ║" -ForegroundColor Green
-    Write-Host "  ╚══════════════════════════════════════════════════════════╝" -ForegroundColor Green
+    Write-Host "  +============================================================+" -ForegroundColor Green
+    Write-Host "  |        PDBOT Statistics Dashboard v2.5.0-patch2            |" -ForegroundColor Green
+    Write-Host "  |        Planning & Development Bot Monitor                  |" -ForegroundColor Green
+    Write-Host "  +============================================================+" -ForegroundColor Green
     Write-Host ""
 }
 
@@ -62,7 +62,7 @@ function Show-Stats {
     Show-Banner
     
     if (-not $Data.Success) {
-        Write-Host "  ❌ Cannot connect to PDBOT API" -ForegroundColor Red
+        Write-Host "  [ERROR] Cannot connect to PDBOT API" -ForegroundColor Red
         Write-Host "     URL: $ApiUrl" -ForegroundColor Gray
         Write-Host "     Error: $($Data.Error)" -ForegroundColor Gray
         Write-Host ""
@@ -75,9 +75,9 @@ function Show-Stats {
     $status = $Data.Status
     
     # Server Info
-    Write-Host "  ┌─────────────────────────────────────────────────────────┐" -ForegroundColor Cyan
-    Write-Host "  │                    🖥️  SERVER INFO                       │" -ForegroundColor Cyan
-    Write-Host "  └─────────────────────────────────────────────────────────┘" -ForegroundColor Cyan
+    Write-Host "  +-----------------------------------------------------------+" -ForegroundColor Cyan
+    Write-Host "  |                    SERVER INFO                            |" -ForegroundColor Cyan
+    Write-Host "  +-----------------------------------------------------------+" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "    Version:        " -NoNewline; Write-Host $status.version -ForegroundColor Yellow
     Write-Host "    PID:            " -NoNewline; Write-Host $stats.system.pid -ForegroundColor Yellow
@@ -87,9 +87,9 @@ function Show-Stats {
     Write-Host ""
     
     # Services Status
-    Write-Host "  ┌─────────────────────────────────────────────────────────┐" -ForegroundColor Cyan
-    Write-Host "  │                   🔌 SERVICES STATUS                     │" -ForegroundColor Cyan
-    Write-Host "  └─────────────────────────────────────────────────────────┘" -ForegroundColor Cyan
+    Write-Host "  +-----------------------------------------------------------+" -ForegroundColor Cyan
+    Write-Host "  |                   SERVICES STATUS                         |" -ForegroundColor Cyan
+    Write-Host "  +-----------------------------------------------------------+" -ForegroundColor Cyan
     Write-Host ""
     
     $qdrantColor = Format-StatusColor $status.qdrant_status
@@ -106,9 +106,9 @@ function Show-Stats {
     Write-Host ""
     
     # Sessions
-    Write-Host "  ┌─────────────────────────────────────────────────────────┐" -ForegroundColor Cyan
-    Write-Host "  │                    👥 ACTIVE SESSIONS                    │" -ForegroundColor Cyan
-    Write-Host "  └─────────────────────────────────────────────────────────┘" -ForegroundColor Cyan
+    Write-Host "  +-----------------------------------------------------------+" -ForegroundColor Cyan
+    Write-Host "  |                    ACTIVE SESSIONS                        |" -ForegroundColor Cyan
+    Write-Host "  +-----------------------------------------------------------+" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "    Active Sessions:  " -NoNewline; Write-Host $stats.sessions.active_count -ForegroundColor Green
     Write-Host "    Total Messages:   " -NoNewline; Write-Host $stats.sessions.total_messages -ForegroundColor Yellow
@@ -118,15 +118,15 @@ function Show-Stats {
     if ($stats.sessions.details -and $stats.sessions.details.Count -gt 0) {
         Write-Host "    Session Details:" -ForegroundColor Gray
         foreach ($session in $stats.sessions.details) {
-            Write-Host "      • $($session.session_id) - $($session.message_count) msgs - $($session.last_activity)" -ForegroundColor DarkGray
+            Write-Host "      * $($session.session_id) - $($session.message_count) msgs - $($session.last_activity)" -ForegroundColor DarkGray
         }
         Write-Host ""
     }
     
     # Feedback
-    Write-Host "  ┌─────────────────────────────────────────────────────────┐" -ForegroundColor Cyan
-    Write-Host "  │                    ⭐ FEEDBACK STATS                     │" -ForegroundColor Cyan
-    Write-Host "  └─────────────────────────────────────────────────────────┘" -ForegroundColor Cyan
+    Write-Host "  +-----------------------------------------------------------+" -ForegroundColor Cyan
+    Write-Host "  |                    FEEDBACK STATS                         |" -ForegroundColor Cyan
+    Write-Host "  +-----------------------------------------------------------+" -ForegroundColor Cyan
     Write-Host ""
     
     $totalFeedback = 0
@@ -134,10 +134,11 @@ function Show-Stats {
         foreach ($key in @("5_star", "4_star", "3_star", "2_star", "1_star")) {
             $count = $stats.feedback.$key
             $totalFeedback += $count
-            $starEmoji = "⭐" * [int]$key.Split("_")[0]
+            $stars = [int]$key.Split("_")[0]
+            $starStr = "*" * $stars
             $barLength = [Math]::Min($count, 20)
-            $bar = "█" * $barLength
-            Write-Host "    $starEmoji : " -NoNewline
+            $bar = "#" * $barLength
+            Write-Host "    $starStr : " -NoNewline
             Write-Host $bar -NoNewline -ForegroundColor Yellow
             Write-Host " ($count)" -ForegroundColor Gray
         }
@@ -147,7 +148,7 @@ function Show-Stats {
     Write-Host ""
     
     # Footer
-    Write-Host "  ─────────────────────────────────────────────────────────" -ForegroundColor DarkGray
+    Write-Host "  -----------------------------------------------------------" -ForegroundColor DarkGray
     Write-Host "    Press Ctrl+C to exit" -ForegroundColor DarkGray
     if ($Watch) {
         Write-Host "    Auto-refreshing every $Interval seconds..." -ForegroundColor DarkGray

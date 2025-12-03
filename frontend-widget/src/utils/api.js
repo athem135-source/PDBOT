@@ -45,6 +45,7 @@ export async function sendChatMessage(query, sessionId, exactMode = false, useGr
       answer: data.answer || data.response || 'No response received.',
       sources: data.sources || [],
       passages: data.passages || [],
+      suggested_questions: data.suggested_questions || [],  // v2.5.0-patch2: Add suggested questions
       mode: data.mode || 'local',
       timestamp: new Date().toISOString()
     };
