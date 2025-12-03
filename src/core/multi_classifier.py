@@ -33,6 +33,7 @@ class QueryClass(Enum):
     IN_SCOPE = "in_scope"
     NUMERIC_QUERY = "numeric_query"
     DEFINITION_QUERY = "definition_query"
+    COMPARISON_QUERY = "comparison_query"  # difference between X and Y
     PROCEDURE_QUERY = "procedure_query"
     COMPLIANCE_QUERY = "compliance_query"
     TIMELINE_QUERY = "timeline_query"
@@ -71,6 +72,13 @@ GREETING_PATTERNS = [
     r"^(?:greetings|salutations)[!.?]*$",
     r"^(?:thanks?|thank\s*you|thx|ty)[!.?]*$",
     r"^(?:bye|goodbye|see\s*you|take\s*care)[!.?]*$",
+    # v2.5.0-patch1: 'ok thanks' type acknowledgments
+    r"^(?:ok|okay|k|kk|alright|acha|theek)\s*[!.?]*$",
+    r"^(?:ok|okay)\s+(?:thanks?|thank\s*you|thx|ty)[!.?]*$",
+    r"^(?:got\s+it|understood|i\s+see|makes\s+sense)[!.?]*$",
+    r"^(?:great|awesome|cool|nice|perfect)[!.?]*$",
+    r"^(?:that'?s?\s+(?:all|it|great|helpful))[!.?]*$",
+    r"^(?:no\s+(?:more\s+)?(?:questions?|queries?))[!.?]*$",
 ]
 
 # Ambiguous/vague query patterns - need clarification
@@ -101,6 +109,18 @@ DEFINITION_PATTERNS = [
     r"^explain\s+(?:the\s+)?(?:term|concept|meaning)",  # "Explain term..."
     r"\b(?:meaning|definition)\s+of\b",  # "meaning of..."
     r"^(?:can\s+you\s+)?explain\s+what\s+",  # "Can you explain what..."
+]
+
+# v2.5.0-patch1: Comparison/difference query indicators
+COMPARISON_PATTERNS = [
+    r"\b(?:difference|diff|differences)\s+(?:between|b\/w|btw)\b",  # "difference between X and Y"
+    r"\b(?:compare|comparison|comparing)\b",  # "compare X with Y"
+    r"\b(?:versus|vs\.?|v\.?)\b",  # "X vs Y"
+    r"\b(?:how\s+(?:is|are|does))\b.*\b(?:different|differ|differs)\b",  # "how is X different from Y"
+    r"\b(?:distinguish|distinction)\b.*\b(?:between|from)\b",  # "distinguish between X and Y"
+    r"\bwhat\s+(?:is|are)\s+the\s+(?:difference|differences)\b",  # "what is the difference"
+    r"\b(?:similarities?\s+(?:and|&)\s+differences?)\b",  # "similarities and differences"
+    r"\b(?:pros?\s+(?:and|&)\s+cons?)\b",  # "pros and cons"
 ]
 
 # Procedure/process query indicators
@@ -533,6 +553,7 @@ class MultiClassifier:
         
         self.numeric_re = [re.compile(p, re.IGNORECASE) for p in NUMERIC_PATTERNS]
         self.definition_re = [re.compile(p, re.IGNORECASE) for p in DEFINITION_PATTERNS]
+        self.comparison_re = [re.compile(p, re.IGNORECASE) for p in COMPARISON_PATTERNS]  # v2.5.0-patch1
         self.procedure_re = [re.compile(p, re.IGNORECASE) for p in PROCEDURE_PATTERNS]
         self.compliance_re = [re.compile(p, re.IGNORECASE) for p in COMPLIANCE_PATTERNS]
         self.timeline_re = [re.compile(p, re.IGNORECASE) for p in TIMELINE_PATTERNS]
@@ -737,6 +758,16 @@ class MultiClassifier:
                 confidence=0.85,
                 should_use_rag=True,
                 retrieval_hints={"prefer_definitions": True}
+            )
+        
+        # v2.5.0-patch1: Comparison queries - "difference between X and Y"
+        if self._match_any(q, self.comparison_re):
+            return ClassificationResult(
+                query_class=QueryClass.COMPARISON_QUERY.value,
+                subcategory="comparison",
+                confidence=0.90,
+                should_use_rag=True,
+                retrieval_hints={"compare_entities": True, "multi_sentence": True}
             )
         
         # Procedure queries - need multi-step chunks

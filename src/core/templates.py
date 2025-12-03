@@ -25,6 +25,13 @@ THANKS_RESPONSES = [
     "Anytime! Is there anything else about the Manual you'd like to know?",
 ]
 
+# v2.5.0-patch1: OK/Acknowledgment responses
+OK_RESPONSES = [
+    "Got it! Let me know if you have any other questions.",
+    "Alright! Feel free to ask more about development projects.",
+    "Great! I'm here if you need any more information.",
+]
+
 GOODBYE_RESPONSES = [
     "Goodbye! Come back if you have more questions about development projects. Allah Hafiz!",
     "Take care! Feel free to return anytime for assistance. Khuda Hafiz!",
@@ -217,16 +224,22 @@ def get_greeting_response(query: str = "") -> str:
     Get appropriate greeting response.
     
     Args:
-        query: Original query to detect thanks/goodbye
+        query: Original query to detect thanks/goodbye/ok
         
     Returns:
         Random greeting response (no RAG, no citations)
     """
-    q_lower = query.lower()
+    q_lower = query.lower().strip()
+    
+    # v2.5.0-patch1: Better detection of acknowledgments
     if any(w in q_lower for w in ["thank", "thx", "ty"]):
         return random.choice(THANKS_RESPONSES)
     elif any(w in q_lower for w in ["bye", "goodbye", "see you", "take care"]):
         return random.choice(GOODBYE_RESPONSES)
+    elif q_lower in ["ok", "okay", "k", "kk", "alright", "acha", "theek", "got it", "understood", "i see", "makes sense", "great", "awesome", "cool", "nice", "perfect"]:
+        return random.choice(OK_RESPONSES)
+    elif "ok thank" in q_lower or "okay thank" in q_lower:
+        return random.choice(THANKS_RESPONSES)
     else:
         return random.choice(GREETING_RESPONSES)
 

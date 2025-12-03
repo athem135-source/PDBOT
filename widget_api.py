@@ -206,7 +206,7 @@ def clear_session_memory(session_id: str):
 # SUGGESTED FOLLOW-UP QUESTIONS (ChatGPT-style)
 # =====================================================
 
-# Topic-based question suggestions
+# v2.5.0-patch1: Comprehensive topic-based question suggestions
 FOLLOW_UP_QUESTIONS = {
     "greeting": [
         "What is PC-I?",
@@ -220,36 +220,117 @@ FOLLOW_UP_QUESTIONS = {
         "What are the different project phases?",
         "How is project cost estimated?",
     ],
-    "numeric_query": [
-        "What are the threshold limits for CDWP?",
-        "How is project cost calculated?",
-        "What is the maximum DDWP approval limit?",
-    ],
-    "definition_query": [
-        "What are the types of PC proformas?",
-        "What is the difference between PC-I and PC-II?",
-        "How is a project defined in the Manual?",
-    ],
-    "procedure_query": [
-        "What are the stages of project approval?",
-        "What documents are required for PC-I?",
-        "How does project revision work?",
-    ],
-    "compliance_query": [
-        "What are the audit requirements?",
-        "How is project transparency ensured?",
-        "What records must be maintained?",
-    ],
+    # PC-I related
     "pc-i": [
         "What are the components of PC-I?",
         "How to prepare a PC-I document?",
         "What is the approval process for PC-I?",
+        "What attachments are required for PC-I?",
+        "What is the difference between PC-I and PC-II?",
     ],
+    # PC-II related  
+    "pc-ii": [
+        "When is PC-II required?",
+        "What is the purpose of feasibility studies in PC-II?",
+        "What cost limits apply to PC-II?",
+        "How to submit PC-II for approval?",
+    ],
+    # PC-III related
+    "pc-iii": [
+        "What is PC-III used for?",
+        "How often should PC-III be submitted?",
+        "What information is included in PC-III?",
+        "Who reviews PC-III reports?",
+    ],
+    # PC-IV related
+    "pc-iv": [
+        "What is PC-IV?",
+        "When is PC-IV prepared?",
+        "What is project completion report?",
+        "What metrics are in PC-IV?",
+    ],
+    # PC-V related
+    "pc-v": [
+        "What is PC-V evaluation?",
+        "When is PC-V conducted?",
+        "What is post-completion evaluation?",
+        "How is project impact measured?",
+    ],
+    # Approval bodies
+    "ddwp": [
+        "What is the DDWP approval limit?",
+        "Who chairs the DDWP meeting?",
+        "What projects go to DDWP?",
+        "How is DDWP different from CDWP?",
+    ],
+    "cdwp": [
+        "What is the CDWP approval threshold?",
+        "Who are the members of CDWP?",
+        "What projects require CDWP approval?",
+        "How to submit projects to CDWP?",
+    ],
+    "ecnec": [
+        "What is the ECNEC approval limit?",
+        "Who chairs ECNEC meetings?",
+        "What projects go to ECNEC?",
+        "What is the ECNEC approval process?",
+    ],
+    # Numeric/financial queries
+    "numeric_query": [
+        "What are the threshold limits for CDWP?",
+        "What is the ECNEC approval limit?",
+        "What is the maximum DDWP approval limit?",
+        "How is project cost calculated?",
+    ],
+    # Definition queries
+    "definition_query": [
+        "What are the types of PC proformas?",
+        "What is the difference between PC-I and PC-II?",
+        "What is PSDP?",
+        "How is a project defined in the Manual?",
+    ],
+    # Comparison queries
+    "comparison_query": [
+        "What is the difference between DDWP and CDWP?",
+        "How does PC-I differ from PC-II?",
+        "What is the difference between federal and provincial projects?",
+        "How is ADP different from PSDP?",
+    ],
+    # Procedure queries
+    "procedure_query": [
+        "What are the stages of project approval?",
+        "What documents are required for PC-I?",
+        "How does project revision work?",
+        "What is the project cycle?",
+    ],
+    # Compliance queries
+    "compliance_query": [
+        "What are the audit requirements?",
+        "How is project transparency ensured?",
+        "What records must be maintained?",
+        "What are the PC-I format requirements?",
+    ],
+    # Monitoring queries
+    "monitoring_evaluation": [
+        "What are the project monitoring KPIs?",
+        "How is project progress tracked?",
+        "What is the role of M&E Division?",
+        "How often are projects reviewed?",
+    ],
+    # Budget/PSDP
+    "budget": [
+        "What is PSDP?",
+        "How are funds allocated to projects?",
+        "What is the budget release process?",
+        "How is project cost overrun handled?",
+    ],
+    # General
     "general": [
         "What is the role of Planning Commission?",
         "What is PSDP?",
         "How are federal projects approved?",
         "What is project monitoring?",
+        "What is the project approval hierarchy?",
     ],
 }
 
@@ -269,9 +350,31 @@ def get_suggested_questions(query_class: str, query: str = "") -> List[str]:
     
     # Check if query mentions specific topics
     q_lower = query.lower()
+    pool = []
     
-    if "pc-i" in q_lower or "pc1" in q_lower:
+    # v2.5.0-patch1: Better topic detection
+    if "pc-i" in q_lower or "pc1" in q_lower or "pc 1" in q_lower:
         pool = FOLLOW_UP_QUESTIONS.get("pc-i", [])
+    elif "pc-ii" in q_lower or "pc2" in q_lower or "pc 2" in q_lower:
+        pool = FOLLOW_UP_QUESTIONS.get("pc-ii", [])
+    elif "pc-iii" in q_lower or "pc3" in q_lower or "pc 3" in q_lower:
+        pool = FOLLOW_UP_QUESTIONS.get("pc-iii", [])
+    elif "pc-iv" in q_lower or "pc4" in q_lower or "pc 4" in q_lower:
+        pool = FOLLOW_UP_QUESTIONS.get("pc-iv", [])
+    elif "pc-v" in q_lower or "pc5" in q_lower or "pc 5" in q_lower:
+        pool = FOLLOW_UP_QUESTIONS.get("pc-v", [])
+    elif "ddwp" in q_lower:
+        pool = FOLLOW_UP_QUESTIONS.get("ddwp", [])
+    elif "cdwp" in q_lower:
+        pool = FOLLOW_UP_QUESTIONS.get("cdwp", [])
+    elif "ecnec" in q_lower or "nec" in q_lower:
+        pool = FOLLOW_UP_QUESTIONS.get("ecnec", [])
+    elif "psdp" in q_lower or "budget" in q_lower or "fund" in q_lower:
+        pool = FOLLOW_UP_QUESTIONS.get("budget", [])
+    elif "monitor" in q_lower or "evaluation" in q_lower or "m&e" in q_lower:
+        pool = FOLLOW_UP_QUESTIONS.get("monitoring_evaluation", [])
+    elif "differ" in q_lower or "compare" in q_lower or "vs" in q_lower:
+        pool = FOLLOW_UP_QUESTIONS.get("comparison_query", [])
     elif query_class in FOLLOW_UP_QUESTIONS:
         pool = FOLLOW_UP_QUESTIONS[query_class]
     else:
@@ -303,21 +406,45 @@ def generate_contextual_followups(query: str, answer: str, query_class: str) -> 
     q_lower = query.lower()
     a_lower = answer.lower()
     
-    # Extract key terms from answer for contextual suggestions
-    if "pc-i" in a_lower:
+    # v2.5.0-patch1: Enhanced contextual suggestions
+    # PC proformas
+    if "pc-i" in a_lower and "pc-i" not in q_lower:
         followups.append("What are the mandatory sections of PC-I?")
-    if "ddwp" in a_lower:
+    if "pc-ii" in a_lower and "pc-ii" not in q_lower:
+        followups.append("When is PC-II required?")
+    if "pc-iii" in a_lower and "pc-iii" not in q_lower:
+        followups.append("What is PC-III used for?")
+    if "pc-iv" in a_lower and "pc-iv" not in q_lower:
+        followups.append("What is the purpose of PC-IV?")
+    if "pc-v" in a_lower and "pc-v" not in q_lower:
+        followups.append("When is PC-V evaluation conducted?")
+    
+    # Approval bodies
+    if "ddwp" in a_lower and "ddwp" not in q_lower:
         followups.append("What is the DDWP approval threshold?")
-    if "cdwp" in a_lower:
+    if "cdwp" in a_lower and "cdwp" not in q_lower:
         followups.append("What projects go to CDWP?")
-    if "ecnec" in a_lower:
+    if "ecnec" in a_lower and "ecnec" not in q_lower:
         followups.append("What is the ECNEC approval limit?")
-    if "approval" in a_lower:
+    
+    # Financial/process topics
+    if ("approval" in a_lower or "approved" in a_lower) and "approval" not in q_lower:
         followups.append("What is the project approval hierarchy?")
-    if "cost" in a_lower or "budget" in a_lower:
+    if ("cost" in a_lower or "budget" in a_lower) and "cost" not in q_lower:
         followups.append("How is project cost estimated?")
-    if "monitoring" in a_lower:
+    if "monitoring" in a_lower and "monitoring" not in q_lower:
         followups.append("What are the project monitoring KPIs?")
+    if "psdp" in a_lower and "psdp" not in q_lower:
+        followups.append("How are PSDP funds allocated?")
+    if "revision" in a_lower and "revision" not in q_lower:
+        followups.append("What is the project revision process?")
+    
+    # For comparison queries, suggest related comparisons
+    if query_class == "comparison_query":
+        if "ddwp" in q_lower or "cdwp" in q_lower:
+            followups.append("What is the difference between CDWP and ECNEC?")
+        if "pc-i" in q_lower or "pc-ii" in q_lower:
+            followups.append("What are the different PC proformas?")
     
     # Fill remaining slots with topic-based suggestions
     if len(followups) < 3:
@@ -329,6 +456,35 @@ def generate_contextual_followups(query: str, answer: str, query_class: str) -> 
                 break
     
     return followups[:3]
+
+
+# v2.5.0-patch1: Long answer handling
+MAX_ANSWER_WORDS = 250  # If answer exceeds this, suggest manual reference
+
+def handle_long_answer(answer: str, sources: List[Dict], query: str) -> str:
+    """
+    Check if answer is too long and add page reference suggestion.
+    
+    Args:
+        answer: The generated answer
+        sources: List of source dictionaries with page info
+        query: Original user query
+        
+    Returns:
+        Modified answer with page reference if too long
+    """
+    word_count = len(answer.split())
+    
+    if word_count > MAX_ANSWER_WORDS:
+        # Get unique page numbers from sources
+        pages = list(set(str(s.get('page', '?')) for s in sources if s.get('page')))
+        pages_str = ", ".join(sorted(pages)) if pages else "the relevant sections"
+        
+        # Add a note about detailed information
+        truncation_note = f"\n\n📖 **Note:** This is a summary. For detailed information, please refer to **pages {pages_str}** in the Manual for Development Projects 2024."
+        answer += truncation_note
+    
+    return answer
 
 
 @app.route('/chat', methods=['POST'])
@@ -519,6 +675,9 @@ def chat():
                     answer = answer[len(prefix):].strip()
         
         final_answer = answer or "I couldn't generate a response. Please try again."
+        
+        # v2.5.0-patch1: Handle long answers by adding page reference
+        final_answer = handle_long_answer(final_answer, sources, query)
         
         # Add bot response to memory
         add_to_session_history(session_id, "bot", final_answer)

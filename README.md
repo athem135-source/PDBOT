@@ -10,7 +10,7 @@
 
 ---
 
-![Version](https://img.shields.io/badge/Version-2.4.9-006600?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-2.5.0-006600?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![React](https://img.shields.io/badge/React-18.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![Qdrant](https://img.shields.io/badge/Qdrant-Vector_DB-DC382D?style=for-the-badge)
@@ -55,11 +55,11 @@
 
 PDBOT is an **enterprise-grade Retrieval-Augmented Generation (RAG) system** developed to provide instant, accurate, and verifiable responses regarding the **Manual for Development Projects 2024** issued by the Government of Pakistan's Ministry of Planning, Development & Special Initiatives.
 
-### 🏆 Key Achievements (v2.4.9)
+### 🏆 Key Achievements (v2.5.0)
 
 ```
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║                         PDBOT PERFORMANCE DASHBOARD v2.4.9                    ║
+║                         PDBOT PERFORMANCE DASHBOARD v2.5.0                    ║
 ╠══════════════════════════════════════════════════════════════════════════════╣
 ║                                                                               ║
 ║   📊 ACCURACY METRICS (Test 37)              🚀 SYSTEM PERFORMANCE           ║
@@ -172,30 +172,31 @@ Type **`nufc`** in the mobile chat to access the Admin Panel with:
 | **📄 Source Citations** | Every answer includes page reference | 100% |
 | **🚫 Zero Hallucinations** | Strict retrieval-based, no fabrication | 100% |
 
-### 🛡️ Safety Classification System
+### 🛡️ Safety Classification System (14 Classes)
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│                        PDBOT 12-CLASS QUERY CLASSIFIER                        │
+│                        PDBOT 14-CLASS QUERY CLASSIFIER                        │
 ├──────────────────────────────────────────────────────────────────────────────┤
 │                                                                               │
-│  ✅ numeric_query       → "What is DDWP limit?" → Answer with Rs. value      │
-│  ✅ definition_query    → "What is PC-I?" → Definition + citation            │
-│  ✅ procedure_query     → "How does revision work?" → Step-by-step           │
-│  ✅ approval_query      → "Who approves 10B projects?" → ECNEC               │
-│  ✅ timeline_query      → "Deadline for PC-I?" → 31st March                  │
-│  ✅ compliance_query    → "M&E requirements?" → From Manual                  │
-│  ❌ off_scope           → "Weather in Islamabad?" → Politely declined        │
-│  🚫 red_line_bribery    → "How to pay speed money?" → BLOCKED                │
-│  🚫 red_line_corruption → "Bypass ECNEC?" → BLOCKED                          │
-│  🚫 red_line_misuse     → "Buy Prados from funds?" → BLOCKED                 │
-│  🔞 sexual_content      → Explicit queries → BLOCKED                         │
-│  🤬 abusive_language    → Insults/abuse → Politely redirected                │
+│  👋 greeting           → "Hello", "Thanks", "Ok" → Friendly response (NO RAG)│
+│  ❓ ambiguous          → "Help", "Tell me" → Clarification prompt            │
+│  ✅ numeric_query      → "What is DDWP limit?" → Answer with Rs. value       │
+│  ✅ definition_query   → "What is PC-I?" → Definition + citation             │
+│  ✅ comparison_query   → "Diff between DDWP and CDWP?" → Side-by-side        │
+│  ✅ procedure_query    → "How does revision work?" → Step-by-step            │
+│  ✅ timeline_query     → "Deadline for PC-I?" → 31st March                   │
+│  ✅ compliance_query   → "M&E requirements?" → From Manual                   │
+│  ❌ off_scope          → "Weather in Islamabad?" → Politely declined         │
+│  🚫 red_line_bribery   → "How to pay speed money?" → BLOCKED                 │
+│  🚫 red_line_misuse    → "Buy Prados from funds?" → BLOCKED                  │
+│  🔞 sexual_content     → Explicit queries → BLOCKED                          │
+│  🤬 abusive_language   → Insults/abuse → Politely redirected                 │
 │                                                                               │
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 🚫 Content Filter (v2.4.9-patch2)
+### 🚫 Content Filter (v2.5.0)
 
 PDBOT includes a comprehensive profanity and inappropriate content filter that blocks:
 
@@ -221,7 +222,7 @@ PDBOT includes a comprehensive profanity and inappropriate content filter that b
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                        PDBOT v2.4.9 ARCHITECTURE                             │
+│                        PDBOT v2.5.0 ARCHITECTURE                             │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
 │    👤 USER (Browser/Mobile)                                                  │
@@ -238,7 +239,7 @@ PDBOT includes a comprehensive profanity and inappropriate content filter that b
 │         ▼                                ▼                        ▼         │
 │  ┌──────────────────┐     ┌─────────────────────┐     ┌─────────────────┐  │
 │  │  🧠 Classifier   │     │  🔍 RAG Pipeline    │     │  💾 Memory      │  │
-│  │  (12-Class)      │     │  + query_points()   │     │  (Per Session)  │  │
+│  │  (14-Class)      │     │  + query_points()   │     │  (Per Session)  │  │
 │  │  + Safety Filter │     │  + Numeric Boost    │     └─────────────────┘  │
 │  └──────────────────┘     └─────────┬───────────┘                          │
 │                                     │                                       │
@@ -428,22 +429,35 @@ PDBOT includes a comprehensive profanity and inappropriate content filter that b
 
 ---
 
-## 🆕 What's New in v2.4.9
+## 🆕 What's New in v2.5.0
 
-### 📱 Mobile Access (NEW!)
-- **Cloudflare Tunnel:** Access PDBOT from any device, anywhere
-- **Mobile-friendly UI:** Clean, responsive chat interface
-- **External URLs:** Share with anyone on any network
-- **start_tunnel.ps1/bat:** One-click tunnel startup
+### 🎯 Smart Query Handling
+- **Greeting Detection:** "Hello", "Hi", "Ok thanks", "Bye" now return friendly responses WITHOUT triggering RAG
+- **Ambiguous Query Detection:** Vague queries like "help", "tell me" return clarification prompts
+- **Comparison Queries:** "Difference between X and Y" queries now properly classified and answered
+- **ChatGPT-style Suggestions:** Every response includes 3 contextual follow-up questions
 
-### 🔧 Stability Fixes
-- **Auto-install:** `qdrant-client` and `waitress` installed on every startup
-- **Version Sync:** All version strings synchronized to v2.4.9
-- **Permanent fix:** No more "module not found" errors
+### 📱 Mobile Site Enhancements
+- **Sources Panel:** Clickable page references in mobile view
+- **Passages Panel:** View supporting text excerpts
+- **Download Feature:** Download answers as .txt files
+- **Suggestion Buttons:** Tap to ask follow-up questions
 
-### Previous (v2.4.8)
-- **Qdrant API:** Fixed `client.search()` → `client.query_points()` for v1.12+
-- **Safety:** Sexual content filter, Urdu abuse detection
+### 📊 Statistics Dashboard
+- **Real-time Monitoring:** `run_stats.bat` for live server stats
+- **Session Tracking:** View active sessions, message counts
+- **Feedback Stats:** See rating distribution
+- **Service Status:** Qdrant, Ollama, Model status at a glance
+- **Menu Option [4]:** Added to `start_pdbot.bat`
+
+### 🔧 Long Answer Handling
+- Automatically detects long responses
+- Adds page references for detailed reading
+- Keeps responses focused and actionable
+
+### Previous (v2.4.9)
+- **Mobile Access:** Cloudflare Tunnel for external access
+- **Auto-install:** Dependencies installed on startup
 
 ---
 
@@ -453,13 +467,14 @@ PDBOT includes a comprehensive profanity and inappropriate content filter that b
   OCT 2025                          NOV 2025                      DEC 2025
   ────────                          ────────                      ────────
   Oct 16: Project Start             Nov 5: v2.0 Reranker          Dec 1: v2.2 Widget
-  Oct 25: v1.0 Release              Nov 12: v2.1 Numeric          Dec 2: v2.4.9 ← NOW
+  Oct 25: v1.0 Release              Nov 12: v2.1 Numeric          Dec 3: v2.5.0 ← NOW
   Oct 31: v1.1 Classifier           Nov 20: Bug Fixes             
                                                                    
-  UPCOMING                                                         
-  ────────                                                         
-  Dec 15: v2.5 Multi-Document                                      
-  Jan 26: v3.0 Production                                          
+  UPCOMING (Future Releases)                                       
+  ─────────────────────────                                        
+  • Multi-Document Support (Coming Soon)                           
+  • Urdu Language Support (Coming Soon)                            
+  • Production Deployment (Planned)                                
 ```
 
 ---
@@ -468,8 +483,8 @@ PDBOT includes a comprehensive profanity and inappropriate content filter that b
 
 | Limitation | Status |
 |------------|--------|
-| Single Document Only | Multi-doc planned v2.5 |
-| English Only | Urdu planned |
+| Single Document Only | Multi-doc coming soon |
+| English Only | Urdu support coming soon |
 | Requires Ollama | Groq fallback exists |
 
 ```
@@ -493,7 +508,7 @@ PDBOT includes a comprehensive profanity and inappropriate content filter that b
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0077B5?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/hassanarifafridi/)
 [![GitHub](https://img.shields.io/badge/GitHub-Follow-181717?style=for-the-badge&logo=github)](https://github.com/athem135-source)
 
-**Project:** Oct 16, 2025 → Present (47 Days)  
+**Project:** Oct 16, 2025 → Present (49 Days)  
 **Tests:** 37 Sessions | 400+ Queries
 
 </div>
@@ -518,7 +533,7 @@ Permitted: Evaluation, Academic Research, GoP Internal Use (with approval)
 
 ## 🇵🇰
 
-**PDBOT v2.4.9** | Built with ❤️ for Pakistan
+**PDBOT v2.5.0** | Built with ❤️ for Pakistan
 
 **37 Tests | 400+ Queries | 95% Accuracy | 100% Safety**
 

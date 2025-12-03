@@ -1,8 +1,9 @@
 # ============================================================================
-# PDBOT Statistics Dashboard v2.5.0
+# PDBOT Statistics Dashboard v2.5.0-patch1
 # ============================================================================
 # Displays real-time statistics about the PDBOT server
 # Run: .\stats_dashboard.ps1
+# Run with watch mode: .\stats_dashboard.ps1 -Watch
 # ============================================================================
 
 param(
@@ -17,7 +18,7 @@ function Show-Banner {
     Clear-Host
     Write-Host ""
     Write-Host "  ╔══════════════════════════════════════════════════════════╗" -ForegroundColor Green
-    Write-Host "  ║        PDBOT Statistics Dashboard v2.5.0                ║" -ForegroundColor Green
+    Write-Host "  ║        PDBOT Statistics Dashboard v2.5.0-patch1         ║" -ForegroundColor Green
     Write-Host "  ║        Planning & Development Bot Monitor               ║" -ForegroundColor Green
     Write-Host "  ╚══════════════════════════════════════════════════════════╝" -ForegroundColor Green
     Write-Host ""

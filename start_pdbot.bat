@@ -1,6 +1,6 @@
 @echo off
 REM ============================================
-REM PDBOT Unified Launcher v2.4.9
+REM PDBOT Unified Launcher v2.5.0
 REM Developer: M. Hassan Arif Afridi
 REM ============================================
 
@@ -19,7 +19,7 @@ if exist ".venv\Scripts\activate.bat" (
 cls
 echo.
 echo  ========================================
-echo      PDBOT v2.4.9 - Unified Launcher
+echo      PDBOT v2.5.0 - Unified Launcher
 echo      Developer: M. Hassan Arif Afridi
 echo      Planning ^& Development Assistant
 echo  ========================================
@@ -36,20 +36,37 @@ echo.
 echo   [3] Start Qdrant Only
 echo       - Vector database server
 echo.
+echo   [4] Statistics Dashboard
+echo       - Real-time server monitoring
+echo       - Session/feedback stats
+echo.
 echo   [0] Exit
 echo.
 echo  ========================================
 echo.
 
-set /p choice="Enter your choice (0-3): "
+set /p choice="Enter your choice (0-4): "
 
 if "%choice%"=="1" goto widget
 if "%choice%"=="2" goto streamlit
 if "%choice%"=="3" goto qdrant
+if "%choice%"=="4" goto stats
 if "%choice%"=="0" goto end
 
 echo Invalid choice. Please try again.
 timeout /t 2 >nul
+goto menu
+
+:stats
+cls
+echo.
+echo  ========================================
+echo   Starting Statistics Dashboard...
+echo  ========================================
+echo.
+echo   Make sure the PDBOT server is running!
+echo.
+powershell -ExecutionPolicy Bypass -File ".\stats_dashboard.ps1" -Watch
 goto menu
 
 :qdrant
