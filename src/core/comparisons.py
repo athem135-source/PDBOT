@@ -1,4 +1,4 @@
-﻿"""
+"""
 Comparison Response Templates for PDBot v2.5.0-patch2
 """
 
@@ -61,9 +61,36 @@ COMPARISON_RESPONSES = {
 }
 
 
+
+# v2.5.0-patch3: Approval Limits Table (for numeric queries)
+APPROVAL_LIMITS_TABLE = '''**Project Approval Limits by Forum**
+
+| Forum | Full Name | Approval Limit |
+|-------|-----------|----------------|
+| **DDWP** | District Development Working Party | Up to Rs. 75 million |
+| **PDWP** | Provincial Development Working Party | Up to Rs. 2,000 million (Rs. 2 billion) |
+| **CDWP** | Central Development Working Party | Rs. 2,000 - 10,000 million (Rs. 2-10 billion) |
+| **ECNEC** | Executive Committee of NEC | Above Rs. 10,000 million (Rs. 10 billion) |
+
+**Notes:**
+- Projects within provincial limits go to PDWP/DDWP
+- Federal projects between Rs. 2-10 billion go to CDWP
+- Mega projects above Rs. 10 billion require ECNEC approval
+
+*Source: Manual for Development Projects 2024*'''
 def get_comparison_response(query):
     """Check if query matches a known comparison."""
     q_lower = query.lower()
+
+    # v2.5.0-patch3: Check for approval limits query
+    if any(kw in q_lower for kw in ['approval limit', 'threshold', 'limits for']):
+        return APPROVAL_LIMITS_TABLE
+
+
+    # v2.5.0-patch3: Check for approval limits query
+    if any(kw in q_lower for kw in ['approval limit', 'threshold', 'limits for']):
+        return APPROVAL_LIMITS_TABLE
+
     
     if all(term in q_lower for term in ["ddwp", "cdwp", "ecnec"]):
         return COMPARISON_RESPONSES["ddwp_cdwp_ecnec"]

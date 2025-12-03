@@ -441,7 +441,7 @@ def generate_contextual_followups(query: str, answer: str, query_class: str) -> 
         followups.append("What is the project revision process?")
     
     # For comparison queries, suggest related comparisons
-    if query_class == "comparison_query":
+    if query_class in ["comparison_query", "numeric_query", "definition_query"]:
         if "ddwp" in q_lower or "cdwp" in q_lower:
             followups.append("What is the difference between CDWP and ECNEC?")
         if "pc-i" in q_lower or "pc-ii" in q_lower:
@@ -564,7 +564,7 @@ def chat():
         # =====================================================
         # STEP 2: CHECK FOR COMPARISON QUERY (use pre-built templates)
         # =====================================================
-        if query_class == "comparison_query":
+        if query_class in ["comparison_query", "numeric_query", "definition_query"]:
             comparison_response = get_comparison_response(query)
             if comparison_response:
                 add_to_session_history(session_id, "user", query)
