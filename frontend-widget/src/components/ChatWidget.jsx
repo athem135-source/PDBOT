@@ -513,16 +513,7 @@ function ChatWidget() {
             <>
               {/* Messages area */}
               <div className="pdbot-messages">
-                {/* Suggested questions - show defaults at start, or dynamic after responses */}
-                {(messages.length <= 1 || suggestedQuestions.length > 0) && !isLoading && (
-                  <SuggestedQuestions
-                    questions={suggestedQuestions.length > 0 ? suggestedQuestions : undefined}
-                    onSelect={handleSuggestedClick}
-                    disabled={isLoading}
-                  />
-                )}
-                
-                {/* Message bubbles */}
+                {/* Message bubbles first */}
                 {messages.map((msg) => (
                   <ChatBubble
                     key={msg.id}
@@ -536,6 +527,16 @@ function ChatWidget() {
                 
                 {/* Typing indicator */}
                 {isLoading && <TypingIndicator />}
+
+                {/* Suggested questions - show AFTER messages */}
+                {(messages.length <= 1 || suggestedQuestions.length > 0) && !isLoading && (
+                  <SuggestedQuestions
+                    questions={suggestedQuestions.length > 0 ? suggestedQuestions : undefined}
+                    onSelect={handleSuggestedClick}
+                    disabled={isLoading}
+                  />
+                )}
+                
                 
                 {/* Scroll anchor */}
                 <div ref={messagesEndRef} />
