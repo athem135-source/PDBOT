@@ -242,6 +242,125 @@
             background: #e8f5e9;
         }
         
+        /* Message Actions & Sources */
+        .message-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-radius: 15px;
+            background: white;
+            color: #666;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .action-btn:hover {
+            background: #e8f5e9;
+            border-color: #006600;
+            color: #006600;
+        }
+        
+        .action-btn.active {
+            background: #006600;
+            color: white;
+            border-color: #006600;
+        }
+        
+        .sources-panel, .passages-panel {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            font-size: 0.85rem;
+        }
+        
+        .sources-panel.show, .passages-panel.show {
+            display: block;
+        }
+        
+        .source-item {
+            padding: 8px;
+            margin-bottom: 5px;
+            background: white;
+            border-radius: 5px;
+            border-left: 3px solid #006600;
+        }
+        
+        .source-item .page {
+            font-weight: bold;
+            color: #006600;
+        }
+        
+        .source-item .relevance {
+            font-size: 0.75rem;
+            color: #888;
+        }
+        
+        .passage-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 5px;
+            border-left: 3px solid #ff9800;
+        }
+        
+        .passage-item .text {
+            font-style: italic;
+            color: #333;
+            line-height: 1.5;
+        }
+        
+        .passage-item .meta {
+            margin-top: 5px;
+            font-size: 0.75rem;
+            color: #888;
+        }
+        
+        /* Suggested Questions */
+        .suggested-questions {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px dashed #ddd;
+        }
+        
+        .suggested-questions .label {
+            font-size: 0.75rem;
+            color: #888;
+            margin-bottom: 8px;
+        }
+        
+        .suggestion-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 10px;
+            color: #006600;
+            font-size: 0.85rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .suggestion-btn:hover {
+            background: #006600;
+            color: white;
+        }
+        
+        .suggestion-btn::before {
+            content: "→ ";
+        }
+        
         /* Admin Panel Styles */
         .admin-panel {
             display: none;
@@ -435,19 +554,125 @@
             sendMessage();
         }
         
-        function addMessage(content, type) {
+        function addMessage(content, type, data = {}) {
             const messages = document.getElementById('messages');
             
             // Remove welcome message if exists
             const welcome = messages.querySelector('.welcome');
             if (welcome) welcome.remove();
             
+            const msgId = 'msg_' + Date.now();
             const msg = document.createElement('div');
             msg.className = `message ${type}`;
-            msg.innerHTML = content;
+            msg.id = msgId;
+            
+            // Main content
+            let html = `<div class="message-content">${content}</div>`;
+            
+            // Add actions for bot messages with sources/passages
+            if (type === 'bot' && (data.sources?.length > 0 || data.passages?.length > 0)) {
+                html += `
+                <div class="message-actions">
+                    ${data.sources?.length > 0 ? `<button class="action-btn" onclick="toggleSources('${msgId}')">📚 Sources (${data.sources.length})</button>` : ''}
+                    ${data.passages?.length > 0 ? `<button class="action-btn" onclick="togglePassages('${msgId}')">📄 Passages (${data.passages.length})</button>` : ''}
+                    <button class="action-btn" onclick="downloadAnswer('${msgId}')">⬇️ Download</button>
+                </div>`;
+                
+                // Sources panel
+                if (data.sources?.length > 0) {
+                    html += `<div class="sources-panel" id="sources_${msgId}">`;
+                    data.sources.forEach((s, i) => {
+                        html += `<div class="source-item">
+                            <span class="page">📖 Page ${s.page || '?'}</span>
+                            ${s.relevance ? `<span class="relevance"> | Relevance: ${s.relevance}%</span>` : ''}
+                            ${s.paragraph ? `<span class="meta"> | Para ${s.paragraph}, Line ${s.line || '?'}</span>` : ''}
+                        </div>`;
+                    });
+                    html += '</div>';
+                }
+                
+                // Passages panel
+                if (data.passages?.length > 0) {
+                    html += `<div class="passages-panel" id="passages_${msgId}">`;
+                    data.passages.forEach((p, i) => {
+                        html += `<div class="passage-item">
+                            <div class="text">"${(p.text || '').substring(0, 300)}${p.text?.length > 300 ? '...' : ''}"</div>
+                            <div class="meta">📖 Page ${p.page || '?'} ${p.relevance ? `| Relevance: ${p.relevance}%` : ''}</div>
+                        </div>`;
+                    });
+                    html += '</div>';
+                }
+            }
+            
+            // Add suggested questions for bot messages
+            if (type === 'bot' && data.suggested_questions?.length > 0) {
+                html += `
+                <div class="suggested-questions">
+                    <div class="label">💡 Related questions you might ask:</div>
+                    ${data.suggested_questions.map(q => 
+                        `<button class="suggestion-btn" onclick="askQuestion('${q.replace(/'/g, "\\'")}')">${q}</button>`
+                    ).join('')}
+                </div>`;
+            }
+            
+            msg.innerHTML = html;
+            
+            // Store data for download
+            msg.dataset.query = data.query || '';
+            msg.dataset.answer = content;
+            msg.dataset.sources = JSON.stringify(data.sources || []);
+            
             messages.appendChild(msg);
             messages.scrollTop = messages.scrollHeight;
             return msg;
+        }
+        
+        function toggleSources(msgId) {
+            const panel = document.getElementById('sources_' + msgId);
+            if (panel) {
+                panel.classList.toggle('show');
+            }
+        }
+        
+        function togglePassages(msgId) {
+            const panel = document.getElementById('passages_' + msgId);
+            if (panel) {
+                panel.classList.toggle('show');
+            }
+        }
+        
+        function downloadAnswer(msgId) {
+            const msg = document.getElementById(msgId);
+            if (!msg) return;
+            
+            const query = msg.dataset.query || 'Question';
+            const answer = msg.querySelector('.message-content')?.innerText || '';
+            const sources = JSON.parse(msg.dataset.sources || '[]');
+            
+            let content = `PDBOT Answer Export\n`;
+            content += `=${'='.repeat(50)}\n\n`;
+            content += `Question: ${query}\n\n`;
+            content += `Answer:\n${answer}\n\n`;
+            
+            if (sources.length > 0) {
+                content += `Sources:\n`;
+                sources.forEach((s, i) => {
+                    content += `  ${i+1}. Page ${s.page || '?'}`;
+                    if (s.relevance) content += ` (Relevance: ${s.relevance}%)`;
+                    content += '\n';
+                });
+            }
+            
+            content += `\n---\nExported: ${new Date().toLocaleString()}\n`;
+            content += `Source: Manual for Development Projects 2024\n`;
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `pdbot_answer_${Date.now()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
         }
         
         function showTyping() {
@@ -492,18 +717,25 @@
                 typingMsg.remove();
                 
                 if (data.error) {
-                    addMessage(`Error: ${data.error}`, 'bot error');
+                    addMessage(`Error: ${data.error}`, 'bot error', {});
                 } else {
                     // Format the response with markdown-like styling
                     let answer = data.answer || data.response || 'No response';
                     answer = answer
                         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                         .replace(/\n/g, '<br>');
-                    addMessage(answer, 'bot');
+                    
+                    // Pass all data including sources, passages, suggestions
+                    addMessage(answer, 'bot', {
+                        query: query,
+                        sources: data.sources || [],
+                        passages: data.passages || [],
+                        suggested_questions: data.suggested_questions || []
+                    });
                 }
             } catch (e) {
                 typingMsg.remove();
-                addMessage(`Connection error: ${e.message}`, 'bot error');
+                addMessage(`Connection error: ${e.message}`, 'bot error', {});
             }
             
             sendBtn.disabled = false;

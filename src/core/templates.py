@@ -1,11 +1,67 @@
 """
-Static Response Templates for PDBot v2.1.0
+Static Response Templates for PDBot v2.5.0
 ==========================================
-Pre-defined responses for red-line, off-scope, and abuse queries.
+Pre-defined responses for red-line, off-scope, abuse, greeting, and ambiguous queries.
 These BYPASS RAG completely to avoid context pollution.
 """
 
 from typing import Optional
+import random
+
+# ============================================================================
+# GREETING RESPONSES (No RAG, no citations)
+# ============================================================================
+
+GREETING_RESPONSES = [
+    "Assalam-o-Alaikum! I'm PDBOT, your assistant for the Manual for Development Projects 2024. How can I help you today?",
+    "Hello! I'm here to help with questions about Pakistan's development project procedures. What would you like to know?",
+    "Hi there! Ask me anything about PC-I, approval processes, or the Manual for Development Projects 2024.",
+    "Welcome! I specialize in Pakistan's planning and development procedures. What can I assist you with?",
+]
+
+THANKS_RESPONSES = [
+    "You're welcome! Feel free to ask if you have more questions about development projects.",
+    "Happy to help! Let me know if you need anything else.",
+    "Anytime! Is there anything else about the Manual you'd like to know?",
+]
+
+GOODBYE_RESPONSES = [
+    "Goodbye! Come back if you have more questions about development projects. Allah Hafiz!",
+    "Take care! Feel free to return anytime for assistance. Khuda Hafiz!",
+]
+
+# ============================================================================
+# CLARIFICATION RESPONSES (Vague queries - need more detail)
+# ============================================================================
+
+CLARIFICATION_RESPONSES = [
+    """I'd be happy to help, but I need a bit more detail about your question.
+
+Could you please specify what you'd like to know? For example:
+• **PC-I requirements** - "What documents are needed for PC-I?"
+• **Approval limits** - "What is the DDWP approval limit?"
+• **Processes** - "How does project revision work?"
+• **Definitions** - "What is ECNEC?"
+
+What specifically would you like to know?""",
+
+    """Your question is a bit vague. To give you accurate information, could you clarify:
+
+• Are you asking about a **specific proforma** (PC-I, II, III, IV, V)?
+• Do you need information about **approval limits** or **processes**?
+• Are you looking for a **definition** or **procedure**?
+
+Please provide more details so I can assist you better.""",
+
+    """I want to make sure I answer correctly! Could you be more specific?
+
+Try asking something like:
+• "What is the purpose of PC-I?"
+• "What is the ECNEC approval threshold?"
+• "How do I submit a project for CDWP approval?"
+
+What exactly would you like to know?"""
+]
 
 # ============================================================================
 # RED-LINE RESPONSES (Bribery, Corruption, Misuse)
@@ -156,18 +212,52 @@ def get_abuse_response(subcategory: str = "hard") -> str:
         return ABUSE_HARD_RESPONSE
 
 
-def get_guardrail_response(classification_class: str, subcategory: Optional[str] = None) -> str:
+def get_greeting_response(query: str = "") -> str:
     """
-    v2.1.0: Unified guardrail response generator.
+    Get appropriate greeting response.
     
     Args:
-        classification_class: "off_scope", "red_line", or "abusive"
+        query: Original query to detect thanks/goodbye
+        
+    Returns:
+        Random greeting response (no RAG, no citations)
+    """
+    q_lower = query.lower()
+    if any(w in q_lower for w in ["thank", "thx", "ty"]):
+        return random.choice(THANKS_RESPONSES)
+    elif any(w in q_lower for w in ["bye", "goodbye", "see you", "take care"]):
+        return random.choice(GOODBYE_RESPONSES)
+    else:
+        return random.choice(GREETING_RESPONSES)
+
+
+def get_clarification_response() -> str:
+    """
+    Get a response asking for clarification on vague queries.
+    
+    Returns:
+        Random clarification prompt (no RAG, no citations)
+    """
+    return random.choice(CLARIFICATION_RESPONSES)
+
+
+def get_guardrail_response(classification_class: str, subcategory: Optional[str] = None, query: str = "") -> str:
+    """
+    v2.5.0: Unified guardrail response generator.
+    
+    Args:
+        classification_class: "off_scope", "red_line", "abusive", "greeting", or "ambiguous"
         subcategory: Optional subcategory for specific response
+        query: Original query (used for greeting detection)
         
     Returns:
         Static response string (no RAG, no citations)
     """
-    if classification_class == "red_line":
+    if classification_class == "greeting":
+        return get_greeting_response(query)
+    elif classification_class == "ambiguous":
+        return get_clarification_response()
+    elif classification_class == "red_line":
         return get_redline_response(subcategory or "generic")
     elif classification_class == "abusive":
         if subcategory == "soft_banter":

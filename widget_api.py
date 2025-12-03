@@ -1,6 +1,6 @@
 """
-PDBOT Widget API Server
-=======================
+PDBOT Widget API Server v2.5.0
+==============================
 
 A lightweight Flask API that bridges the React widget to the PDBOT RAG pipeline.
 This is the primary frontend API (Streamlit is now legacy).
@@ -8,10 +8,13 @@ This is the primary frontend API (Streamlit is now legacy).
 Features:
   - Contextual memory (session-based chat history)
   - RAG-powered responses from Manual for Development Projects 2024
-  - Multi-class query classification (off-scope, red-line, abusive detection)
+  - Multi-class query classification (greeting, ambiguous, off-scope, red-line, abusive)
+  - Suggested follow-up questions (ChatGPT-style)
+  - Clarification prompts for vague queries
   - Source and passage tracking
   - Feedback collection
   - Admin status endpoint
+  - Statistics dashboard endpoint
   - Production WSGI server (waitress)
   - Localtunnel for mobile access
 
@@ -22,9 +25,10 @@ Endpoints:
   POST /memory/clear - Clear session memory
   GET  /health - Health check
   GET  /admin/status - Backend status for admin panel
+  GET  /admin/statistics - Detailed usage statistics
 
 @author M. Hassan Arif Afridi
-@version 2.4.9
+@version 2.5.0
 """
 
 import os
@@ -197,6 +201,136 @@ def clear_session_memory(session_id: str):
     if session_id in session_memory:
         del session_memory[session_id]
 
+
+# =====================================================
+# SUGGESTED FOLLOW-UP QUESTIONS (ChatGPT-style)
+# =====================================================
+
+# Topic-based question suggestions
+FOLLOW_UP_QUESTIONS = {
+    "greeting": [
+        "What is PC-I?",
+        "What are the DDWP approval limits?",
+        "How does project approval work?",
+        "What is ECNEC?",
+    ],
+    "ambiguous": [
+        "What is the purpose of PC-I?",
+        "What is the approval hierarchy for projects?",
+        "What are the different project phases?",
+        "How is project cost estimated?",
+    ],
+    "numeric_query": [
+        "What are the threshold limits for CDWP?",
+        "How is project cost calculated?",
+        "What is the maximum DDWP approval limit?",
+    ],
+    "definition_query": [
+        "What are the types of PC proformas?",
+        "What is the difference between PC-I and PC-II?",
+        "How is a project defined in the Manual?",
+    ],
+    "procedure_query": [
+        "What are the stages of project approval?",
+        "What documents are required for PC-I?",
+        "How does project revision work?",
+    ],
+    "compliance_query": [
+        "What are the audit requirements?",
+        "How is project transparency ensured?",
+        "What records must be maintained?",
+    ],
+    "pc-i": [
+        "What are the components of PC-I?",
+        "How to prepare a PC-I document?",
+        "What is the approval process for PC-I?",
+    ],
+    "general": [
+        "What is the role of Planning Commission?",
+        "What is PSDP?",
+        "How are federal projects approved?",
+        "What is project monitoring?",
+    ],
+}
+
+
+def get_suggested_questions(query_class: str, query: str = "") -> List[str]:
+    """
+    Generate suggested follow-up questions based on query type.
+    
+    Args:
+        query_class: Classification result
+        query: Original query for context
+        
+    Returns:
+        List of 3 suggested questions
+    """
+    import random
+    
+    # Check if query mentions specific topics
+    q_lower = query.lower()
+    
+    if "pc-i" in q_lower or "pc1" in q_lower:
+        pool = FOLLOW_UP_QUESTIONS.get("pc-i", [])
+    elif query_class in FOLLOW_UP_QUESTIONS:
+        pool = FOLLOW_UP_QUESTIONS[query_class]
+    else:
+        pool = FOLLOW_UP_QUESTIONS.get("general", [])
+    
+    # Add some variety by mixing with general questions
+    general = FOLLOW_UP_QUESTIONS.get("general", [])
+    combined = list(set(pool + general))
+    
+    # Return 3 random questions, avoiding the current query
+    suggestions = [q for q in combined if q.lower() not in query.lower()]
+    random.shuffle(suggestions)
+    return suggestions[:3]
+
+
+def generate_contextual_followups(query: str, answer: str, query_class: str) -> List[str]:
+    """
+    Generate contextual follow-up questions based on the answer.
+    
+    Args:
+        query: Original user query
+        answer: Bot's response
+        query_class: Classification result
+        
+    Returns:
+        List of 3 contextual follow-up questions
+    """
+    followups = []
+    q_lower = query.lower()
+    a_lower = answer.lower()
+    
+    # Extract key terms from answer for contextual suggestions
+    if "pc-i" in a_lower:
+        followups.append("What are the mandatory sections of PC-I?")
+    if "ddwp" in a_lower:
+        followups.append("What is the DDWP approval threshold?")
+    if "cdwp" in a_lower:
+        followups.append("What projects go to CDWP?")
+    if "ecnec" in a_lower:
+        followups.append("What is the ECNEC approval limit?")
+    if "approval" in a_lower:
+        followups.append("What is the project approval hierarchy?")
+    if "cost" in a_lower or "budget" in a_lower:
+        followups.append("How is project cost estimated?")
+    if "monitoring" in a_lower:
+        followups.append("What are the project monitoring KPIs?")
+    
+    # Fill remaining slots with topic-based suggestions
+    if len(followups) < 3:
+        additional = get_suggested_questions(query_class, query)
+        for q in additional:
+            if q not in followups:
+                followups.append(q)
+            if len(followups) >= 3:
+                break
+    
+    return followups[:3]
+
+
 @app.route('/chat', methods=['POST'])
 def chat():
     """
@@ -254,9 +388,9 @@ def chat():
         
         print(f"[Widget API] Classification: {query_class}/{classification.subcategory}")
         
-        # Handle guardrail classes (off-scope, red-line, abusive)
-        if query_class in ["off_scope", "red_line", "abusive"]:
-            guardrail_response = get_guardrail_response(query_class, classification.subcategory or "")
+        # Handle guardrail classes (greeting, ambiguous, off-scope, red-line, abusive)
+        if query_class in ["greeting", "ambiguous", "off_scope", "red_line", "abusive"]:
+            guardrail_response = get_guardrail_response(query_class, classification.subcategory or "", query)
             add_to_session_history(session_id, "user", query)
             add_to_session_history(session_id, "bot", guardrail_response)
             
@@ -265,7 +399,8 @@ def chat():
                 'sources': [],
                 'passages': [],
                 'mode': 'guardrail',
-                'classification': query_class
+                'classification': query_class,
+                'suggested_questions': get_suggested_questions(query_class) if query_class in ["greeting", "ambiguous"] else []
             })
         
         # Get conversation context from memory
@@ -388,13 +523,17 @@ def chat():
         # Add bot response to memory
         add_to_session_history(session_id, "bot", final_answer)
         
+        # Generate contextual follow-up questions
+        suggested_questions = generate_contextual_followups(query, final_answer, query_class)
+        
         print(f"[Widget API] Response generated ({len(final_answer)} chars, mode: {response_mode})")
         
         return jsonify({
             'answer': final_answer,
             'sources': sources,
             'passages': passages,
-            'mode': response_mode
+            'mode': response_mode,
+            'suggested_questions': suggested_questions
         })
         
     except Exception as e:
@@ -527,8 +666,8 @@ def health():
     return jsonify({
         'status': 'ok',
         'service': 'PDBOT Widget API',
-        'version': '2.4.9',
-        'features': ['contextual_memory', 'rag_retrieval', 'feedback_collection', 'admin_panel']
+        'version': '2.5.0',
+        'features': ['contextual_memory', 'rag_retrieval', 'feedback_collection', 'admin_panel', 'suggested_questions', 'greeting_detection']
     })
 
 
@@ -575,7 +714,7 @@ def admin_status():
     
     return jsonify({
         'status': 'ok',
-        'version': '2.4.9',
+        'version': '2.5.0',
         'uptime': datetime.now().isoformat(),
         'memory_mb': round(memory_mb, 2),
         'active_sessions': active_sessions,
@@ -584,8 +723,81 @@ def admin_status():
         'qdrant_status': qdrant_status,
         'ollama_status': ollama_status,
         'qdrant_url': os.getenv("QDRANT_URL", "http://localhost:6338"),
-        'debug_mode': app.debug
+        'debug_mode': app.debug,
+        'model_loaded': model is not None,
+        'embedding_ready': True
     })
+
+
+@app.route('/admin/statistics', methods=['GET'])
+def admin_statistics():
+    """
+    Admin endpoint - returns comprehensive usage statistics.
+    For dashboard monitoring.
+    """
+    try:
+        import psutil
+        import glob
+        
+        # System stats
+        process = psutil.Process(os.getpid())
+        memory_mb = process.memory_info().rss / 1024 / 1024
+        cpu_percent = process.cpu_percent()
+        
+        # Session stats
+        active_sessions = len(session_memory)
+        total_messages = sum(len(msgs) for msgs in session_memory.values())
+        
+        # Per-session breakdown
+        session_details = []
+        for sid, msgs in session_memory.items():
+            session_details.append({
+                'session_id': sid[:12] + '...',
+                'message_count': len(msgs),
+                'last_activity': msgs[-1].get('timestamp', 'N/A') if msgs else 'N/A'
+            })
+        
+        # Feedback stats (count files in feedback folders)
+        feedback_dir = os.path.join(os.path.dirname(__file__), 'feedback')
+        feedback_stats = {}
+        for star in ['1_star', '2_star', '3_star', '4_star', '5_star']:
+            star_dir = os.path.join(feedback_dir, star)
+            if os.path.exists(star_dir):
+                feedback_stats[star] = len(os.listdir(star_dir))
+            else:
+                feedback_stats[star] = 0
+        
+        # Log stats
+        log_dir = os.path.join(os.path.dirname(__file__), 'logs')
+        log_count = len(glob.glob(os.path.join(log_dir, '*.log'))) if os.path.exists(log_dir) else 0
+        
+        return jsonify({
+            'status': 'ok',
+            'timestamp': datetime.now().isoformat(),
+            'system': {
+                'version': '2.5.0',
+                'memory_mb': round(memory_mb, 2),
+                'cpu_percent': round(cpu_percent, 2),
+                'pid': os.getpid()
+            },
+            'sessions': {
+                'active_count': active_sessions,
+                'total_messages': total_messages,
+                'max_per_session': MAX_MEMORY_MESSAGES,
+                'details': session_details[:10]  # Top 10 sessions
+            },
+            'feedback': feedback_stats,
+            'logs': {
+                'log_files': log_count
+            },
+            'services': {
+                'model_loaded': model is not None,
+                'classifier_loaded': classifier is not None,
+                'groq_available': GROQ_AVAILABLE
+            }
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/admin/clear-all-memory', methods=['POST'])
@@ -619,7 +831,7 @@ if __name__ == '__main__':
     port = 5000
     
     print("\n" + "="*60)
-    print("  PDBOT Widget API Server v2.4.9")
+    print("  PDBOT Widget API Server v2.5.0")
     print("  Developed by M. Hassan Arif Afridi")
     print("="*60)
     print(f"\n  🌐 Local:   http://localhost:{port}")

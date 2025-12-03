@@ -28,6 +28,8 @@ from enum import Enum
 
 class QueryClass(Enum):
     """Enumeration of all query classification types."""
+    GREETING = "greeting"  # hi, hello, salam - simple response, NO RAG
+    AMBIGUOUS = "ambiguous"  # vague query - needs clarification
     IN_SCOPE = "in_scope"
     NUMERIC_QUERY = "numeric_query"
     DEFINITION_QUERY = "definition_query"
@@ -56,6 +58,31 @@ class ClassificationResult:
 # =============================================================================
 # PATTERN DEFINITIONS (NO HARDCODED MANUAL CONTENT)
 # =============================================================================
+
+# Greeting patterns - these should NOT trigger RAG
+GREETING_PATTERNS = [
+    r"^(?:hi|hello|hey|hiya|heya|yo)\s*[!.?]*$",
+    r"^(?:hi|hello|hey)\s+(?:there|bot|pdbot|assistant)[!.?]*$",
+    r"^(?:good\s*)?(?:morning|afternoon|evening|night)[!.?]*$",
+    r"^(?:assalam[ou]?[- ]?alaikum|salam|aoa|slm)[!.?]*$",
+    r"^(?:walaikum[- ]?[ao]?s*salam)[!.?]*$",
+    r"^how\s+are\s+you\??$",
+    r"^(?:what'?s?\s+up|sup|wassup)\??$",
+    r"^(?:greetings|salutations)[!.?]*$",
+    r"^(?:thanks?|thank\s*you|thx|ty)[!.?]*$",
+    r"^(?:bye|goodbye|see\s*you|take\s*care)[!.?]*$",
+]
+
+# Ambiguous/vague query patterns - need clarification
+AMBIGUOUS_PATTERNS = [
+    r"^(?:help|help\s*me)[!.?]*$",
+    r"^(?:i\s+need|i\s+want)\s+(?:help|information|info)[!.?]*$",
+    r"^(?:tell\s+me|explain)[!.?]*$",
+    r"^(?:what|how|where|when|why|which)\??$",  # Single-word question
+    r"^(?:anything|something|stuff)\s+(?:about|on)\??$",
+    r"^(?:project|manual|document)[!.?]*$",  # Just single nouns
+    r"^(?:can\s+you|could\s+you|would\s+you)\??$",
+]
 
 # Numeric query indicators
 NUMERIC_PATTERNS = [
@@ -500,6 +527,10 @@ class MultiClassifier:
     def __init__(self):
         """Initialize classifier with compiled regex patterns."""
         # Compile all patterns
+        # v2.5.0: Greeting and ambiguous patterns (highest priority after abuse)
+        self.greeting_re = [re.compile(p, re.IGNORECASE) for p in GREETING_PATTERNS]
+        self.ambiguous_re = [re.compile(p, re.IGNORECASE) for p in AMBIGUOUS_PATTERNS]
+        
         self.numeric_re = [re.compile(p, re.IGNORECASE) for p in NUMERIC_PATTERNS]
         self.definition_re = [re.compile(p, re.IGNORECASE) for p in DEFINITION_PATTERNS]
         self.procedure_re = [re.compile(p, re.IGNORECASE) for p in PROCEDURE_PATTERNS]
@@ -576,6 +607,32 @@ class MultiClassifier:
                     confidence=0.85,
                     should_use_rag=False,
                     response_template="banter_response"
+                )
+        
+        # =====================================================================
+        # Priority 1.5: GREETING (simple greetings - NO RAG, simple response)
+        # =====================================================================
+        if self._match_any(q, self.greeting_re):
+            return ClassificationResult(
+                query_class=QueryClass.GREETING.value,
+                subcategory="greeting",
+                confidence=0.95,
+                should_use_rag=False,
+                response_template="greeting_response"
+            )
+        
+        # =====================================================================
+        # Priority 1.6: AMBIGUOUS (vague query - needs clarification)
+        # =====================================================================
+        if self._match_any(q, self.ambiguous_re) or len(q.split()) <= 2:
+            # Very short queries (1-2 words) that aren't greetings/abuse are ambiguous
+            if not self._has_development_governance(q):
+                return ClassificationResult(
+                    query_class=QueryClass.AMBIGUOUS.value,
+                    subcategory="vague",
+                    confidence=0.70,
+                    should_use_rag=False,
+                    response_template="clarification_needed"
                 )
         
         # =====================================================================
