@@ -750,6 +750,17 @@ class MultiClassifier:
                 retrieval_hints={"boost_numeric": True, "ensure_numbers": True}
             )
         
+        # v2.5.0-patch2: Check comparison BEFORE definition (keyword priority)
+        comparison_keywords = ['difference', 'differences', 'compare', 'comparing', 'versus', ' vs ', ' v ']
+        if any(kw in q for kw in comparison_keywords) and self._match_any(q, self.comparison_re):
+            return ClassificationResult(
+                query_class=QueryClass.COMPARISON_QUERY.value,
+                subcategory="comparison",
+                confidence=0.92,
+                should_use_rag=True,
+                retrieval_hints={"compare_entities": True, "multi_sentence": True}
+            )
+
         # Definition queries - need concise explanations
         if self._match_any(q, self.definition_re):
             return ClassificationResult(

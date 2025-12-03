@@ -51,6 +51,7 @@ from utils.text_utils import find_exact_locations
 # Import classifier and templates for off-scope/red-line detection
 from core.multi_classifier import MultiClassifier
 from core.templates import get_guardrail_response
+from core.comparisons import get_comparison_response
 
 # Groq API support (optional)
 try:
@@ -559,6 +560,26 @@ def chat():
                 'suggested_questions': get_suggested_questions(query_class) if query_class in ["greeting", "ambiguous"] else []
             })
         
+
+        # =====================================================
+        # STEP 2: CHECK FOR COMPARISON QUERY (use pre-built templates)
+        # =====================================================
+        if query_class == "comparison_query":
+            comparison_response = get_comparison_response(query)
+            if comparison_response:
+                add_to_session_history(session_id, "user", query)
+                add_to_session_history(session_id, "bot", comparison_response)
+                followups = get_suggested_questions(query_class, query)
+                return jsonify({
+                    'answer': comparison_response,
+                    'sources': [{'title': 'Manual for Development Projects 2024', 'page': 'Various', 'relevance': 100}],
+                    'passages': [],
+                    'mode': 'comparison_template',
+                    'classification': query_class,
+                    'suggested_questions': followups
+                })
+            # If no template match, fall through to RAG
+
         # Get conversation context from memory
         conversation_context = build_context_with_memory(session_id, query)
         
@@ -1045,3 +1066,4 @@ if __name__ == '__main__':
         print("     Install with: pip install waitress")
         print("="*60 + "\n")
         app.run(host='0.0.0.0', port=port, debug=False)
+
